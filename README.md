@@ -4,7 +4,7 @@
 
 ```json
   "dependencies": {
-    "@aurora-is-near/engine": "git://github.com/aurora-is-near/aurora-engine/clients/js",
+    "@aurora-is-near/engine": "git://github.com/aurora-is-near/aurora.js",
   }
 ```
 

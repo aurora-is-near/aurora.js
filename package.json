@@ -24,9 +24,9 @@
   "keywords": [],
   "author": "Arto Bendiken <arto@near.org> (https://ar.to)",
   "license": "CC0-1.0",
-  "homepage": "https://github.com/aurora-is-near/aurora-engine",
-  "bugs": "https://github.com/aurora-is-near/aurora-engine/issues",
-  "repository": "https://github.com/aurora-is-near/aurora-engine.git",
+  "homepage": "https://github.com/aurora-is-near/aurora.js",
+  "bugs": "https://github.com/aurora-is-near/aurora.js/issues",
+  "repository": "https://github.com/aurora-is-near/aurora.js.git",
   "dependencies": {
     "@ethersproject/abi": "^5.0.7",
     "@ethersproject/address": "^5.0.11",
