@@ -1,7 +1,7 @@
 {
   "name": "@aurora-is-near/engine",
   "version": "0.0.0",
-  "description": "Aurora Engine client for JavaScript.",
+  "description": "Aurora Engine client library for JavaScript.",
   "type": "module",
   "module": "index.js",
   "main": "index.js",
