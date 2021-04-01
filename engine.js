@@ -38,6 +38,18 @@ export class Engine {
             return new Engine(near, keyStore, signer, options.evm);
         });
     }
+    install(contractCode) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contractAccount = yield this.near.account(this.contractID);
+            const result = yield contractAccount.deployContract(contractCode);
+            return result.transaction.hash;
+        });
+    }
+    upgrade(contractCode) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.install(contractCode);
+        });
+    }
     initialize(options) {
         return __awaiter(this, void 0, void 0, function* () {
             const args = new NewCallArgs(parseHexString(defaultAbiCoder.encode(['uint256'], [options.chain || 0])), options.owner || '', options.bridgeProver || '', new BN(options.upgradeDelay || 0));

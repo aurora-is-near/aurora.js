@@ -19,6 +19,7 @@ export type Amount = bigint | number;
 export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
+export type TransactionID = string;
 export type U256 = bigint;
 
 export class Engine {
@@ -39,6 +40,16 @@ export class Engine {
     });
     const signer = await near.account(options.signer);
     return new Engine(near, keyStore, signer, options.evm);
+  }
+
+  async install(contractCode: Bytecode): Promise<TransactionID> {
+    const contractAccount = await this.near.account(this.contractID);
+    const result = await contractAccount.deployContract(contractCode);
+    return result.transaction.hash;
+  }
+
+  async upgrade(contractCode: Bytecode): Promise<TransactionID> {
+    return await this.install(contractCode);
   }
 
   async initialize(options: any): Promise<any> {

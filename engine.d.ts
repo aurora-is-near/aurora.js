@@ -9,6 +9,7 @@ export declare type Amount = bigint | number;
 export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
+export declare type TransactionID = string;
 export declare type U256 = bigint;
 export declare class Engine {
     near: NEAR.Near;
@@ -17,6 +18,8 @@ export declare class Engine {
     contractID: AccountID;
     constructor(near: NEAR.Near, keyStore: KeyStore, signer: NEAR.Account, contractID: AccountID);
     static connect(options: any, env: any): Promise<Engine>;
+    install(contractCode: Bytecode): Promise<TransactionID>;
+    upgrade(contractCode: Bytecode): Promise<TransactionID>;
     initialize(options: any): Promise<any>;
     getVersion(): Promise<string>;
     getOwner(): Promise<AccountID>;
