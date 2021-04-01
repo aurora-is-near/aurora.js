@@ -17,13 +17,17 @@ export interface TransactionOutcome {
     id: TransactionID;
     output: Uint8Array;
 }
+export interface ConnectEnv {
+    NEAR_ENV?: string;
+    NEAR_URL?: string;
+}
 export declare class Engine {
     near: NEAR.Near;
     keyStore: KeyStore;
     signer: NEAR.Account;
     contractID: AccountID;
     constructor(near: NEAR.Near, keyStore: KeyStore, signer: NEAR.Account, contractID: AccountID);
-    static connect(options: any, env: any): Promise<Engine>;
+    static connect(options: any, env: ConnectEnv): Promise<Engine>;
     install(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     initialize(options: any): Promise<Result<TransactionID, Error>>;

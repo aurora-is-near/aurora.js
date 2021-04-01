@@ -29,6 +29,11 @@ export interface TransactionOutcome {
   output: Uint8Array;
 }
 
+export interface ConnectEnv {
+  NEAR_ENV?: string;
+  NEAR_URL?: string;
+}
+
 export class Engine {
   constructor(
     public near: NEAR.Near,
@@ -37,13 +42,13 @@ export class Engine {
     public contractID: AccountID) {
   }
 
-  static async connect(options: any, env: any): Promise<Engine> {
+  static async connect(options: any, env: ConnectEnv): Promise<Engine> {
     const networkID = env && env.NEAR_ENV || 'local';
     const keyStore = new KeyStore(env);
     const near = new NEAR.Near({
       deps: { keyStore },
       networkId: networkID,
-      nodeUrl: 'http://localhost:3030',
+      nodeUrl: env && env.NEAR_URL || 'http://localhost:3030',
     });
     const signer = await near.account(options.signer);
     return new Engine(near, keyStore, signer, options.evm);

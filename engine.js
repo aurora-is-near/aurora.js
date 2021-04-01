@@ -23,7 +23,7 @@ export class Engine {
         const near = new NEAR.Near({
             deps: { keyStore },
             networkId: networkID,
-            nodeUrl: 'http://localhost:3030',
+            nodeUrl: env && env.NEAR_URL || 'http://localhost:3030',
         });
         const signer = await near.account(options.signer);
         return new Engine(near, keyStore, signer, options.evm);
