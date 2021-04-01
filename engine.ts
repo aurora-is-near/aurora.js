@@ -1,6 +1,8 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
+import { KeyStore } from './key_store.js';
+
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { getAddress as parseAddress } from '@ethersproject/address';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
@@ -22,18 +24,21 @@ export type U256 = bigint;
 export class Engine {
   constructor(
     public near: NEAR.Near,
+    public keyStore: KeyStore,
     public signer: NEAR.Account,
-    public contract: AccountID) {}
+    public contractID: AccountID) {
+  }
 
   static async connect(options: any, env: any): Promise<Engine> {
-    const near = await NEAR.connect({
-      deps: {keyStore: new NEAR.keyStores.InMemoryKeyStore()},
-      networkId: env.NEAR_ENV || 'local',
+    const networkID = env && env.NEAR_ENV || 'local';
+    const keyStore = new KeyStore(env);
+    const near = new NEAR.Near({
+      deps: { keyStore },
+      networkId: networkID,
       nodeUrl: 'http://localhost:3030',
-      keyPath: `${env.HOME}/.near/validator_key.json`,
     });
     const signer = await near.account(options.signer);
-    return new Engine(near, signer, options.evm);
+    return new Engine(near, keyStore, signer, options.evm);
   }
 
   async initialize(options: any): Promise<any> {
@@ -63,6 +68,10 @@ export class Engine {
     return toBigIntBE(result);
   }
 
+  // TODO: getUpgradeIndex()
+  // TODO: stageUpgrade()
+  // TODO: deployUpgrade()
+
   async deployCode(bytecode: Bytecodeish): Promise<Address> {
     const args = parseHexString(bytecode);
     const result = await this.callMutativeFunction('deploy_code', args);
@@ -76,6 +85,9 @@ export class Engine {
     );
     return (await this.callMutativeFunction('call', args.encode()));
   }
+
+  // TODO: rawCall()
+  // TODO: metaCall()
 
   async view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Uint8Array> {
     const args = new ViewCallArgs(
@@ -113,10 +125,13 @@ export class Engine {
     return toBigIntBE(result);
   }
 
+  // TODO: beginChain()
+  // TODO: beginBlock()
+
   protected async callFunction(methodName: string, args?: Uint8Array): Promise<Buffer> {
     const result = await this.signer.connection.provider.query({
       request_type: 'call_function',
-      account_id: this.contract,
+      account_id: this.contractID,
       method_name: methodName,
       args_base64: this.prepareInput(args).toString('base64'),
       finality: 'optimistic',
@@ -127,7 +142,7 @@ export class Engine {
   }
 
   protected async callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Buffer> {
-    const result = await this.signer.functionCall(this.contract, methodName, this.prepareInput(args));
+    const result = await this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
     if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
       return Buffer.from(result.status.SuccessValue, 'base64');
     }

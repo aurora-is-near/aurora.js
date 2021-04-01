@@ -17,6 +17,8 @@
     "index.d.ts",
     "engine.js",
     "engine.d.ts",
+    "key_store.js",
+    "key_store.d.ts",
     "schema.js",
     "schema.d.ts"
   ],

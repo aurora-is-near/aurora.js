@@ -2,7 +2,7 @@ TSC = npx tsc
 
 # The default target:
 
-all: index.js engine.js schema.js
+all: index.js engine.js key_store.js schema.js
 
 .PHONY: all
 

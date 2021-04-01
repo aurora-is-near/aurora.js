@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { KeyStore } from './key_store.js';
 import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
@@ -11,9 +12,10 @@ export declare type ChainID = bigint;
 export declare type U256 = bigint;
 export declare class Engine {
     near: NEAR.Near;
+    keyStore: KeyStore;
     signer: NEAR.Account;
-    contract: AccountID;
-    constructor(near: NEAR.Near, signer: NEAR.Account, contract: AccountID);
+    contractID: AccountID;
+    constructor(near: NEAR.Near, keyStore: KeyStore, signer: NEAR.Account, contractID: AccountID);
     static connect(options: any, env: any): Promise<Engine>;
     initialize(options: any): Promise<any>;
     getVersion(): Promise<string>;

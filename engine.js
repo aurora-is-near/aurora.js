@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
+import { KeyStore } from './key_store.js';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { getAddress as parseAddress } from '@ethersproject/address';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
@@ -18,21 +19,23 @@ import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 export class Engine {
-    constructor(near, signer, contract) {
+    constructor(near, keyStore, signer, contractID) {
         this.near = near;
+        this.keyStore = keyStore;
         this.signer = signer;
-        this.contract = contract;
+        this.contractID = contractID;
     }
     static connect(options, env) {
         return __awaiter(this, void 0, void 0, function* () {
-            const near = yield NEAR.connect({
-                deps: { keyStore: new NEAR.keyStores.InMemoryKeyStore() },
-                networkId: env.NEAR_ENV || 'local',
+            const networkID = env && env.NEAR_ENV || 'local';
+            const keyStore = new KeyStore(env);
+            const near = new NEAR.Near({
+                deps: { keyStore },
+                networkId: networkID,
                 nodeUrl: 'http://localhost:3030',
-                keyPath: `${env.HOME}/.near/validator_key.json`,
             });
             const signer = yield near.account(options.signer);
-            return new Engine(near, signer, options.evm);
+            return new Engine(near, keyStore, signer, options.evm);
         });
     }
     initialize(options) {
@@ -62,6 +65,9 @@ export class Engine {
             return toBigIntBE(result);
         });
     }
+    // TODO: getUpgradeIndex()
+    // TODO: stageUpgrade()
+    // TODO: deployUpgrade()
     deployCode(bytecode) {
         return __awaiter(this, void 0, void 0, function* () {
             const args = parseHexString(bytecode);
@@ -75,6 +81,8 @@ export class Engine {
             return (yield this.callMutativeFunction('call', args.encode()));
         });
     }
+    // TODO: rawCall()
+    // TODO: metaCall()
     view(sender, address, amount, input) {
         return __awaiter(this, void 0, void 0, function* () {
             const args = new ViewCallArgs(parseHexString(parseAddress(sender)), parseHexString(parseAddress(address)), toBufferBE(BigInt(amount), 32), this.prepareInput(input));
@@ -108,11 +116,13 @@ export class Engine {
             return toBigIntBE(result);
         });
     }
+    // TODO: beginChain()
+    // TODO: beginBlock()
     callFunction(methodName, args) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield this.signer.connection.provider.query({
                 request_type: 'call_function',
-                account_id: this.contract,
+                account_id: this.contractID,
                 method_name: methodName,
                 args_base64: this.prepareInput(args).toString('base64'),
                 finality: 'optimistic',
@@ -124,7 +134,7 @@ export class Engine {
     }
     callMutativeFunction(methodName, args) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.signer.functionCall(this.contract, methodName, this.prepareInput(args));
+            const result = yield this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
             if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
                 return Buffer.from(result.status.SuccessValue, 'base64');
             }
