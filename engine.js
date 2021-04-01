@@ -1,13 +1,4 @@
 /* This is free and unencumbered software released into the public domain. */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
 import { KeyStore } from './key_store.js';
 import { defaultAbiCoder } from '@ethersproject/abi';
@@ -25,133 +16,99 @@ export class Engine {
         this.signer = signer;
         this.contractID = contractID;
     }
-    static connect(options, env) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const networkID = env && env.NEAR_ENV || 'local';
-            const keyStore = new KeyStore(env);
-            const near = new NEAR.Near({
-                deps: { keyStore },
-                networkId: networkID,
-                nodeUrl: 'http://localhost:3030',
-            });
-            const signer = yield near.account(options.signer);
-            return new Engine(near, keyStore, signer, options.evm);
+    static async connect(options, env) {
+        const networkID = env && env.NEAR_ENV || 'local';
+        const keyStore = new KeyStore(env);
+        const near = new NEAR.Near({
+            deps: { keyStore },
+            networkId: networkID,
+            nodeUrl: 'http://localhost:3030',
         });
+        const signer = await near.account(options.signer);
+        return new Engine(near, keyStore, signer, options.evm);
     }
-    install(contractCode) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contractAccount = yield this.near.account(this.contractID);
-            const result = yield contractAccount.deployContract(contractCode);
-            return result.transaction.hash;
-        });
+    async install(contractCode) {
+        const contractAccount = await this.near.account(this.contractID);
+        const result = await contractAccount.deployContract(contractCode);
+        return result.transaction.hash;
     }
-    upgrade(contractCode) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.install(contractCode);
-        });
+    async upgrade(contractCode) {
+        return await this.install(contractCode);
     }
-    initialize(options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = new NewCallArgs(parseHexString(defaultAbiCoder.encode(['uint256'], [options.chain || 0])), options.owner || '', options.bridgeProver || '', new BN(options.upgradeDelay || 0));
-            return yield this.callMutativeFunction('new', args.encode());
-        });
+    async initialize(options) {
+        const args = new NewCallArgs(parseHexString(defaultAbiCoder.encode(['uint256'], [options.chain || 0])), options.owner || '', options.bridgeProver || '', new BN(options.upgradeDelay || 0));
+        return await this.callMutativeFunction('new', args.encode());
     }
-    getVersion() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.callFunction('get_version')).toString();
-        });
+    async getVersion() {
+        return (await this.callFunction('get_version')).toString();
     }
-    getOwner() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.callFunction('get_owner')).toString();
-        });
+    async getOwner() {
+        return (await this.callFunction('get_owner')).toString();
     }
-    getBridgeProvider() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.callFunction('get_bridge_provider')).toString();
-        });
+    async getBridgeProvider() {
+        return (await this.callFunction('get_bridge_provider')).toString();
     }
-    getChainID() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.callFunction('get_chain_id');
-            return toBigIntBE(result);
-        });
+    async getChainID() {
+        const result = await this.callFunction('get_chain_id');
+        return toBigIntBE(result);
     }
     // TODO: getUpgradeIndex()
     // TODO: stageUpgrade()
     // TODO: deployUpgrade()
-    deployCode(bytecode) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = parseHexString(bytecode);
-            const result = yield this.callMutativeFunction('deploy_code', args);
-            return parseAddress(result.toString('hex'));
-        });
+    async deployCode(bytecode) {
+        const args = parseHexString(bytecode);
+        const result = await this.callMutativeFunction('deploy_code', args);
+        return parseAddress(result.toString('hex'));
     }
-    call(contract, input) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = new FunctionCallArgs(parseHexString(parseAddress(contract)), this.prepareInput(input));
-            return (yield this.callMutativeFunction('call', args.encode()));
-        });
+    async call(contract, input) {
+        const args = new FunctionCallArgs(parseHexString(parseAddress(contract)), this.prepareInput(input));
+        return (await this.callMutativeFunction('call', args.encode()));
     }
     // TODO: rawCall()
     // TODO: metaCall()
-    view(sender, address, amount, input) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = new ViewCallArgs(parseHexString(parseAddress(sender)), parseHexString(parseAddress(address)), toBufferBE(BigInt(amount), 32), this.prepareInput(input));
-            return (yield this.callFunction('view', args.encode()));
-        });
+    async view(sender, address, amount, input) {
+        const args = new ViewCallArgs(parseHexString(parseAddress(sender)), parseHexString(parseAddress(address)), toBufferBE(BigInt(amount), 32), this.prepareInput(input));
+        return (await this.callFunction('view', args.encode()));
     }
-    getCode(address) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = parseHexString(parseAddress(address));
-            return yield this.callFunction('get_code', args);
-        });
+    async getCode(address) {
+        const args = parseHexString(parseAddress(address));
+        return await this.callFunction('get_code', args);
     }
-    getBalance(address) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = parseHexString(parseAddress(address));
-            const result = yield this.callFunction('get_balance', args);
-            return toBigIntBE(result);
-        });
+    async getBalance(address) {
+        const args = parseHexString(parseAddress(address));
+        const result = await this.callFunction('get_balance', args);
+        return toBigIntBE(result);
     }
-    getNonce(address) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = parseHexString(parseAddress(address));
-            const result = yield this.callFunction('get_nonce', args);
-            return toBigIntBE(result);
-        });
+    async getNonce(address) {
+        const args = parseHexString(parseAddress(address));
+        const result = await this.callFunction('get_nonce', args);
+        return toBigIntBE(result);
     }
-    getStorageAt(address, key) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const args = new GetStorageAtArgs(parseHexString(parseAddress(address)), parseHexString(defaultAbiCoder.encode(['uint256'], [key])));
-            const result = yield this.callFunction('get_storage_at', args.encode());
-            return toBigIntBE(result);
-        });
+    async getStorageAt(address, key) {
+        const args = new GetStorageAtArgs(parseHexString(parseAddress(address)), parseHexString(defaultAbiCoder.encode(['uint256'], [key])));
+        const result = await this.callFunction('get_storage_at', args.encode());
+        return toBigIntBE(result);
     }
     // TODO: beginChain()
     // TODO: beginBlock()
-    callFunction(methodName, args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.signer.connection.provider.query({
-                request_type: 'call_function',
-                account_id: this.contractID,
-                method_name: methodName,
-                args_base64: this.prepareInput(args).toString('base64'),
-                finality: 'optimistic',
-            });
-            if (result.logs && result.logs.length > 0)
-                console.debug(result.logs); // TODO
-            return Buffer.from(result.result);
+    async callFunction(methodName, args) {
+        const result = await this.signer.connection.provider.query({
+            request_type: 'call_function',
+            account_id: this.contractID,
+            method_name: methodName,
+            args_base64: this.prepareInput(args).toString('base64'),
+            finality: 'optimistic',
         });
+        if (result.logs && result.logs.length > 0)
+            console.debug(result.logs); // TODO
+        return Buffer.from(result.result);
     }
-    callMutativeFunction(methodName, args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
-            if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
-                return Buffer.from(result.status.SuccessValue, 'base64');
-            }
-            throw new Error(result.toString()); // TODO
-        });
+    async callMutativeFunction(methodName, args) {
+        const result = await this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
+        if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
+            return Buffer.from(result.status.SuccessValue, 'base64');
+        }
+        throw new Error(result.toString()); // TODO
     }
     prepareInput(args) {
         if (typeof args === 'undefined')
