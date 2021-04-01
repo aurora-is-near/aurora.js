@@ -4,6 +4,7 @@ import { KeyStore } from './key_store.js';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { getAddress as parseAddress } from '@ethersproject/address';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
+import { Ok, Err } from '@hqoss/monads';
 import { toBigIntBE, toBufferBE } from 'bigint-buffer';
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
@@ -30,27 +31,27 @@ export class Engine {
     async install(contractCode) {
         const contractAccount = await this.near.account(this.contractID);
         const result = await contractAccount.deployContract(contractCode);
-        return result.transaction.hash;
+        return Ok(result.transaction.hash);
     }
     async upgrade(contractCode) {
         return await this.install(contractCode);
     }
     async initialize(options) {
         const args = new NewCallArgs(parseHexString(defaultAbiCoder.encode(['uint256'], [options.chain || 0])), options.owner || '', options.bridgeProver || '', new BN(options.upgradeDelay || 0));
-        return await this.callMutativeFunction('new', args.encode());
+        return (await this.callMutativeFunction('new', args.encode())).map(({ id }) => id);
     }
     async getVersion() {
-        return (await this.callFunction('get_version')).toString();
+        return (await this.callFunction('get_version')).map(output => output.toString());
     }
     async getOwner() {
-        return (await this.callFunction('get_owner')).toString();
+        return (await this.callFunction('get_owner')).map(output => output.toString());
     }
     async getBridgeProvider() {
-        return (await this.callFunction('get_bridge_provider')).toString();
+        return (await this.callFunction('get_bridge_provider')).map(output => output.toString());
     }
     async getChainID() {
         const result = await this.callFunction('get_chain_id');
-        return toBigIntBE(result);
+        return result.map(toBigIntBE);
     }
     // TODO: getUpgradeIndex()
     // TODO: stageUpgrade()
@@ -58,17 +59,17 @@ export class Engine {
     async deployCode(bytecode) {
         const args = parseHexString(bytecode);
         const result = await this.callMutativeFunction('deploy_code', args);
-        return parseAddress(result.toString('hex'));
+        return result.map(({ output }) => parseAddress(Buffer.from(output).toString('hex')));
     }
     async call(contract, input) {
         const args = new FunctionCallArgs(parseHexString(parseAddress(contract)), this.prepareInput(input));
-        return (await this.callMutativeFunction('call', args.encode()));
+        return (await this.callMutativeFunction('call', args.encode())).map(({ output }) => output);
     }
     // TODO: rawCall()
     // TODO: metaCall()
     async view(sender, address, amount, input) {
         const args = new ViewCallArgs(parseHexString(parseAddress(sender)), parseHexString(parseAddress(address)), toBufferBE(BigInt(amount), 32), this.prepareInput(input));
-        return (await this.callFunction('view', args.encode()));
+        return await this.callFunction('view', args.encode());
     }
     async getCode(address) {
         const args = parseHexString(parseAddress(address));
@@ -77,17 +78,17 @@ export class Engine {
     async getBalance(address) {
         const args = parseHexString(parseAddress(address));
         const result = await this.callFunction('get_balance', args);
-        return toBigIntBE(result);
+        return result.map(toBigIntBE);
     }
     async getNonce(address) {
         const args = parseHexString(parseAddress(address));
         const result = await this.callFunction('get_nonce', args);
-        return toBigIntBE(result);
+        return result.map(toBigIntBE);
     }
     async getStorageAt(address, key) {
         const args = new GetStorageAtArgs(parseHexString(parseAddress(address)), parseHexString(defaultAbiCoder.encode(['uint256'], [key])));
         const result = await this.callFunction('get_storage_at', args.encode());
-        return toBigIntBE(result);
+        return result.map(toBigIntBE);
     }
     // TODO: beginChain()
     // TODO: beginBlock()
@@ -101,14 +102,14 @@ export class Engine {
         });
         if (result.logs && result.logs.length > 0)
             console.debug(result.logs); // TODO
-        return Buffer.from(result.result);
+        return Ok(Buffer.from(result.result));
     }
     async callMutativeFunction(methodName, args) {
         const result = await this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
         if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
-            return Buffer.from(result.status.SuccessValue, 'base64');
+            return Ok({ id: result.transaction.hash, output: Buffer.from(result.status.SuccessValue, 'base64') });
         }
-        throw new Error(result.toString()); // TODO
+        return Err(result.toString()); // TODO
     }
     prepareInput(args) {
         if (typeof args === 'undefined')

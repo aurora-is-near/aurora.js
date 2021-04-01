@@ -6,6 +6,7 @@ import { KeyStore } from './key_store.js';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { getAddress as parseAddress } from '@ethersproject/address';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
+import { Result, Ok, Err } from '@hqoss/monads';
 import { toBigIntBE, toBufferBE } from 'bigint-buffer';
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
@@ -19,8 +20,14 @@ export type Amount = bigint | number;
 export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
+export type Error = string;
 export type TransactionID = string;
 export type U256 = bigint;
+
+export interface TransactionOutcome {
+  id: TransactionID;
+  output: Uint8Array;
+}
 
 export class Engine {
   constructor(
@@ -42,104 +49,104 @@ export class Engine {
     return new Engine(near, keyStore, signer, options.evm);
   }
 
-  async install(contractCode: Bytecode): Promise<TransactionID> {
+  async install(contractCode: Bytecode): Promise<Result<TransactionID, Error>> {
     const contractAccount = await this.near.account(this.contractID);
     const result = await contractAccount.deployContract(contractCode);
-    return result.transaction.hash;
+    return Ok(result.transaction.hash);
   }
 
-  async upgrade(contractCode: Bytecode): Promise<TransactionID> {
+  async upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>> {
     return await this.install(contractCode);
   }
 
-  async initialize(options: any): Promise<any> {
+  async initialize(options: any): Promise<Result<TransactionID, Error>> {
     const args = new NewCallArgs(
       parseHexString(defaultAbiCoder.encode(['uint256'], [options.chain || 0])),
       options.owner || '',
       options.bridgeProver || '',
       new BN(options.upgradeDelay || 0)
     );
-    return await this.callMutativeFunction('new', args.encode());
+    return (await this.callMutativeFunction('new', args.encode())).map(({ id }) => id);
   }
 
-  async getVersion(): Promise<string> {
-    return (await this.callFunction('get_version')).toString();
+  async getVersion(): Promise<Result<string, Error>> {
+    return (await this.callFunction('get_version')).map(output => output.toString());
   }
 
-  async getOwner(): Promise<AccountID> {
-    return (await this.callFunction('get_owner')).toString();
+  async getOwner(): Promise<Result<AccountID, Error>> {
+    return (await this.callFunction('get_owner')).map(output => output.toString());
   }
 
-  async getBridgeProvider(): Promise<AccountID> {
-    return (await this.callFunction('get_bridge_provider')).toString();
+  async getBridgeProvider(): Promise<Result<AccountID, Error>> {
+    return (await this.callFunction('get_bridge_provider')).map(output => output.toString());
   }
 
-  async getChainID(): Promise<ChainID> {
+  async getChainID(): Promise<Result<ChainID, Error>> {
     const result = await this.callFunction('get_chain_id');
-    return toBigIntBE(result);
+    return result.map(toBigIntBE);
   }
 
   // TODO: getUpgradeIndex()
   // TODO: stageUpgrade()
   // TODO: deployUpgrade()
 
-  async deployCode(bytecode: Bytecodeish): Promise<Address> {
+  async deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>> {
     const args = parseHexString(bytecode);
     const result = await this.callMutativeFunction('deploy_code', args);
-    return parseAddress(result.toString('hex'));
+    return result.map(({ output }) => parseAddress(Buffer.from(output).toString('hex')));
   }
 
-  async call(contract: Address, input: Uint8Array | string): Promise<Uint8Array> {
+  async call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
     const args = new FunctionCallArgs(
       parseHexString(parseAddress(contract)),
       this.prepareInput(input),
     );
-    return (await this.callMutativeFunction('call', args.encode()));
+    return (await this.callMutativeFunction('call', args.encode())).map(({ output }) => output);
   }
 
   // TODO: rawCall()
   // TODO: metaCall()
 
-  async view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Uint8Array> {
+  async view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
     const args = new ViewCallArgs(
       parseHexString(parseAddress(sender)),
       parseHexString(parseAddress(address)),
       toBufferBE(BigInt(amount), 32),
       this.prepareInput(input),
     );
-    return (await this.callFunction('view', args.encode()));
+    return await this.callFunction('view', args.encode());
   }
 
-  async getCode(address: Address): Promise<Bytecode> {
+  async getCode(address: Address): Promise<Result<Bytecode, Error>> {
     const args = parseHexString(parseAddress(address));
     return await this.callFunction('get_code', args);
   }
 
-  async getBalance(address: Address): Promise<U256> {
+  async getBalance(address: Address): Promise<Result<U256, Error>> {
     const args = parseHexString(parseAddress(address));
     const result = await this.callFunction('get_balance', args);
-    return toBigIntBE(result);
+    return result.map(toBigIntBE);
   }
 
-  async getNonce(address: Address): Promise<U256> {
+  async getNonce(address: Address): Promise<Result<U256, Error>> {
     const args = parseHexString(parseAddress(address));
     const result = await this.callFunction('get_nonce', args);
-    return toBigIntBE(result);
+    return result.map(toBigIntBE);
   }
 
-  async getStorageAt(address: Address, key: U256 | number | string): Promise<U256> {
+  async getStorageAt(address: Address, key: U256 | number | string): Promise<Result<U256, Error>> {
     const args = new GetStorageAtArgs(
       parseHexString(parseAddress(address)),
       parseHexString(defaultAbiCoder.encode(['uint256'], [key])),
     );
     const result = await this.callFunction('get_storage_at', args.encode());
-    return toBigIntBE(result);
+    return result.map(toBigIntBE);
   }
 
   // TODO: beginChain()
   // TODO: beginBlock()
 
-  protected async callFunction(methodName: string, args?: Uint8Array): Promise<Buffer> {
+  protected async callFunction(methodName: string, args?: Uint8Array): Promise<Result<Buffer, Error>> {
     const result = await this.signer.connection.provider.query({
       request_type: 'call_function',
       account_id: this.contractID,
@@ -149,15 +156,15 @@ export class Engine {
     });
     if (result.logs && result.logs.length > 0)
       console.debug(result.logs); // TODO
-    return Buffer.from(result.result);
+    return Ok(Buffer.from(result.result));
   }
 
-  protected async callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Buffer> {
+  protected async callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>> {
     const result = await this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
     if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
-      return Buffer.from(result.status.SuccessValue, 'base64');
+      return Ok({ id: result.transaction.hash, output: Buffer.from(result.status.SuccessValue, 'base64') });
     }
-    throw new Error(result.toString()); // TODO
+    return Err(result.toString()); // TODO
   }
 
   private prepareInput(args?: Uint8Array | string): Buffer {

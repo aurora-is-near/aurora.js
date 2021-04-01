@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { KeyStore } from './key_store.js';
+import { Result } from '@hqoss/monads';
 import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
@@ -9,8 +10,13 @@ export declare type Amount = bigint | number;
 export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
+export declare type Error = string;
 export declare type TransactionID = string;
 export declare type U256 = bigint;
+export interface TransactionOutcome {
+    id: TransactionID;
+    output: Uint8Array;
+}
 export declare class Engine {
     near: NEAR.Near;
     keyStore: KeyStore;
@@ -18,21 +24,21 @@ export declare class Engine {
     contractID: AccountID;
     constructor(near: NEAR.Near, keyStore: KeyStore, signer: NEAR.Account, contractID: AccountID);
     static connect(options: any, env: any): Promise<Engine>;
-    install(contractCode: Bytecode): Promise<TransactionID>;
-    upgrade(contractCode: Bytecode): Promise<TransactionID>;
-    initialize(options: any): Promise<any>;
-    getVersion(): Promise<string>;
-    getOwner(): Promise<AccountID>;
-    getBridgeProvider(): Promise<AccountID>;
-    getChainID(): Promise<ChainID>;
-    deployCode(bytecode: Bytecodeish): Promise<Address>;
-    call(contract: Address, input: Uint8Array | string): Promise<Uint8Array>;
-    view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Uint8Array>;
-    getCode(address: Address): Promise<Bytecode>;
-    getBalance(address: Address): Promise<U256>;
-    getNonce(address: Address): Promise<U256>;
-    getStorageAt(address: Address, key: U256 | number | string): Promise<U256>;
-    protected callFunction(methodName: string, args?: Uint8Array): Promise<Buffer>;
-    protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Buffer>;
+    install(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
+    upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
+    initialize(options: any): Promise<Result<TransactionID, Error>>;
+    getVersion(): Promise<Result<string, Error>>;
+    getOwner(): Promise<Result<AccountID, Error>>;
+    getBridgeProvider(): Promise<Result<AccountID, Error>>;
+    getChainID(): Promise<Result<ChainID, Error>>;
+    deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
+    call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
+    view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
+    getCode(address: Address): Promise<Result<Bytecode, Error>>;
+    getBalance(address: Address): Promise<Result<U256, Error>>;
+    getNonce(address: Address): Promise<Result<U256, Error>>;
+    getStorageAt(address: Address, key: U256 | number | string): Promise<Result<U256, Error>>;
+    protected callFunction(methodName: string, args?: Uint8Array): Promise<Result<Buffer, Error>>;
+    protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;
 }
