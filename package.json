@@ -35,6 +35,7 @@
     "@ethersproject/abi": "^5.0.7",
     "@ethersproject/address": "^5.0.11",
     "@ethersproject/bytes": "^5.0.11",
+    "@hqoss/monads": "^0.4.0",
     "bigint-buffer": "^1.1.5",
     "bn.js": "^5.0.0",
     "near-api-js": "^0.39.0"
