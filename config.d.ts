@@ -8,4 +8,4 @@ export interface NetworkConfig {
     walletLink: string;
     explorerLink: string;
 }
-export declare const ENVS: Map<string, NetworkConfig>;
+export declare const NETWORKS: Map<string, NetworkConfig>;

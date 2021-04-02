@@ -19,8 +19,17 @@ export interface TransactionOutcome {
     id: TransactionID;
     output: Uint8Array;
 }
+export interface ConnectOptions {
+    network?: string;
+    endpoint?: string;
+    contract?: string;
+    signer?: string;
+}
 export interface ConnectEnv {
+    AURORA_ENGINE?: string;
+    HOME?: string;
     NEAR_ENV?: string;
+    NEAR_MASTER_ACCOUNT?: string;
     NEAR_URL?: string;
 }
 export declare type AddressStorage = Map<U256, U256>;
@@ -50,7 +59,7 @@ export declare class Engine {
     signer: NEAR.Account;
     contractID: AccountID;
     constructor(near: NEAR.Near, keyStore: KeyStore, signer: NEAR.Account, contractID: AccountID);
-    static connect(options: any, env: ConnectEnv): Promise<Engine>;
+    static connect(options: ConnectOptions, env?: ConnectEnv): Promise<Engine>;
     install(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     initialize(options: any): Promise<Result<TransactionID, Error>>;

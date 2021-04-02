@@ -1,5 +1,5 @@
 /* This is free and unencumbered software released into the public domain. */
-export const ENVS = new Map(Object.entries({
+export const NETWORKS = new Map(Object.entries({
     'local': {
         id: 'local',
         label: 'LocalNet',

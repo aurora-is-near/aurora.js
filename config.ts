@@ -11,7 +11,7 @@ export interface NetworkConfig {
   explorerLink: string;
 }
 
-export const ENVS: Map<string, NetworkConfig> = new Map(Object.entries({
+export const NETWORKS: Map<string, NetworkConfig> = new Map(Object.entries({
   'local': {
     id: 'local',
     label: 'LocalNet',

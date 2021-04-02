@@ -1,5 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
+import { NETWORKS } from './config.js';
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
 import { KeyStore } from './key_store.js';
 
@@ -31,9 +32,19 @@ export interface TransactionOutcome {
   output: Uint8Array;
 }
 
+export interface ConnectOptions {
+  network?: string;              // network ID
+  endpoint?: string;             // endpoint URL
+  contract?: string;             // engine ID
+  signer?: string;               // signer ID
+}
+
 export interface ConnectEnv {
-  NEAR_ENV?: string;
-  NEAR_URL?: string;
+  AURORA_ENGINE?: string;        // engine ID
+  HOME?: string;                 // home directory
+  NEAR_ENV?: string;             // network ID
+  NEAR_MASTER_ACCOUNT?: string;  // signer ID
+  NEAR_URL?: string;             // endpoint URL
 }
 
 export type AddressStorage = Map<U256, U256>;
@@ -62,6 +73,8 @@ export class EngineState {
     public storage: EngineStorage = new Map()) {}
 }
 
+const DEFAULT_NETWORK_ID = 'local';
+
 export class Engine {
   constructor(
     public near: NEAR.Near,
@@ -69,16 +82,20 @@ export class Engine {
     public signer: NEAR.Account,
     public contractID: AccountID) {}
 
-  static async connect(options: any, env: ConnectEnv): Promise<Engine> {
-    const networkID = env && env.NEAR_ENV || 'local';
+  static async connect(options: ConnectOptions, env?: ConnectEnv): Promise<Engine> {
+    const networkID = options.network || env && env.NEAR_ENV || DEFAULT_NETWORK_ID;
+    const network = NETWORKS.get(networkID)!; // TODO: error handling
+    const contractID = options.contract || env && env.AURORA_ENGINE || network.contractID;
+    const signerID = options.signer || env && env.NEAR_MASTER_ACCOUNT; // TODO: error handling
+
     const keyStore = new KeyStore(env);
     const near = new NEAR.Near({
       deps: { keyStore },
       networkId: networkID,
-      nodeUrl: env && env.NEAR_URL || 'http://localhost:3030',
+      nodeUrl: options.endpoint || env && env.NEAR_URL || network.nearEndpoint,
     });
-    const signer = await near.account(options.signer);
-    return new Engine(near, keyStore, signer, options.evm);
+    const signer = await near.account(signerID!);
+    return new Engine(near, keyStore, signer, contractID);
   }
 
   async install(contractCode: Bytecode): Promise<Result<TransactionID, Error>> {

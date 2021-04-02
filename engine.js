@@ -1,4 +1,5 @@
 /* This is free and unencumbered software released into the public domain. */
+import { NETWORKS } from './config.js';
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
 import { KeyStore } from './key_store.js';
 import { defaultAbiCoder } from '@ethersproject/abi';
@@ -24,6 +25,7 @@ export class EngineState {
         this.storage = storage;
     }
 }
+const DEFAULT_NETWORK_ID = 'local';
 export class Engine {
     constructor(near, keyStore, signer, contractID) {
         this.near = near;
@@ -32,15 +34,18 @@ export class Engine {
         this.contractID = contractID;
     }
     static async connect(options, env) {
-        const networkID = env && env.NEAR_ENV || 'local';
+        const networkID = options.network || env && env.NEAR_ENV || DEFAULT_NETWORK_ID;
+        const network = NETWORKS.get(networkID); // TODO: error handling
+        const contractID = options.contract || env && env.AURORA_ENGINE || network.contractID;
+        const signerID = options.signer || env && env.NEAR_MASTER_ACCOUNT; // TODO: error handling
         const keyStore = new KeyStore(env);
         const near = new NEAR.Near({
             deps: { keyStore },
             networkId: networkID,
-            nodeUrl: env && env.NEAR_URL || 'http://localhost:3030',
+            nodeUrl: options.endpoint || env && env.NEAR_URL || network.nearEndpoint,
         });
-        const signer = await near.account(options.signer);
-        return new Engine(near, keyStore, signer, options.evm);
+        const signer = await near.account(signerID);
+        return new Engine(near, keyStore, signer, contractID);
     }
     async install(contractCode) {
         const contractAccount = (await this.getAccount()).unwrap();
