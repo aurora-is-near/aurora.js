@@ -10,6 +10,20 @@ import BN from 'bn.js';
 import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
+export class AddressState {
+    constructor(address, nonce = BigInt(0), balance = BigInt(0), code, storage = new Map()) {
+        this.address = address;
+        this.nonce = nonce;
+        this.balance = balance;
+        this.code = code;
+        this.storage = storage;
+    }
+}
+export class EngineState {
+    constructor(storage = new Map()) {
+        this.storage = storage;
+    }
+}
 export class Engine {
     constructor(near, keyStore, signer, contractID) {
         this.near = near;
@@ -105,6 +119,40 @@ export class Engine {
     }
     // TODO: beginChain()
     // TODO: beginBlock()
+    async getStorage() {
+        const result = new Map();
+        const contractAccount = (await this.getAccount()).unwrap();
+        const records = await contractAccount.viewState('', { finality: 'final' });
+        for (const record of records) {
+            const record_type = record.key[0];
+            if (record_type == 0 /* Config */)
+                continue; // skip EVM metadata
+            const key = (record_type == 4 /* Storage */) ?
+                record.key.subarray(1, 21) : record.key.subarray(1);
+            const address = Buffer.from(key).toString('hex');
+            if (!result.has(address)) {
+                result.set(address, new AddressState(parseAddress(address)));
+            }
+            const state = result.get(address);
+            switch (record_type) {
+                case 0 /* Config */: break; // unreachable
+                case 1 /* Nonce */:
+                    state.nonce = toBigIntBE(record.value);
+                    break;
+                case 2 /* Balance */:
+                    state.balance = toBigIntBE(record.value);
+                    break;
+                case 3 /* Code */:
+                    state.code = record.value;
+                    break;
+                case 4 /* Storage */: {
+                    state.storage.set(toBigIntBE(record.key.subarray(21)), toBigIntBE(record.value));
+                    break;
+                }
+            }
+        }
+        return Ok(result);
+    }
     async callFunction(methodName, args) {
         const result = await this.signer.connection.provider.query({
             request_type: 'call_function',

@@ -23,6 +23,27 @@ export interface ConnectEnv {
     NEAR_ENV?: string;
     NEAR_URL?: string;
 }
+export declare type AddressStorage = Map<U256, U256>;
+export declare class AddressState {
+    address: Address;
+    nonce: U256;
+    balance: Amount;
+    code?: Uint8Array | undefined;
+    storage: AddressStorage;
+    constructor(address: Address, nonce?: U256, balance?: Amount, code?: Uint8Array | undefined, storage?: AddressStorage);
+}
+export declare const enum EngineStorageKeyPrefix {
+    Config = 0,
+    Nonce = 1,
+    Balance = 2,
+    Code = 3,
+    Storage = 4
+}
+export declare type EngineStorage = Map<Address, AddressState>;
+export declare class EngineState {
+    storage: EngineStorage;
+    constructor(storage?: EngineStorage);
+}
 export declare class Engine {
     near: NEAR.Near;
     keyStore: KeyStore;
@@ -47,6 +68,7 @@ export declare class Engine {
     getBalance(address: Address): Promise<Result<U256, Error>>;
     getNonce(address: Address): Promise<Result<U256, Error>>;
     getStorageAt(address: Address, key: U256 | number | string): Promise<Result<U256, Error>>;
+    getStorage(): Promise<Result<EngineStorage, Error>>;
     protected callFunction(methodName: string, args?: Uint8Array): Promise<Result<Buffer, Error>>;
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;

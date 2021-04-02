@@ -36,13 +36,38 @@ export interface ConnectEnv {
   NEAR_URL?: string;
 }
 
+export type AddressStorage = Map<U256, U256>;
+
+export class AddressState {
+  constructor(
+    public address: Address,
+    public nonce: U256 = BigInt(0),
+    public balance: Amount = BigInt(0),
+    public code?: Bytecode,
+    public storage: AddressStorage = new Map()) {}
+}
+
+export const enum EngineStorageKeyPrefix {
+  Config = 0x0,
+  Nonce = 0x1,
+  Balance = 0x2,
+  Code = 0x3,
+  Storage = 0x4,
+}
+
+export type EngineStorage = Map<Address, AddressState>;
+
+export class EngineState {
+  constructor(
+    public storage: EngineStorage = new Map()) {}
+}
+
 export class Engine {
   constructor(
     public near: NEAR.Near,
     public keyStore: KeyStore,
     public signer: NEAR.Account,
-    public contractID: AccountID) {
-  }
+    public contractID: AccountID) {}
 
   static async connect(options: any, env: ConnectEnv): Promise<Engine> {
     const networkID = env && env.NEAR_ENV || 'local';
@@ -168,6 +193,37 @@ export class Engine {
 
   // TODO: beginChain()
   // TODO: beginBlock()
+
+  async getStorage(): Promise<Result<EngineStorage, Error>> {
+    const result = new Map();
+    const contractAccount = (await this.getAccount()).unwrap();
+    const records = await contractAccount.viewState('', { finality: 'final' });
+    for (const record of records) {
+      const record_type = record.key[0];
+      if (record_type == EngineStorageKeyPrefix.Config) continue; // skip EVM metadata
+
+      const key = (record_type == EngineStorageKeyPrefix.Storage) ?
+        record.key.subarray(1, 21) : record.key.subarray(1);
+      const address = Buffer.from(key).toString('hex');
+
+      if (!result.has(address))  {
+        result.set(address, new AddressState(parseAddress(address)));
+      }
+
+      const state = result.get(address)!;
+      switch (record_type) {
+        case EngineStorageKeyPrefix.Config: break; // unreachable
+        case EngineStorageKeyPrefix.Nonce: state.nonce = toBigIntBE(record.value); break;
+        case EngineStorageKeyPrefix.Balance: state.balance = toBigIntBE(record.value); break;
+        case EngineStorageKeyPrefix.Code: state.code = record.value; break;
+        case EngineStorageKeyPrefix.Storage: {
+          state.storage.set(toBigIntBE(record.key.subarray(21)), toBigIntBE(record.value));
+          break;
+        }
+      }
+    }
+    return Ok(result);
+  }
 
   protected async callFunction(methodName: string, args?: Uint8Array): Promise<Result<Buffer, Error>> {
     const result = await this.signer.connection.provider.query({
