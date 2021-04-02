@@ -254,3 +254,7 @@ export class Engine {
     return Buffer.from(args);
   }
 }
+
+export function formatU256(value: U256): string {
+  return `0x${toBufferBE(value, 32).toString('hex')}`;
+}

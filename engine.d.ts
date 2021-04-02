@@ -73,3 +73,4 @@ export declare class Engine {
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;
 }
+export declare function formatU256(value: U256): string;

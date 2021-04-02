@@ -180,3 +180,6 @@ export class Engine {
         return Buffer.from(args);
     }
 }
+export function formatU256(value) {
+    return `0x${toBufferBE(value, 32).toString('hex')}`;
+}
