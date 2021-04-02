@@ -29,7 +29,7 @@ export class Engine {
         return new Engine(near, keyStore, signer, options.evm);
     }
     async install(contractCode) {
-        const contractAccount = await this.near.account(this.contractID);
+        const contractAccount = (await this.getAccount()).unwrap();
         const result = await contractAccount.deployContract(contractCode);
         return Ok(result.transaction.hash);
     }
@@ -39,6 +39,19 @@ export class Engine {
     async initialize(options) {
         const args = new NewCallArgs(parseHexString(defaultAbiCoder.encode(['uint256'], [options.chain || 0])), options.owner || '', options.bridgeProver || '', new BN(options.upgradeDelay || 0));
         return (await this.callMutativeFunction('new', args.encode())).map(({ id }) => id);
+    }
+    async getAccount() {
+        return Ok(await this.near.account(this.contractID));
+    }
+    async getBlockHash() {
+        const contractAccount = (await this.getAccount()).unwrap();
+        const state = await contractAccount.state();
+        return Ok(state.block_hash);
+    }
+    async getBlockHeight() {
+        const contractAccount = (await this.getAccount()).unwrap();
+        const state = await contractAccount.state();
+        return Ok(state.block_height);
     }
     async getVersion() {
         return (await this.callFunction('get_version')).map(output => output.toString());

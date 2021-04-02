@@ -7,6 +7,8 @@ export { arrayify as parseHexString } from '@ethersproject/bytes';
 export declare type AccountID = string;
 export declare type Address = string;
 export declare type Amount = bigint | number;
+export declare type BlockHash = string;
+export declare type BlockHeight = number;
 export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
@@ -31,6 +33,9 @@ export declare class Engine {
     install(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     initialize(options: any): Promise<Result<TransactionID, Error>>;
+    getAccount(): Promise<Result<NEAR.Account, Error>>;
+    getBlockHash(): Promise<Result<BlockHash, Error>>;
+    getBlockHeight(): Promise<Result<BlockHeight, Error>>;
     getVersion(): Promise<Result<string, Error>>;
     getOwner(): Promise<Result<AccountID, Error>>;
     getBridgeProvider(): Promise<Result<AccountID, Error>>;

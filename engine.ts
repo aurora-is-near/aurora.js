@@ -17,6 +17,8 @@ export { arrayify as parseHexString } from '@ethersproject/bytes';
 export type AccountID = string;
 export type Address = string;
 export type Amount = bigint | number;
+export type BlockHash = string;
+export type BlockHeight = number;
 export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
@@ -55,7 +57,7 @@ export class Engine {
   }
 
   async install(contractCode: Bytecode): Promise<Result<TransactionID, Error>> {
-    const contractAccount = await this.near.account(this.contractID);
+    const contractAccount = (await this.getAccount()).unwrap();
     const result = await contractAccount.deployContract(contractCode);
     return Ok(result.transaction.hash);
   }
@@ -72,6 +74,22 @@ export class Engine {
       new BN(options.upgradeDelay || 0)
     );
     return (await this.callMutativeFunction('new', args.encode())).map(({ id }) => id);
+  }
+
+  async getAccount(): Promise<Result<NEAR.Account, Error>> {
+    return Ok(await this.near.account(this.contractID));
+  }
+
+  async getBlockHash(): Promise<Result<BlockHash, Error>> {
+    const contractAccount = (await this.getAccount()).unwrap();
+    const state = await contractAccount.state() as any;
+    return Ok(state.block_hash);
+  }
+
+  async getBlockHeight(): Promise<Result<BlockHeight, Error>> {
+    const contractAccount = (await this.getAccount()).unwrap();
+    const state = await contractAccount.state() as any;
+    return Ok(state.block_height);
   }
 
   async getVersion(): Promise<Result<string, Error>> {
