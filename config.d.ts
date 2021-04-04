@@ -8,4 +8,10 @@ export interface NetworkConfig {
     walletLink: string;
     explorerLink: string;
 }
+export declare enum NetworkID {
+    Local = "local",
+    BetaNet = "betanet",
+    TestNet = "testnet",
+    MainNet = "mainnet"
+}
 export declare const NETWORKS: Map<string, NetworkConfig>;

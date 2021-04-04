@@ -1,4 +1,11 @@
 /* This is free and unencumbered software released into the public domain. */
+export var NetworkID;
+(function (NetworkID) {
+    NetworkID["Local"] = "local";
+    NetworkID["BetaNet"] = "betanet";
+    NetworkID["TestNet"] = "testnet";
+    NetworkID["MainNet"] = "mainnet";
+})(NetworkID || (NetworkID = {}));
 export const NETWORKS = new Map(Object.entries({
     'local': {
         id: 'local',

@@ -11,6 +11,13 @@ export interface NetworkConfig {
   explorerLink: string;
 }
 
+export enum NetworkID {
+  Local = 'local',
+  BetaNet = 'betanet',
+  TestNet = 'testnet',
+  MainNet = 'mainnet',
+}
+
 export const NETWORKS: Map<string, NetworkConfig> = new Map(Object.entries({
   'local': {
     id: 'local',

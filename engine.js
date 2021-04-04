@@ -20,6 +20,14 @@ export class AddressState {
         this.storage = storage;
     }
 }
+export var EngineStorageKeyPrefix;
+(function (EngineStorageKeyPrefix) {
+    EngineStorageKeyPrefix[EngineStorageKeyPrefix["Config"] = 0] = "Config";
+    EngineStorageKeyPrefix[EngineStorageKeyPrefix["Nonce"] = 1] = "Nonce";
+    EngineStorageKeyPrefix[EngineStorageKeyPrefix["Balance"] = 2] = "Balance";
+    EngineStorageKeyPrefix[EngineStorageKeyPrefix["Code"] = 3] = "Code";
+    EngineStorageKeyPrefix[EngineStorageKeyPrefix["Storage"] = 4] = "Storage";
+})(EngineStorageKeyPrefix || (EngineStorageKeyPrefix = {}));
 export class EngineState {
     constructor(storage = new Map()) {
         this.storage = storage;
@@ -130,9 +138,9 @@ export class Engine {
         const records = await contractAccount.viewState('', { finality: 'final' });
         for (const record of records) {
             const record_type = record.key[0];
-            if (record_type == 0 /* Config */)
+            if (record_type == EngineStorageKeyPrefix.Config)
                 continue; // skip EVM metadata
-            const key = (record_type == 4 /* Storage */) ?
+            const key = (record_type == EngineStorageKeyPrefix.Storage) ?
                 record.key.subarray(1, 21) : record.key.subarray(1);
             const address = Buffer.from(key).toString('hex');
             if (!result.has(address)) {
@@ -140,17 +148,17 @@ export class Engine {
             }
             const state = result.get(address);
             switch (record_type) {
-                case 0 /* Config */: break; // unreachable
-                case 1 /* Nonce */:
+                case EngineStorageKeyPrefix.Config: break; // unreachable
+                case EngineStorageKeyPrefix.Nonce:
                     state.nonce = toBigIntBE(record.value);
                     break;
-                case 2 /* Balance */:
+                case EngineStorageKeyPrefix.Balance:
                     state.balance = toBigIntBE(record.value);
                     break;
-                case 3 /* Code */:
+                case EngineStorageKeyPrefix.Code:
                     state.code = record.value;
                     break;
-                case 4 /* Storage */: {
+                case EngineStorageKeyPrefix.Storage: {
                     state.storage.set(toBigIntBE(record.key.subarray(21)), toBigIntBE(record.value));
                     break;
                 }

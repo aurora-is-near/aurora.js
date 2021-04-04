@@ -4,6 +4,7 @@
     "declaration": true,
     "strict": true,
     "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
     "moduleResolution": "node"
   },
   "files": ["index.ts", "config.ts", "engine.ts", "key_store.ts", "schema.ts"]

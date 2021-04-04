@@ -20,6 +20,7 @@ declare const _default: {
     EngineStorageKeyPrefix: typeof engine.EngineStorageKeyPrefix;
     EngineState: typeof engine.EngineState;
     Engine: typeof engine.Engine;
+    NetworkID: typeof config.NetworkID;
     NETWORKS: Map<string, config.NetworkConfig>;
 };
 export default _default;
