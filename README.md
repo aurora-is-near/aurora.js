@@ -22,5 +22,5 @@ npm install aurora-is-near/aurora.js
 ## Usage
 
 ```js
-import { NewCallArgs } from '@aurora-is-near/engine';
+import Aurora from '@aurora-is-near/engine';
 ```
