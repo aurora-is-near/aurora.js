@@ -24,3 +24,7 @@ npm install aurora-is-near/aurora.js
 ```js
 import Aurora from '@aurora-is-near/engine';
 ```
+
+See the [Aurora CLI] for example usage.
+
+[Aurora CLI]: https://github.com/aurora-is-near/aurora-cli/blob/master/aurora.ts
