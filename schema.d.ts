@@ -1,8 +1,14 @@
 import BN from 'bn.js';
+interface FunctionCall {
+    methodName: string;
+    args: Uint8Array;
+    gas: BN;
+    deposit: BN;
+}
 declare abstract class Assignable {
     abstract functionName(): string;
     encode(): Uint8Array;
-    toFunctionCall(): object;
+    toFunctionCall(): FunctionCall;
 }
 export declare class NewCallArgs extends Assignable {
     chainID: Uint8Array;

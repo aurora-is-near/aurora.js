@@ -3,6 +3,13 @@
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
 
+interface FunctionCall {
+  methodName: string;
+  args: Uint8Array;
+  gas: BN;
+  deposit: BN;
+}
+
 abstract class Assignable {
   abstract functionName(): string;
 
@@ -10,7 +17,7 @@ abstract class Assignable {
     return NEAR.utils.serialize.serialize(SCHEMA, this);
   }
 
-  toFunctionCall(): object {
+  toFunctionCall(): FunctionCall {
     return {
       methodName: this.functionName(),
       args: this.encode(),
@@ -134,6 +141,7 @@ export class BeginBlockArgs extends Assignable {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 const SCHEMA = new Map<Function, any>([
   [NewCallArgs, {kind: 'struct', fields: [
     ['chainID', [32]],

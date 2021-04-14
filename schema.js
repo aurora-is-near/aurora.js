@@ -112,6 +112,7 @@ export class BeginBlockArgs extends Assignable {
         return 'begin_block';
     }
 }
+// eslint-disable-next-line @typescript-eslint/ban-types
 const SCHEMA = new Map([
     [NewCallArgs, { kind: 'struct', fields: [
                 ['chainID', [32]],
