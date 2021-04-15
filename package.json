@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "description": "Aurora Engine client library for JavaScript.",
   "type": "module",
-  "module": "index.js",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "module": "lib/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
     "AUTHORS",
     "CHANGES.md",
@@ -13,18 +13,19 @@
     "README.md",
     "VERSION",
     "package.json",
-    "index.js",
-    "index.d.ts",
-    "config.js",
-    "config.d.ts",
-    "engine.js",
-    "engine.d.ts",
-    "key_store.js",
-    "key_store.d.ts",
-    "schema.js",
-    "schema.d.ts"
+    "lib/index.js",
+    "lib/index.d.ts",
+    "lib/config.js",
+    "lib/config.d.ts",
+    "lib/engine.js",
+    "lib/engine.d.ts",
+    "lib/key_store.js",
+    "lib/key_store.d.ts",
+    "lib/schema.js",
+    "lib/schema.d.ts"
   ],
   "scripts": {
+    "build": "tsc",
     "test": "make check"
   },
   "keywords": [

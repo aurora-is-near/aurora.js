@@ -1,7 +1,14 @@
 {
-  "files": ["index.ts", "config.ts", "engine.ts", "key_store.ts", "schema.ts"],
+  "files": [
+    "src/index.ts",
+    "src/config.ts",
+    "src/engine.ts",
+    "src/key_store.ts",
+    "src/schema.ts"
+  ],
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
+    "outDir": "./lib",
     "target": "es2020",
     "module": "es2020",
     "moduleResolution": "node",

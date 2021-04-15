@@ -3,22 +3,22 @@ TYPEDOC = npx typedoc
 
 # The default target:
 
-all: index.js config.js engine.js key_store.js schema.js
+all: lib/index.js
 
 .PHONY: all
 
 # Rules for development:
 
-%.js: %.ts tsconfig.json package.json package-lock.json
+lib/%.js: src/%.ts tsconfig.json package.json package-lock.json
 	$(TSC)
 
-%.d.ts: %.js
+lib/%.d.ts: lib/%.js
 
 docs:
 	$(TYPEDOC) --out $@
 
 clean:
-	@rm -Rf docs *.js *.d.ts *~
+	@rm -Rf docs lib/*.js lib/*.d.ts *~
 
 distclean: clean
 
