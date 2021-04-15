@@ -1,4 +1,5 @@
 {
+  "files": ["index.ts", "config.ts", "engine.ts", "key_store.ts", "schema.ts"],
   "compilerOptions": {
     "target": "es2018",
     "declaration": true,
@@ -7,5 +8,9 @@
     "isolatedModules": true,
     "moduleResolution": "node"
   },
-  "files": ["index.ts", "config.ts", "engine.ts", "key_store.ts", "schema.ts"]
+  "typedocOptions": {
+    "entryPoints": ["index.ts"],
+    "includeVersion": false,
+    "hideGenerator": true
+  }
 }
