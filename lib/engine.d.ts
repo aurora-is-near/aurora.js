@@ -13,11 +13,20 @@ export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
 export declare type Error = string;
+export declare type Quantity = bigint;
 export declare type TransactionID = string;
 export declare type U256 = bigint;
 export interface TransactionOutcome {
     id: TransactionID;
     output: Uint8Array;
+}
+export interface BlockInfo {
+    hash: BlockHash;
+    coinbase: Address;
+    timestamp: number;
+    number: BlockHeight;
+    difficulty: number;
+    gasLimit: Amount;
 }
 export interface ConnectOptions {
     network?: string;
@@ -66,6 +75,8 @@ export declare class Engine {
     getAccount(): Promise<Result<NEAR.Account, Error>>;
     getBlockHash(): Promise<Result<BlockHash, Error>>;
     getBlockHeight(): Promise<Result<BlockHeight, Error>>;
+    getBlockInfo(): Promise<Result<BlockInfo, Error>>;
+    getCoinbase(): Promise<Result<Address, Error>>;
     getVersion(): Promise<Result<string, Error>>;
     getOwner(): Promise<Result<AccountID, Error>>;
     getBridgeProvider(): Promise<Result<AccountID, Error>>;

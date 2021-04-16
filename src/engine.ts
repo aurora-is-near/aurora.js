@@ -24,12 +24,22 @@ export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
 export type Error = string;
+export type Quantity = bigint;
 export type TransactionID = string;
 export type U256 = bigint;
 
 export interface TransactionOutcome {
   id: TransactionID;
   output: Uint8Array;
+}
+
+export interface BlockInfo {
+  hash: BlockHash;
+  coinbase: Address;
+  timestamp: number;
+  number: BlockHeight;
+  difficulty: number;
+  gasLimit: Amount;
 }
 
 export interface ConnectOptions {
@@ -132,6 +142,21 @@ export class Engine {
     const contractAccount = (await this.getAccount()).unwrap();
     const state = await contractAccount.state() as any;
     return Ok(state.block_height);
+  }
+
+  async getBlockInfo(): Promise<Result<BlockInfo, Error>> {
+    return Ok({
+      hash: '', // TODO
+      coinbase: '0x0000000000000000000000000000000000000000', // TODO
+      timestamp: 0,
+      number: 0,
+      difficulty: 0,
+      gasLimit: 0,
+    });
+  }
+
+  async getCoinbase(): Promise<Result<Address, Error>> {
+    return Ok('0x0000000000000000000000000000000000000000'); // TODO
   }
 
   async getVersion(): Promise<Result<string, Error>> {
