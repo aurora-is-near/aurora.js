@@ -11,7 +11,7 @@
 ## Installation
 
 ```shell
-npm install aurora-is-near/aurora.js
+npm install -D aurora-is-near/aurora.js
 ```
 
 ```json
@@ -26,6 +26,6 @@ npm install aurora-is-near/aurora.js
 import Aurora from '@aurora-is-near/engine';
 ```
 
-See the [Aurora CLI] for example usage.
+See the [Aurora CLI] source code for example usage.
 
-[Aurora CLI]: https://github.com/aurora-is-near/aurora-cli/blob/master/aurora.ts
+[Aurora CLI]: https://github.com/aurora-is-near/aurora-cli/blob/master/src/aurora.ts
