@@ -1,11 +1,10 @@
 /// <reference types="node" />
+import { AccountID, Address } from './account.js';
 import { KeyStore } from './key_store.js';
 import { Result } from '@hqoss/monads';
 import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
-export declare type AccountID = string;
-export declare type Address = string;
 export declare type Amount = bigint | number;
 export declare type BlockHash = string;
 export declare type BlockHeight = number;

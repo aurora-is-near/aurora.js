@@ -1,5 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
+import { AccountID, Address } from './account.js';
 import { NETWORKS } from './config.js';
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
 import { KeyStore } from './key_store.js';
@@ -15,8 +16,6 @@ import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 
-export type AccountID = string;
-export type Address = string;
 export type Amount = bigint | number;
 export type BlockHash = string;
 export type BlockHeight = number;
