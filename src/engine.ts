@@ -100,7 +100,7 @@ export class Engine {
     const contractID = options.contract || env && env.AURORA_ENGINE || network.contractID;
     const signerID = options.signer || env && env.NEAR_MASTER_ACCOUNT; // TODO: error handling
 
-    const keyStore = new KeyStore(env);
+    const keyStore = KeyStore.load(networkID, env);
     const near = new NEAR.Near({
       deps: { keyStore },
       networkId: networkID,

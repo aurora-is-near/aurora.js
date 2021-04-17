@@ -14,27 +14,36 @@ export interface KeyStoreEnv {
 }
 
 export class KeyStore extends MergeKeyStore {
-  constructor(env?: KeyStoreEnv) {
+  protected constructor(public readonly networkID: string, keyStores: NEAR.keyStores.KeyStore[]) {
+    super(keyStores);
+  }
+
+  static load(networkID: string, env?: KeyStoreEnv): KeyStore {
     const memKeyStore = new InMemoryKeyStore();
     if (env && env.HOME) {
-      const devKeyStore = new InMemoryKeyStore();
-      loadLocalKeys(devKeyStore, env);
+      const devKeyStore = KeyStore.loadLocalKeys(env);
       const cliKeyStore = new UnencryptedFileSystemKeyStore(`${env.HOME}/.near-credentials`);
-      super([memKeyStore, devKeyStore, cliKeyStore]);
+      return new KeyStore(networkID, [memKeyStore, devKeyStore, cliKeyStore]);
     }
     else {
-      super([memKeyStore]);
+      return new KeyStore(networkID, [memKeyStore]);
     }
   }
-}
 
-function loadLocalKeys(keyStore: NEAR.keyStores.KeyStore, env?: KeyStoreEnv) {
-  if (env && env.HOME) {
-    const localValidatorKeyPath = `${env.HOME}/.near/validator_key.json`;
-    if (existsSync(localValidatorKeyPath)) {
-      const [accountID, keyPair] = loadKeyFile(localValidatorKeyPath);
-      keyStore.setKey('local', accountID, keyPair);
+  static loadLocalKeys(env?: KeyStoreEnv): NEAR.keyStores.KeyStore {
+    const keyStore = new InMemoryKeyStore();
+    if (env && env.HOME) {
+      const localValidatorKeyPath = `${env.HOME}/.near/validator_key.json`;
+      if (existsSync(localValidatorKeyPath)) {
+        const [accountID, keyPair] = loadKeyFile(localValidatorKeyPath);
+        keyStore.setKey('local', accountID, keyPair);
+      }
     }
+    return keyStore;
+  }
+
+  async getAccounts(): Promise<string[]> {
+    return super.getAccounts(this.networkID);
   }
 }
 

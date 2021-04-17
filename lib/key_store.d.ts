@@ -5,6 +5,10 @@ export interface KeyStoreEnv {
     HOME?: string;
 }
 export declare class KeyStore extends MergeKeyStore {
-    constructor(env?: KeyStoreEnv);
+    readonly networkID: string;
+    protected constructor(networkID: string, keyStores: NEAR.keyStores.KeyStore[]);
+    static load(networkID: string, env?: KeyStoreEnv): KeyStore;
+    static loadLocalKeys(env?: KeyStoreEnv): NEAR.keyStores.KeyStore;
+    getAccounts(): Promise<string[]>;
 }
 export {};
