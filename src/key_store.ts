@@ -45,7 +45,7 @@ export class KeyStore extends MergeKeyStore {
   }
 
   async getAccounts(): Promise<string[]> {
-    return super.getAccounts(this.networkID); // TODO: fix sorting
+    return super.getAccounts(this.networkID); // TODO: fix sorting, dedup
   }
 
   async getSigningAccounts(): Promise<Account[]> {
