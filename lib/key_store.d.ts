@@ -1,3 +1,4 @@
+import { Account } from './account.js';
 import NEAR from 'near-api-js';
 export declare const KeyPair: typeof NEAR.utils.key_pair.KeyPair;
 declare const MergeKeyStore: typeof NEAR.keyStores.MergeKeyStore;
@@ -10,5 +11,6 @@ export declare class KeyStore extends MergeKeyStore {
     static load(networkID: string, env?: KeyStoreEnv): KeyStore;
     static loadLocalKeys(env?: KeyStoreEnv): NEAR.keyStores.KeyStore;
     getAccounts(): Promise<string[]>;
+    getSigningAccounts(): Promise<Account[]>;
 }
 export {};
