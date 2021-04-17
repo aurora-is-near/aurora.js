@@ -1,6 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-import { Account } from './account.js';
+import { Account, Address } from './account.js';
 
 import { existsSync, readFileSync } from 'fs';
 import NEAR from 'near-api-js';
@@ -50,6 +50,10 @@ export class KeyStore extends MergeKeyStore {
 
   async getSigningAccounts(): Promise<Account[]> {
     return (await this.getAccounts()).map(id => new Account(id));
+  }
+
+  async getSigningAddresses(): Promise<Address[]> {
+    return (await this.getAccounts()).map(id => (new Account(id)).toAddress());
   }
 }
 
