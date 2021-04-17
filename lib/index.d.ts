@@ -1,3 +1,9 @@
+export * from './account.js';
+export * from './config.js';
+export * from './engine.js';
+export * from './key_store.js';
+export * from './schema.js';
+import * as account from './account.js';
 import * as config from './config.js';
 import * as engine from './engine.js';
 import * as keyStore from './key_store.js';
@@ -22,9 +28,6 @@ declare const _default: {
     Engine: typeof engine.Engine;
     NetworkID: typeof config.NetworkID;
     NETWORKS: Map<string, config.NetworkConfig>;
+    Account: typeof account.Account;
 };
 export default _default;
-export * from './config.js';
-export * from './engine.js';
-export * from './key_store.js';
-export * from './schema.js';

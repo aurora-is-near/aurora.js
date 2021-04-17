@@ -1,6 +1,7 @@
 {
   "files": [
     "src/index.ts",
+    "src/account.ts",
     "src/config.ts",
     "src/engine.ts",
     "src/key_store.ts",
