@@ -63,11 +63,12 @@ export declare class EngineState {
     constructor(storage?: EngineStorage);
 }
 export declare class Engine {
-    near: NEAR.Near;
-    keyStore: KeyStore;
-    signer: NEAR.Account;
-    contractID: AccountID;
-    constructor(near: NEAR.Near, keyStore: KeyStore, signer: NEAR.Account, contractID: AccountID);
+    readonly near: NEAR.Near;
+    readonly keyStore: KeyStore;
+    readonly signer: NEAR.Account;
+    readonly networkID: string;
+    readonly contractID: AccountID;
+    protected constructor(near: NEAR.Near, keyStore: KeyStore, signer: NEAR.Account, networkID: string, contractID: AccountID);
     static connect(options: ConnectOptions, env?: ConnectEnv): Promise<Engine>;
     install(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;

@@ -86,11 +86,13 @@ export class EngineState {
 const DEFAULT_NETWORK_ID = 'local';
 
 export class Engine {
-  constructor(
-    public near: NEAR.Near,
-    public keyStore: KeyStore,
-    public signer: NEAR.Account,
-    public contractID: AccountID) {}
+
+  protected constructor(
+    public readonly near: NEAR.Near,
+    public readonly keyStore: KeyStore,
+    public readonly signer: NEAR.Account,
+    public readonly networkID: string,
+    public readonly contractID: AccountID) {}
 
   static async connect(options: ConnectOptions, env?: ConnectEnv): Promise<Engine> {
     const networkID = options.network || env && env.NEAR_ENV || DEFAULT_NETWORK_ID;
@@ -105,7 +107,7 @@ export class Engine {
       nodeUrl: options.endpoint || env && env.NEAR_URL || network.nearEndpoint,
     });
     const signer = await near.account(signerID!);
-    return new Engine(near, keyStore, signer, contractID);
+    return new Engine(near, keyStore, signer, networkID, contractID);
   }
 
   async install(contractCode: Bytecode): Promise<Result<TransactionID, Error>> {
