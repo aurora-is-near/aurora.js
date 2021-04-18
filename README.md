@@ -28,4 +28,13 @@ import Aurora from '@aurora-is-near/engine';
 
 See the [Aurora CLI] source code for example usage.
 
+### Key Management
+
+The library will load the following local keys by default, if found:
+
+- `$HOME/.near-credentials/*/*.json`: credentials stored by the NEAR CLI
+
+- `$HOME/.near/validator_key.json`: the local `nearcore` validator key
+  (for the `test.near` master account)
+
 [Aurora CLI]: https://github.com/aurora-is-near/aurora-cli/blob/master/src/aurora.ts
