@@ -6,9 +6,10 @@ import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 export declare type Amount = bigint | number;
-export declare type BlockHash = string;
+export declare type BlockTag = 'earliest' | 'latest' | 'pending';
 export declare type BlockHeight = number;
-export declare type BlockID = BlockHeight | BlockHash;
+export declare type BlockHash = string;
+export declare type BlockID = BlockTag | BlockHeight | BlockHash;
 export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
@@ -95,4 +96,3 @@ export declare class Engine {
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;
 }
-export declare function formatU256(value: U256): string;

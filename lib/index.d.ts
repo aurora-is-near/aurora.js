@@ -10,6 +10,7 @@ import * as engine from './engine.js';
 import * as keyStore from './key_store.js';
 import * as schema from './schema.js';
 declare const _default: {
+    formatU256(value: bigint): string;
     hexToBase58(input: string): string;
     base58ToHex(input: string): string;
     NewCallArgs: typeof schema.NewCallArgs;
@@ -22,7 +23,6 @@ declare const _default: {
     BeginBlockArgs: typeof schema.BeginBlockArgs;
     KeyPair: typeof import("near-api-js").KeyPair;
     KeyStore: typeof keyStore.KeyStore;
-    formatU256(value: bigint): string;
     parseAddress: typeof engine.parseAddress;
     parseHexString: typeof engine.parseHexString;
     AddressState: typeof engine.AddressState;

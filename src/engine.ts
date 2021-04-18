@@ -17,9 +17,10 @@ export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 
 export type Amount = bigint | number;
-export type BlockHash = string;
+export type BlockTag = 'earliest' | 'latest' | 'pending'
 export type BlockHeight = number;
-export type BlockID = BlockHeight | BlockHash;
+export type BlockHash = string;
+export type BlockID = BlockTag | BlockHeight | BlockHash;
 export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
@@ -161,7 +162,7 @@ export class Engine {
     try {
       const provider = this.near.connection.provider;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const block = (await provider.block({blockId: blockID})) as any;
+      const block = (await provider.block(parseBlockID(blockID))) as any;
       const requests = block.chunks.map(async (chunkHeader: any) => {
         if (chunkHeader.tx_root == '11111111111111111111111111111111') {
           return 0; // no transactions in this chunk
@@ -321,6 +322,12 @@ export class Engine {
   }
 }
 
-export function formatU256(value: U256): string {
-  return `0x${toBufferBE(value, 32).toString('hex')}`;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseBlockID(blockID: BlockID): any {
+  switch (blockID) {
+    case 'earliest': return { sync_checkpoint: 'genesis' }
+    case 'latest': return { finality: 'final' }
+    case 'pending': return { finality: 'optimistic' }
+    default: return { blockId: blockID }
+  }
 }
