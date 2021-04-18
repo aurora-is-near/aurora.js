@@ -1,8 +1,10 @@
 export * from './account.js';
+export * from './block.js';
 export * from './config.js';
 export * from './engine.js';
 export * from './key_store.js';
 export * from './schema.js';
+export * from './transaction.js';
 export * from './utils.js';
 import * as account from './account.js';
 import * as config from './config.js';

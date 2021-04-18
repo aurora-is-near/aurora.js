@@ -1,9 +1,11 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
+import { BlockHash, BlockHeight, BlockID } from './block.js';
 import { NETWORKS } from './config.js';
-import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
 import { KeyStore } from './key_store.js';
+import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
+import { TransactionID } from './transaction.js';
 
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { getAddress as parseAddress } from '@ethersproject/address';
@@ -17,16 +19,11 @@ export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 
 export type Amount = bigint | number;
-export type BlockTag = 'earliest' | 'latest' | 'pending'
-export type BlockHeight = number;
-export type BlockHash = string;
-export type BlockID = BlockTag | BlockHeight | BlockHash;
 export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
 export type Error = string;
 export type Quantity = bigint;
-export type TransactionID = string;
 export type U256 = bigint;
 
 export interface TransactionOutcome {

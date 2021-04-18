@@ -1,21 +1,18 @@
 /// <reference types="node" />
 import { AccountID, Address } from './account.js';
+import { BlockHash, BlockHeight, BlockID } from './block.js';
 import { KeyStore } from './key_store.js';
+import { TransactionID } from './transaction.js';
 import { Result } from '@hqoss/monads';
 import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 export declare type Amount = bigint | number;
-export declare type BlockTag = 'earliest' | 'latest' | 'pending';
-export declare type BlockHeight = number;
-export declare type BlockHash = string;
-export declare type BlockID = BlockTag | BlockHeight | BlockHash;
 export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
 export declare type Error = string;
 export declare type Quantity = bigint;
-export declare type TransactionID = string;
 export declare type U256 = bigint;
 export interface TransactionOutcome {
     id: TransactionID;

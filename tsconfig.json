@@ -2,10 +2,12 @@
   "files": [
     "src/index.ts",
     "src/account.ts",
+    "src/block.ts",
     "src/config.ts",
     "src/engine.ts",
     "src/key_store.ts",
     "src/schema.ts",
+    "src/transaction.ts",
     "src/utils.ts"
   ],
   "extends": "@tsconfig/node14/tsconfig.json",

@@ -17,6 +17,8 @@
     "lib/index.d.ts",
     "lib/account.js",
     "lib/account.d.ts",
+    "lib/block.js",
+    "lib/block.d.ts",
     "lib/config.js",
     "lib/config.d.ts",
     "lib/engine.js",
@@ -25,6 +27,8 @@
     "lib/key_store.d.ts",
     "lib/schema.js",
     "lib/schema.d.ts",
+    "lib/transaction.js",
+    "lib/transaction.d.ts",
     "lib/utils.js",
     "lib/utils.d.ts"
   ],
