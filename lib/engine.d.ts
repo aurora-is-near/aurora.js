@@ -8,6 +8,7 @@ export { arrayify as parseHexString } from '@ethersproject/bytes';
 export declare type Amount = bigint | number;
 export declare type BlockHash = string;
 export declare type BlockHeight = number;
+export declare type BlockID = BlockHeight | BlockHash;
 export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
@@ -76,6 +77,7 @@ export declare class Engine {
     getBlockHash(): Promise<Result<BlockHash, Error>>;
     getBlockHeight(): Promise<Result<BlockHeight, Error>>;
     getBlockInfo(): Promise<Result<BlockInfo, Error>>;
+    getBlockTransactionCount(blockID: BlockID): Promise<Result<number, Error>>;
     getCoinbase(): Promise<Result<Address, Error>>;
     getVersion(): Promise<Result<string, Error>>;
     getOwner(): Promise<Result<AccountID, Error>>;

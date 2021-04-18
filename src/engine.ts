@@ -19,6 +19,7 @@ export { arrayify as parseHexString } from '@ethersproject/bytes';
 export type Amount = bigint | number;
 export type BlockHash = string;
 export type BlockHeight = number;
+export type BlockID = BlockHeight | BlockHash;
 export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
@@ -154,6 +155,28 @@ export class Engine {
       difficulty: 0,
       gasLimit: 0,
     });
+  }
+
+  async getBlockTransactionCount(blockID: BlockID): Promise<Result<number, Error>> {
+    try {
+      const provider = this.near.connection.provider;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const block = (await provider.block({blockId: blockID})) as any;
+      const requests = block.chunks.map(async (chunkHeader: any) => {
+        if (chunkHeader.tx_root == '11111111111111111111111111111111') {
+          return 0; // no transactions in this chunk
+        }
+        else {
+          const chunk = await provider.chunk(chunkHeader.chunk_hash);
+          return chunk.transactions.length;
+        }
+      });
+      const counts = (await Promise.all(requests)) as number[];
+      return Ok(counts.reduce((a, b) => a + b, 0));
+    } catch (error) {
+      //console.error('getBlockTransactionCount', error);
+      return Err(error.message);
+    }
   }
 
   async getCoinbase(): Promise<Result<Address, Error>> {
