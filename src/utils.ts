@@ -12,7 +12,7 @@ export function base58ToHex(input: string): string {
 }
 
 export function base58ToBytes(input: string): Uint8Array {
-  return new Uint8Array(bs58.decode(input));
+  return Buffer.from(bs58.decode(input));
 }
 
 export function bytesToHex(input: Uint8Array): string {
@@ -25,4 +25,24 @@ export function hexToBase58(input: string): string {
 
 export function intToHex(input: number | bigint): string {
   return `0x${input.toString(16)}`;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function exportJSON(object: any): any {
+  for (const [k, v] of Object.entries(object)) {
+    console.log(k, v, typeof v);
+    switch (typeof v) {
+      case 'number':
+      case 'bigint':
+        object[k] = intToHex(v);
+        break;
+      case 'object':
+        object[k] = (v instanceof Uint8Array) ?
+        `0x${Buffer.from(v).toString('hex')}` :
+        ((v !== null) ? exportJSON(v) : null);
+        break;
+      default: break;
+    }
+  }
+  return object;
 }

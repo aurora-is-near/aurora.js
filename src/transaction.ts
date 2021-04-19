@@ -7,6 +7,10 @@ import { base58ToHex, bytesToHex, intToHex } from './utils.js';
 export class TransactionID {
   protected constructor(public readonly id: string) {}
 
+  static zero(): TransactionID {
+    return new TransactionID(`0x${'00'.repeat(32)}`);
+  }
+
   static fromHex(id: string): TransactionID {
     return new TransactionID(id);
   }

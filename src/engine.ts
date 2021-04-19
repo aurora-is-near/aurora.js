@@ -1,7 +1,7 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
-import { BlockHash, BlockHeight, BlockID } from './block.js';
+import { Block, BlockHash, BlockHeight, BlockID, parseBlockID } from './block.js';
 import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
 import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
@@ -173,6 +173,11 @@ export class Engine {
     }
   }
 
+  async getBlock(blockID: BlockID): Promise<Result<Block, Error>> {
+    const provider = this.near.connection.provider;
+    return await Block.fetch(provider, blockID);
+  }
+
   async getCoinbase(): Promise<Result<Address, Error>> {
     return Ok(Address.zero()); // TODO
   }
@@ -315,15 +320,5 @@ export class Engine {
     if (typeof args === 'string')
       return Buffer.from(parseHexString(args as string));
     return Buffer.from(args);
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseBlockID(blockID: BlockID): any {
-  switch (blockID) {
-    case 'earliest': return { sync_checkpoint: 'genesis' }
-    case 'latest': return { finality: 'final' }
-    case 'pending': return { finality: 'optimistic' }
-    default: return { blockId: blockID }
   }
 }

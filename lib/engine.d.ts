@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { AccountID, Address } from './account.js';
-import { BlockHash, BlockHeight, BlockID } from './block.js';
+import { Block, BlockHash, BlockHeight, BlockID } from './block.js';
 import { KeyStore } from './key_store.js';
 import { Quantity, Result, U256 } from './prelude.js';
 import { TransactionID } from './transaction.js';
@@ -73,6 +73,7 @@ export declare class Engine {
     getBlockHeight(): Promise<Result<BlockHeight, Error>>;
     getBlockInfo(): Promise<Result<BlockInfo, Error>>;
     getBlockTransactionCount(blockID: BlockID): Promise<Result<number, Error>>;
+    getBlock(blockID: BlockID): Promise<Result<Block, Error>>;
     getCoinbase(): Promise<Result<Address, Error>>;
     getVersion(): Promise<Result<string, Error>>;
     getOwner(): Promise<Result<AccountID, Error>>;

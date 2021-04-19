@@ -10,6 +10,7 @@ export declare class Address {
 export declare class AccountID {
     readonly id: string;
     constructor(id: string);
+    static aurora(): AccountID;
     static parse(id?: string): Result<AccountID, string>;
     toString(): string;
     toAddress(): Address;

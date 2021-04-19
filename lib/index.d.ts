@@ -8,6 +8,7 @@ export * from './schema.js';
 export * from './transaction.js';
 export * from './utils.js';
 import * as account from './account.js';
+import * as block from './block.js';
 import * as config from './config.js';
 import * as engine from './engine.js';
 import * as keyStore from './key_store.js';
@@ -21,6 +22,7 @@ declare const _default: {
     bytesToHex(input: Uint8Array): string;
     hexToBase58(input: string): string;
     intToHex(input: number | bigint): string;
+    exportJSON(object: any): any;
     TransactionID: typeof transaction.TransactionID;
     Transaction: typeof transaction.Transaction;
     NewCallArgs: typeof schema.NewCallArgs;
@@ -53,6 +55,8 @@ declare const _default: {
     Engine: typeof engine.Engine;
     NetworkID: typeof config.NetworkID;
     NETWORKS: Map<string, config.NetworkConfig>;
+    parseBlockID(blockID: block.BlockID): any;
+    Block: typeof block.Block;
     Address: typeof account.Address;
     AccountID: typeof account.AccountID;
 };

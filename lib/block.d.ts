@@ -1,6 +1,8 @@
 import { Address } from './account.js';
 import { Transaction, TransactionID } from './transaction.js';
-import { Quantity } from './prelude.js';
+import { Quantity, Result } from './prelude.js';
+import NEAR from 'near-api-js';
+import { BlockHeader, ChunkResult } from 'near-api-js/lib/providers/provider';
 export declare type BlockHash = string;
 export declare type BlockHeight = Quantity;
 export declare type BlockID = BlockTag | BlockHeight | BlockHash;
@@ -9,12 +11,12 @@ export interface BlockMetadata {
     number: BlockHeight | null;
     hash: BlockHash | null;
     parentHash: BlockHash;
-    nonce: string | null;
-    sha3Uncles: string;
-    logsBloom: string | null;
-    transactionsRoot: string;
-    stateRoot: string;
-    receiptsRoot: string;
+    nonce: Uint8Array | null;
+    sha3Uncles: Uint8Array;
+    logsBloom: Uint8Array | null;
+    transactionsRoot: Uint8Array;
+    stateRoot: Uint8Array;
+    receiptsRoot: Uint8Array;
     miner: Address;
     difficulty: Quantity;
     totalDifficulty: Quantity;
@@ -26,3 +28,17 @@ export interface BlockMetadata {
     transactions: TransactionID[] | Transaction[];
     uncles: BlockHash[];
 }
+export declare class Block {
+    protected readonly provider: NEAR.providers.Provider;
+    protected readonly header: BlockHeader;
+    protected readonly chunks: ChunkResult[];
+    readonly number: BlockHeight;
+    readonly hash: BlockHash;
+    readonly parentHash: BlockHash;
+    protected constructor(provider: NEAR.providers.Provider, header: BlockHeader, chunks: ChunkResult[]);
+    static fetch(provider: NEAR.providers.Provider, id: BlockID): Promise<Result<Block, string>>;
+    getMetadata(): BlockMetadata;
+    toString(): string;
+    toJSON(): any;
+}
+export declare function parseBlockID(blockID: BlockID): any;

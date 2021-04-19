@@ -10,7 +10,7 @@ export class Address {
   protected constructor(public readonly id: string) {}
 
   static zero(): Address {
-    return new Address('0x0000000000000000000000000000000000000000');
+    return new Address(`0x${'00'.repeat(20)}`);
   }
 
   static parse(id?: string): Result<Address, string> {
@@ -28,6 +28,10 @@ export class Address {
 
 export class AccountID {
   constructor(public readonly id: string) {} // TODO: validate the ID
+
+  static aurora(): AccountID {
+    return new AccountID("aurora");
+  }
 
   static parse(id?: string): Result<AccountID, string> {
     return Ok(new AccountID(id!));

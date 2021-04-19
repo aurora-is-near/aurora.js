@@ -3,6 +3,7 @@ import { Option, U64, U256 } from './prelude.js';
 export declare class TransactionID {
     readonly id: string;
     protected constructor(id: string);
+    static zero(): TransactionID;
     static fromHex(id: string): TransactionID;
     static fromBase58(id: string): TransactionID;
     toString(): string;
