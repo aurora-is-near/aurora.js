@@ -20,6 +20,7 @@ declare const _default: {
     bytesToHex(input: Uint8Array): string;
     hexToBase58(input: string): string;
     intToHex(input: number | bigint): string;
+    TransactionID: typeof transaction.TransactionID;
     Transaction: typeof transaction.Transaction;
     NewCallArgs: typeof schema.NewCallArgs;
     GetChainID: typeof schema.GetChainID;

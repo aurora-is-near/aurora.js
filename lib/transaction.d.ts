@@ -1,7 +1,13 @@
 import { Address } from './account.js';
 import { U64, U256 } from './prelude.js';
 import { Option } from '@hqoss/monads';
-export declare type TransactionID = string;
+export declare class TransactionID {
+    readonly id: string;
+    protected constructor(id: string);
+    static fromHex(id: string): TransactionID;
+    static fromBase58(id: string): TransactionID;
+    toString(): string;
+}
 export declare class Transaction {
     readonly nonce: U256;
     readonly gasPrice: U256;

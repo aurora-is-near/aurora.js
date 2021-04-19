@@ -111,7 +111,7 @@ export class Engine {
   async install(contractCode: Bytecode): Promise<Result<TransactionID, Error>> {
     const contractAccount = (await this.getAccount()).unwrap();
     const result = await contractAccount.deployContract(contractCode);
-    return Ok(result.transaction.hash);
+    return Ok(TransactionID.fromHex(result.transaction.hash));
   }
 
   async upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>> {
@@ -305,7 +305,10 @@ export class Engine {
   protected async callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>> {
     const result = await this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
     if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
-      return Ok({ id: result.transaction.hash, output: Buffer.from(result.status.SuccessValue, 'base64') });
+      return Ok({
+        id: TransactionID.fromHex(result.transaction.hash),
+        output: Buffer.from(result.status.SuccessValue, 'base64'),
+      });
     }
     return Err(result.toString()); // TODO
   }
