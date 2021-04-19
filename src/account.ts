@@ -1,9 +1,10 @@
 /* This is free and unencumbered software released into the public domain. */
 
+import { Ok, Result } from './prelude.js';
+
 import { getAddress as parseAddress } from '@ethersproject/address';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
 import { keccak256 } from '@ethersproject/keccak256';
-import { Result, Ok } from '@hqoss/monads';
 
 export class Address {
   protected constructor(public readonly id: string) {}

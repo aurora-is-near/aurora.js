@@ -11,6 +11,7 @@ import * as account from './account.js';
 import * as config from './config.js';
 import * as engine from './engine.js';
 import * as keyStore from './key_store.js';
+import * as prelude from './prelude.js';
 import * as schema from './schema.js';
 import * as transaction from './transaction.js';
 declare const _default: {
@@ -30,6 +31,18 @@ declare const _default: {
     GetStorageAtArgs: typeof schema.GetStorageAtArgs;
     BeginChainArgs: typeof schema.BeginChainArgs;
     BeginBlockArgs: typeof schema.BeginBlockArgs;
+    Left: typeof prelude.Left;
+    Right: typeof prelude.Right;
+    isLeft: typeof prelude.isLeft;
+    isRight: typeof prelude.isRight;
+    Some: typeof prelude.Some;
+    None: import("@hqoss/monads/dist/lib/option/option").OptNone<any>;
+    isSome: typeof prelude.isSome;
+    isNone: typeof prelude.isNone;
+    Ok: typeof prelude.Ok;
+    Err: typeof prelude.Err;
+    isOk: typeof prelude.isOk;
+    isErr: typeof prelude.isErr;
     KeyPair: typeof import("near-api-js").KeyPair;
     KeyStore: typeof keyStore.KeyStore;
     parseAddress: typeof engine.parseAddress;

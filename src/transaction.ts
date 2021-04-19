@@ -1,10 +1,8 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { Address } from './account.js';
-import { U64, U256 } from './prelude.js';
+import { Option, U64, U256 } from './prelude.js';
 import { base58ToHex, bytesToHex, intToHex } from './utils.js';
-
-import { Option } from '@hqoss/monads';
 
 export class TransactionID {
   protected constructor(public readonly id: string) {}

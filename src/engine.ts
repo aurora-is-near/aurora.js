@@ -4,13 +4,12 @@ import { AccountID, Address } from './account.js';
 import { BlockHash, BlockHeight, BlockID } from './block.js';
 import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
-import { U256 } from './prelude.js';
+import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
 import { TransactionID } from './transaction.js';
 
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
-import { Result, Ok, Err } from '@hqoss/monads';
 import { toBigIntBE, toBufferBE } from 'bigint-buffer';
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
@@ -18,12 +17,10 @@ import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 
-export type Amount = bigint | number;
 export type Bytecode = Uint8Array;
 export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
 export type Error = string;
-export type Quantity = bigint;
 
 export interface TransactionOutcome {
   id: TransactionID;
@@ -36,7 +33,7 @@ export interface BlockInfo {
   timestamp: number;
   number: BlockHeight;
   difficulty: number;
-  gasLimit: Amount;
+  gasLimit: Quantity;
 }
 
 export interface ConnectOptions {
@@ -60,7 +57,7 @@ export class AddressState {
   constructor(
     public address: Address,
     public nonce: U256 = BigInt(0),
-    public balance: Amount = BigInt(0),
+    public balance: Quantity = BigInt(0),
     public code?: Bytecode,
     public storage: AddressStorage = new Map()) {}
 }
@@ -218,7 +215,7 @@ export class Engine {
   // TODO: rawCall()
   // TODO: metaCall()
 
-  async view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
+  async view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
     const args = new ViewCallArgs(
       sender.toBytes(),
       address.toBytes(),

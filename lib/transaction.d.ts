@@ -1,6 +1,5 @@
 import { Address } from './account.js';
-import { U64, U256 } from './prelude.js';
-import { Option } from '@hqoss/monads';
+import { Option, U64, U256 } from './prelude.js';
 export declare class TransactionID {
     readonly id: string;
     protected constructor(id: string);

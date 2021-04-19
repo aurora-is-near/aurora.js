@@ -2,18 +2,15 @@
 import { AccountID, Address } from './account.js';
 import { BlockHash, BlockHeight, BlockID } from './block.js';
 import { KeyStore } from './key_store.js';
-import { U256 } from './prelude.js';
+import { Quantity, Result, U256 } from './prelude.js';
 import { TransactionID } from './transaction.js';
-import { Result } from '@hqoss/monads';
 import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
-export declare type Amount = bigint | number;
 export declare type Bytecode = Uint8Array;
 export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
 export declare type Error = string;
-export declare type Quantity = bigint;
 export interface TransactionOutcome {
     id: TransactionID;
     output: Uint8Array;
@@ -24,7 +21,7 @@ export interface BlockInfo {
     timestamp: number;
     number: BlockHeight;
     difficulty: number;
-    gasLimit: Amount;
+    gasLimit: Quantity;
 }
 export interface ConnectOptions {
     network?: string;
@@ -43,10 +40,10 @@ export declare type AddressStorage = Map<U256, U256>;
 export declare class AddressState {
     address: Address;
     nonce: U256;
-    balance: Amount;
+    balance: Quantity;
     code?: Uint8Array | undefined;
     storage: AddressStorage;
-    constructor(address: Address, nonce?: U256, balance?: Amount, code?: Uint8Array | undefined, storage?: AddressStorage);
+    constructor(address: Address, nonce?: U256, balance?: Quantity, code?: Uint8Array | undefined, storage?: AddressStorage);
 }
 export declare const enum EngineStorageKeyPrefix {
     Config = 0,
@@ -83,7 +80,7 @@ export declare class Engine {
     getChainID(): Promise<Result<ChainID, Error>>;
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
-    view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
+    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
     getCode(address: Address): Promise<Result<Bytecode, Error>>;
     getBalance(address: Address): Promise<Result<U256, Error>>;
     getNonce(address: Address): Promise<Result<U256, Error>>;

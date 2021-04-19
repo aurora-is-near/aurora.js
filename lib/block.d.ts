@@ -1,9 +1,10 @@
 import { Address } from './account.js';
 import { Transaction, TransactionID } from './transaction.js';
-export declare type BlockTag = 'earliest' | 'latest' | 'pending';
-export declare type BlockHeight = number;
+import { Quantity } from './prelude.js';
 export declare type BlockHash = string;
+export declare type BlockHeight = Quantity;
 export declare type BlockID = BlockTag | BlockHeight | BlockHash;
+export declare type BlockTag = 'earliest' | 'latest' | 'pending';
 export interface BlockMetadata {
     number: BlockHeight | null;
     hash: BlockHash | null;
@@ -15,13 +16,13 @@ export interface BlockMetadata {
     stateRoot: string;
     receiptsRoot: string;
     miner: Address;
-    difficulty: number;
-    totalDifficulty: number;
+    difficulty: Quantity;
+    totalDifficulty: Quantity;
     extraData: Uint8Array;
-    size: number;
-    gasLimit: number;
-    gasUsed: number;
-    timestamp: number;
+    size: Quantity;
+    gasLimit: Quantity;
+    gasUsed: Quantity;
+    timestamp: Quantity;
     transactions: TransactionID[] | Transaction[];
-    uncles: string[];
+    uncles: BlockHash[];
 }

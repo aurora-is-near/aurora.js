@@ -1,4 +1,4 @@
-import { Result } from '@hqoss/monads';
+import { Result } from './prelude.js';
 export declare class Address {
     readonly id: string;
     protected constructor(id: string);
