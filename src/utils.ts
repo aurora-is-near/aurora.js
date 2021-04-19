@@ -11,8 +11,12 @@ export function base58ToHex(input: string): string {
   return `0x${Buffer.from(bs58.decode(input)).toString('hex')}`;
 }
 
-export function base58ToUint8Array(input: string): Uint8Array {
+export function base58ToBytes(input: string): Uint8Array {
   return new Uint8Array(bs58.decode(input));
+}
+
+export function bytesToHex(input: Uint8Array): string {
+  return `0x${Buffer.from(input).toString('hex')}`;
 }
 
 export function hexToBase58(input: string): string {

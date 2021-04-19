@@ -16,7 +16,8 @@ import * as transaction from './transaction.js';
 declare const _default: {
     formatU256(value: bigint): string;
     base58ToHex(input: string): string;
-    base58ToUint8Array(input: string): Uint8Array;
+    base58ToBytes(input: string): Uint8Array;
+    bytesToHex(input: Uint8Array): string;
     hexToBase58(input: string): string;
     intToHex(input: number | bigint): string;
     Transaction: typeof transaction.Transaction;
