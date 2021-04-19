@@ -9,7 +9,6 @@ import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from '.
 import { TransactionID } from './transaction.js';
 
 import { defaultAbiCoder } from '@ethersproject/abi';
-import { getAddress as parseAddress } from '@ethersproject/address';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
 import { Result, Ok, Err } from '@hqoss/monads';
 import { toBigIntBE, toBufferBE } from 'bigint-buffer';
@@ -147,7 +146,7 @@ export class Engine {
   async getBlockInfo(): Promise<Result<BlockInfo, Error>> {
     return Ok({
       hash: '', // TODO
-      coinbase: '0x0000000000000000000000000000000000000000', // TODO
+      coinbase: Address.parse('0x0000000000000000000000000000000000000000'), // TODO
       timestamp: 0,
       number: 0,
       difficulty: 0,
@@ -178,7 +177,7 @@ export class Engine {
   }
 
   async getCoinbase(): Promise<Result<Address, Error>> {
-    return Ok('0x0000000000000000000000000000000000000000'); // TODO
+    return Ok(Address.parse('0x0000000000000000000000000000000000000000')); // TODO
   }
 
   async getVersion(): Promise<Result<string, Error>> {
@@ -205,12 +204,12 @@ export class Engine {
   async deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>> {
     const args = parseHexString(bytecode);
     const result = await this.callMutativeFunction('deploy_code', args);
-    return result.map(({ output }) => parseAddress(Buffer.from(output).toString('hex')));
+    return result.map(({ output }) => Address.parse(Buffer.from(output).toString('hex')));
   }
 
   async call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
     const args = new FunctionCallArgs(
-      parseHexString(parseAddress(contract)),
+      contract.toBytes(),
       this.prepareInput(input),
     );
     return (await this.callMutativeFunction('call', args.encode())).map(({ output }) => output);
@@ -221,8 +220,8 @@ export class Engine {
 
   async view(sender: Address, address: Address, amount: Amount, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
     const args = new ViewCallArgs(
-      parseHexString(parseAddress(sender)),
-      parseHexString(parseAddress(address)),
+      sender.toBytes(),
+      address.toBytes(),
       toBufferBE(BigInt(amount), 32),
       this.prepareInput(input),
     );
@@ -230,25 +229,25 @@ export class Engine {
   }
 
   async getCode(address: Address): Promise<Result<Bytecode, Error>> {
-    const args = parseHexString(parseAddress(address));
+    const args = address.toBytes();
     return await this.callFunction('get_code', args);
   }
 
   async getBalance(address: Address): Promise<Result<U256, Error>> {
-    const args = parseHexString(parseAddress(address));
+    const args = address.toBytes();
     const result = await this.callFunction('get_balance', args);
     return result.map(toBigIntBE);
   }
 
   async getNonce(address: Address): Promise<Result<U256, Error>> {
-    const args = parseHexString(parseAddress(address));
+    const args = address.toBytes();
     const result = await this.callFunction('get_nonce', args);
     return result.map(toBigIntBE);
   }
 
   async getStorageAt(address: Address, key: U256 | number | string): Promise<Result<U256, Error>> {
     const args = new GetStorageAtArgs(
-      parseHexString(parseAddress(address)),
+      address.toBytes(),
       parseHexString(defaultAbiCoder.encode(['uint256'], [key])),
     );
     const result = await this.callFunction('get_storage_at', args.encode());
@@ -271,7 +270,7 @@ export class Engine {
       const address = Buffer.from(key).toString('hex');
 
       if (!result.has(address))  {
-        result.set(address, new AddressState(parseAddress(address)));
+        result.set(address, new AddressState(Address.parse(address)));
       }
 
       const state = result.get(address)!;
