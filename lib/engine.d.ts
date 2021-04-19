@@ -2,6 +2,7 @@
 import { AccountID, Address } from './account.js';
 import { BlockHash, BlockHeight, BlockID } from './block.js';
 import { KeyStore } from './key_store.js';
+import { U256 } from './prelude.js';
 import { TransactionID } from './transaction.js';
 import { Result } from '@hqoss/monads';
 import NEAR from 'near-api-js';
@@ -13,7 +14,6 @@ export declare type Bytecodeish = Bytecode | string;
 export declare type ChainID = bigint;
 export declare type Error = string;
 export declare type Quantity = bigint;
-export declare type U256 = bigint;
 export interface TransactionOutcome {
     id: TransactionID;
     output: Uint8Array;

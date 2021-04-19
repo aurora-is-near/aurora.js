@@ -4,6 +4,7 @@ import { AccountID, Address } from './account.js';
 import { BlockHash, BlockHeight, BlockID } from './block.js';
 import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
+import { U256 } from './prelude.js';
 import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
 import { TransactionID } from './transaction.js';
 
@@ -24,7 +25,6 @@ export type Bytecodeish = Bytecode | string;
 export type ChainID = bigint;
 export type Error = string;
 export type Quantity = bigint;
-export type U256 = bigint;
 
 export interface TransactionOutcome {
   id: TransactionID;
@@ -172,7 +172,7 @@ export class Engine {
       const counts = (await Promise.all(requests)) as number[];
       return Ok(counts.reduce((a, b) => a + b, 0));
     } catch (error) {
-      //console.error('getBlockTransactionCount', error);
+      //console.error('Engine#getBlockTransactionCount', error);
       return Err(error.message);
     }
   }

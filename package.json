@@ -25,6 +25,8 @@
     "lib/engine.d.ts",
     "lib/key_store.js",
     "lib/key_store.d.ts",
+    "lib/prelude.js",
+    "lib/prelude.d.ts",
     "lib/schema.js",
     "lib/schema.d.ts",
     "lib/transaction.js",

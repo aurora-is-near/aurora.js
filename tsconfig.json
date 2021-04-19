@@ -6,6 +6,7 @@
     "src/config.ts",
     "src/engine.ts",
     "src/key_store.ts",
+    "src/prelude.ts",
     "src/schema.ts",
     "src/transaction.ts",
     "src/utils.ts"
