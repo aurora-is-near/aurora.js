@@ -5,17 +5,19 @@ import { arrayify as parseHexString } from '@ethersproject/bytes';
 import { keccak256 } from '@ethersproject/keccak256';
 import { Result, Ok } from '@hqoss/monads';
 
-export type AccountID = string;
-
 export class Address {
   protected constructor(public readonly id: string) {}
 
-  static parse(id: string): Address {
-    return new Address(parseAddress(id));
+  static zero(): Address {
+    return new Address('0x0000000000000000000000000000000000000000');
+  }
+
+  static parse(id?: string): Result<Address, string> {
+    return Ok(new Address(parseAddress(id!)));
   }
 
   toString(): string {
-    return `0x${this.id}`;
+    return this.id;
   }
 
   toBytes(): Uint8Array {
@@ -23,11 +25,11 @@ export class Address {
   }
 }
 
-export class Account {
+export class AccountID {
   constructor(public readonly id: string) {} // TODO: validate the ID
 
-  static parse(id: string): Result<Account, string> {
-    return Ok(new Account(id));
+  static parse(id?: string): Result<AccountID, string> {
+    return Ok(new AccountID(id!));
   }
 
   toString(): string {
@@ -35,6 +37,6 @@ export class Account {
   }
 
   toAddress(): Address {
-    return Address.parse(keccak256(Buffer.from(this.id)).slice(26, 66));
+    return Address.parse(keccak256(Buffer.from(this.id)).slice(26, 66)).unwrap();
   }
 }

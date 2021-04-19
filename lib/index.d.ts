@@ -41,6 +41,6 @@ declare const _default: {
     NetworkID: typeof config.NetworkID;
     NETWORKS: Map<string, config.NetworkConfig>;
     Address: typeof account.Address;
-    Account: typeof account.Account;
+    AccountID: typeof account.AccountID;
 };
 export default _default;

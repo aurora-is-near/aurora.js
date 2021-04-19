@@ -1,16 +1,16 @@
 import { Result } from '@hqoss/monads';
-export declare type AccountID = string;
 export declare class Address {
     readonly id: string;
     protected constructor(id: string);
-    static parse(id: string): Address;
+    static zero(): Address;
+    static parse(id?: string): Result<Address, string>;
     toString(): string;
     toBytes(): Uint8Array;
 }
-export declare class Account {
+export declare class AccountID {
     readonly id: string;
     constructor(id: string);
-    static parse(id: string): Result<Account, string>;
+    static parse(id?: string): Result<AccountID, string>;
     toString(): string;
     toAddress(): Address;
 }

@@ -94,8 +94,8 @@ export class Engine {
   static async connect(options: ConnectOptions, env?: ConnectEnv): Promise<Engine> {
     const networkID = options.network || env && env.NEAR_ENV || DEFAULT_NETWORK_ID;
     const network = NETWORKS.get(networkID)!; // TODO: error handling
-    const contractID = options.contract || env && env.AURORA_ENGINE || network.contractID;
-    const signerID = options.signer || env && env.NEAR_MASTER_ACCOUNT; // TODO: error handling
+    const contractID = AccountID.parse(options.contract || env && env.AURORA_ENGINE || network.contractID).unwrap();
+    const signerID = AccountID.parse(options.signer || env && env.NEAR_MASTER_ACCOUNT).unwrap(); // TODO: error handling
 
     const keyStore = KeyStore.load(networkID, env);
     const near = new NEAR.Near({
@@ -103,7 +103,7 @@ export class Engine {
       networkId: networkID,
       nodeUrl: options.endpoint || env && env.NEAR_URL || network.nearEndpoint,
     });
-    const signer = await near.account(signerID!);
+    const signer = await near.account(signerID.toString());
     return new Engine(near, keyStore, signer, networkID, contractID);
   }
 
@@ -128,7 +128,7 @@ export class Engine {
   }
 
   async getAccount(): Promise<Result<NEAR.Account, Error>> {
-    return Ok(await this.near.account(this.contractID));
+    return Ok(await this.near.account(this.contractID.toString()));
   }
 
   async getBlockHash(): Promise<Result<BlockHash, Error>> {
@@ -146,7 +146,7 @@ export class Engine {
   async getBlockInfo(): Promise<Result<BlockInfo, Error>> {
     return Ok({
       hash: '', // TODO
-      coinbase: Address.parse('0x0000000000000000000000000000000000000000'), // TODO
+      coinbase: Address.zero(), // TODO
       timestamp: 0,
       number: 0,
       difficulty: 0,
@@ -177,7 +177,7 @@ export class Engine {
   }
 
   async getCoinbase(): Promise<Result<Address, Error>> {
-    return Ok(Address.parse('0x0000000000000000000000000000000000000000')); // TODO
+    return Ok(Address.zero()); // TODO
   }
 
   async getVersion(): Promise<Result<string, Error>> {
@@ -185,11 +185,11 @@ export class Engine {
   }
 
   async getOwner(): Promise<Result<AccountID, Error>> {
-    return (await this.callFunction('get_owner')).map(output => output.toString());
+    return (await this.callFunction('get_owner')).andThen(output => AccountID.parse(output.toString()));
   }
 
   async getBridgeProvider(): Promise<Result<AccountID, Error>> {
-    return (await this.callFunction('get_bridge_provider')).map(output => output.toString());
+    return (await this.callFunction('get_bridge_provider')).andThen(output => AccountID.parse(output.toString()));
   }
 
   async getChainID(): Promise<Result<ChainID, Error>> {
@@ -204,7 +204,7 @@ export class Engine {
   async deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>> {
     const args = parseHexString(bytecode);
     const result = await this.callMutativeFunction('deploy_code', args);
-    return result.map(({ output }) => Address.parse(Buffer.from(output).toString('hex')));
+    return result.map(({ output }) => Address.parse(Buffer.from(output).toString('hex')).unwrap());
   }
 
   async call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
@@ -270,7 +270,7 @@ export class Engine {
       const address = Buffer.from(key).toString('hex');
 
       if (!result.has(address))  {
-        result.set(address, new AddressState(Address.parse(address)));
+        result.set(address, new AddressState(Address.parse(address).unwrap()));
       }
 
       const state = result.get(address)!;
@@ -302,7 +302,7 @@ export class Engine {
   }
 
   protected async callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>> {
-    const result = await this.signer.functionCall(this.contractID, methodName, this.prepareInput(args));
+    const result = await this.signer.functionCall(this.contractID.toString(), methodName, this.prepareInput(args));
     if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
       return Ok({
         id: TransactionID.fromHex(result.transaction.hash),
