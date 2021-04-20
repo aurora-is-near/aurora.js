@@ -81,6 +81,7 @@ export declare class Engine {
     getChainID(): Promise<Result<ChainID, Error>>;
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
+    rawCall(input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
     view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
     getCode(address: Address): Promise<Result<Bytecode, Error>>;
     getBalance(address: Address): Promise<Result<U256, Error>>;

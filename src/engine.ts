@@ -217,7 +217,11 @@ export class Engine {
     return (await this.callMutativeFunction('call', args.encode())).map(({ output }) => output);
   }
 
-  // TODO: rawCall()
+  async rawCall(input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
+    const args = this.prepareInput(input);
+    return (await this.callMutativeFunction('raw_call', args)).map(({ output }) => output);
+  }
+
   // TODO: metaCall()
 
   async view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
