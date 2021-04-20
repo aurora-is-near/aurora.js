@@ -178,6 +178,11 @@ export class Engine {
     return await BlockProxy.fetch(provider, blockID, options);
   }
 
+  async hasBlock(blockID: BlockID): Promise<Result<boolean, Error>> {
+    const provider = this.near.connection.provider;
+    return await BlockProxy.lookup(provider, blockID);
+  }
+
   async getCoinbase(): Promise<Result<Address, Error>> {
     return Ok(Address.zero()); // TODO
   }

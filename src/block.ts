@@ -58,6 +58,15 @@ export class BlockProxy {
     this.parentHash = base58ToHex(header.prev_hash);
   }
 
+  static async lookup(provider: NEAR.providers.Provider, id: BlockID): Promise<Result<boolean, string>> {
+    try {
+      (await provider.block(parseBlockID(id)));
+      return Ok(true);
+    } catch (error) {
+      return Err(error.message);
+    }
+  }
+
   static async fetch(provider: NEAR.providers.Provider, id: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, string>> {
     try {
       const block = (await provider.block(parseBlockID(id))) as any;

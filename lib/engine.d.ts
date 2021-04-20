@@ -74,6 +74,7 @@ export declare class Engine {
     getBlockInfo(): Promise<Result<BlockInfo, Error>>;
     getBlockTransactionCount(blockID: BlockID): Promise<Result<number, Error>>;
     getBlock(blockID: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, Error>>;
+    hasBlock(blockID: BlockID): Promise<Result<boolean, Error>>;
     getCoinbase(): Promise<Result<Address, Error>>;
     getVersion(): Promise<Result<string, Error>>;
     getOwner(): Promise<Result<AccountID, Error>>;
