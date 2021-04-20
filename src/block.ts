@@ -1,7 +1,7 @@
 /* This is free and unencumbered software released into the public domain. */
 
-import { Address } from './account.js';
-import { Err, None, Ok, Quantity, Result } from './prelude.js';
+import { AccountID, Address } from './account.js';
+import { Err, Ok, Quantity, Result } from './prelude.js';
 import { Transaction, TransactionID } from './transaction.js';
 import { base58ToBytes, base58ToHex, exportJSON } from './utils.js';
 
@@ -16,6 +16,7 @@ export type BlockTag = 'earliest' | 'latest' | 'pending'
 export interface BlockOptions {
   chunks?: boolean;
   transactions?: 'id' | 'full';
+  contractID?: AccountID,
 }
 
 export interface BlockMetadata {
@@ -98,14 +99,15 @@ export class BlockProxy {
   getMetadata(): BlockMetadata {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const header = this.header as any;
+    const contractID = this.options.contractID;
     const transactions = ((opt?: string) => {
       switch (opt) {
         case 'id': return this.transactions;
         case 'full':
-          return this.outcomes.map(_ => {
-            return new Transaction(0n, 0n, 0n, None, 0n, Buffer.alloc(0), 0n, 0n, 0n); // TODO
+          return this.outcomes.flatMap(outcome => {
+            return Transaction.fromOutcome(outcome, contractID).match({ some: tx => [tx], none: [] })
           });
-        default: return [] as TransactionID[];
+        default: return [];
       }
     })(this.options.transactions);
     return {

@@ -62,6 +62,7 @@
   },
   "devDependencies": {
     "@ethersproject/keccak256": "^5.1.0",
+    "@ethersproject/transactions": "^5.1.1",
     "@tsconfig/node14": "^1.0.0",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",

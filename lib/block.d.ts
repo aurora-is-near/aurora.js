@@ -1,4 +1,4 @@
-import { Address } from './account.js';
+import { AccountID, Address } from './account.js';
 import { Quantity, Result } from './prelude.js';
 import { Transaction, TransactionID } from './transaction.js';
 import NEAR from 'near-api-js';
@@ -10,6 +10,7 @@ export declare type BlockTag = 'earliest' | 'latest' | 'pending';
 export interface BlockOptions {
     chunks?: boolean;
     transactions?: 'id' | 'full';
+    contractID?: AccountID;
 }
 export interface BlockMetadata {
     number: BlockHeight | null;

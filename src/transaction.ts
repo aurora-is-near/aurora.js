@@ -1,8 +1,10 @@
 /* This is free and unencumbered software released into the public domain. */
 
-import { Address } from './account.js';
-import { Option, U64, U256 } from './prelude.js';
+import { AccountID, Address } from './account.js';
+import { None, Option, Some, U64, U256 } from './prelude.js';
 import { base58ToHex, bytesToHex, intToHex } from './utils.js';
+
+import NEAR from 'near-api-js';
 
 export class TransactionID {
   protected constructor(public readonly id: string) {}
@@ -35,6 +37,16 @@ export class Transaction {
     public readonly v?: U64,
     public readonly r?: U256,
     public readonly s?: U256) {}
+
+  static fromOutcome(outcome: NEAR.providers.FinalExecutionOutcome, contractID?: AccountID): Option<Transaction> {
+    const contractID_ = contractID || AccountID.aurora();
+    if (outcome.transaction.receiver_id == contractID_.id) return None;
+    const actions = outcome.transaction.actions as any[];
+    const action = actions.find(action => action.FunctionCall && action.FunctionCall.method_name === 'raw_call');
+    const rawTransaction = Buffer.from(action.FunctionCall.args, 'base64');
+    console.debug('Transaction.fromOutcome', rawTransaction); // DEBUG
+    return Some(new Transaction(0n, 0n, 0n, None, 0n, Buffer.alloc(0), 0n, 0n, 0n)); // TODO!
+  }
 
   isSigned(): boolean {
     return this.v !== undefined && this.r !== undefined && this.s !== undefined;
