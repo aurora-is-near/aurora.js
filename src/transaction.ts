@@ -5,6 +5,7 @@ import { None, Option, Some, U64, U256 } from './prelude.js';
 import { base58ToHex, bytesToHex, intToHex } from './utils.js';
 
 import NEAR from 'near-api-js';
+import { parse } from '@ethersproject/transactions';
 
 export class TransactionID {
   protected constructor(public readonly id: string) {}
@@ -30,22 +31,35 @@ export class Transaction {
   constructor(
     public readonly nonce: U256,
     public readonly gasPrice: U256,
-    public readonly gas: U256,
+    public readonly gasLimit: U256,
     public readonly to: Option<Address>,
     public readonly value: U256,
-    public readonly input: Uint8Array,
+    public readonly data: Uint8Array,
     public readonly v?: U64,
     public readonly r?: U256,
-    public readonly s?: U256) {}
+    public readonly s?: U256,
+    public readonly from?: Address,
+    public readonly hash?: string) {}
 
   static fromOutcome(outcome: NEAR.providers.FinalExecutionOutcome, contractID?: AccountID): Option<Transaction> {
     const contractID_ = contractID || AccountID.aurora();
-    if (outcome.transaction.receiver_id == contractID_.id) return None;
+    if (outcome.transaction.receiver_id != contractID_.id) return None;
     const actions = outcome.transaction.actions as any[];
-    const action = actions.find(action => action.FunctionCall && action.FunctionCall.method_name === 'raw_call');
-    const rawTransaction = Buffer.from(action.FunctionCall.args, 'base64');
-    console.debug('Transaction.fromOutcome', rawTransaction); // DEBUG
-    return Some(new Transaction(0n, 0n, 0n, None, 0n, Buffer.alloc(0), 0n, 0n, 0n)); // TODO!
+    const action = actions.find(a => a.FunctionCall && a.FunctionCall.method_name === 'raw_call');
+    const transaction = parse(Buffer.from(action.FunctionCall.args, 'base64'));
+    return Some(new Transaction(
+      transaction.nonce,
+      BigInt(transaction.gasPrice.toString()),
+      BigInt(transaction.gasLimit.toString()),
+      Address.parse(transaction.to).ok(),
+      BigInt(transaction.value.toString()),
+      Buffer.from(transaction.data, 'hex'),
+      BigInt(transaction.v),
+      BigInt(transaction.r),
+      BigInt(transaction.s),
+      transaction.from ? Address.parse(transaction.from).unwrap() : undefined,
+      transaction.hash,
+    ));
   }
 
   isSigned(): boolean {
@@ -57,13 +71,15 @@ export class Transaction {
     return {
       nonce: intToHex(this.nonce),
       gasPrice: intToHex(this.gasPrice),
-      gas: intToHex(this.gas),
-      to: this.to.isSome() ? this.to.unwrap() : null,
+      gas: intToHex(this.gasLimit),
+      to: this.to.isSome() ? this.to.unwrap().toString() : null,
       value: intToHex(this.value),
-      input: bytesToHex(this.input),
+      input: bytesToHex(this.data),
       v: (this.v !== undefined) ? intToHex(this.v) : undefined,
       r: (this.r !== undefined) ? intToHex(this.r) : undefined,
       s: (this.s !== undefined) ? intToHex(this.s) : undefined,
+      from: this.from ? this.from.toString() : undefined,
+      hash: this.hash,
     };
   }
 }

@@ -6,8 +6,8 @@ import { Transaction, TransactionID } from './transaction.js';
 import { toBufferBE } from 'bigint-buffer';
 import bs58 from 'bs58';
 
-export function formatU256(value: bigint): string {
-  return `0x${toBufferBE(value, 32).toString('hex')}`;
+export function formatU256(value: number | bigint): string {
+  return `0x${toBufferBE(BigInt(value), 32).toString('hex')}`;
 }
 
 export function base58ToHex(input: string): string {

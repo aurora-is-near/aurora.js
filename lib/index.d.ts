@@ -16,7 +16,7 @@ import * as prelude from './prelude.js';
 import * as schema from './schema.js';
 import * as transaction from './transaction.js';
 declare const _default: {
-    formatU256(value: bigint): string;
+    formatU256(value: number | bigint): string;
     base58ToHex(input: string): string;
     base58ToBytes(input: string): Uint8Array;
     bytesToHex(input: Uint8Array): string;

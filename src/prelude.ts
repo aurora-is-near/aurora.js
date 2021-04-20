@@ -3,5 +3,5 @@
 export * from '@hqoss/monads';
 
 export type Quantity = number | bigint;
-export type U64 = bigint;
-export type U256 = bigint;
+export type U64 = number | bigint;
+export type U256 = number | bigint;
