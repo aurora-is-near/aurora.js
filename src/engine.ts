@@ -1,7 +1,7 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
-import { Block, BlockHash, BlockHeight, BlockID, parseBlockID } from './block.js';
+import { BlockHash, BlockHeight, BlockID, BlockOptions, BlockProxy, parseBlockID } from './block.js';
 import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
 import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
@@ -173,9 +173,9 @@ export class Engine {
     }
   }
 
-  async getBlock(blockID: BlockID): Promise<Result<Block, Error>> {
+  async getBlock(blockID: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, Error>> {
     const provider = this.near.connection.provider;
-    return await Block.fetch(provider, blockID);
+    return await BlockProxy.fetch(provider, blockID, options);
   }
 
   async getCoinbase(): Promise<Result<Address, Error>> {

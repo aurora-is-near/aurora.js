@@ -7,6 +7,10 @@ export declare type BlockHash = string;
 export declare type BlockHeight = Quantity;
 export declare type BlockID = BlockTag | BlockHeight | BlockHash;
 export declare type BlockTag = 'earliest' | 'latest' | 'pending';
+export interface BlockOptions {
+    chunks?: boolean;
+    transactions?: 'id' | 'full';
+}
 export interface BlockMetadata {
     number: BlockHeight | null;
     hash: BlockHash | null;
@@ -28,15 +32,16 @@ export interface BlockMetadata {
     transactions: TransactionID[] | Transaction[];
     uncles: BlockHash[];
 }
-export declare class Block {
+export declare class BlockProxy {
     protected readonly provider: NEAR.providers.Provider;
     protected readonly header: BlockHeader;
     protected readonly chunks: ChunkResult[];
+    protected readonly outcomes: NEAR.providers.FinalExecutionOutcome[];
     readonly number: BlockHeight;
     readonly hash: BlockHash;
     readonly parentHash: BlockHash;
-    protected constructor(provider: NEAR.providers.Provider, header: BlockHeader, chunks: ChunkResult[]);
-    static fetch(provider: NEAR.providers.Provider, id: BlockID): Promise<Result<Block, string>>;
+    protected constructor(provider: NEAR.providers.Provider, header: BlockHeader, chunks: ChunkResult[], outcomes: NEAR.providers.FinalExecutionOutcome[]);
+    static fetch(provider: NEAR.providers.Provider, id: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, string>>;
     getMetadata(): BlockMetadata;
     toString(): string;
     toJSON(): any;

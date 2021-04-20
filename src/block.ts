@@ -13,6 +13,11 @@ export type BlockHeight = Quantity;
 export type BlockID = BlockTag | BlockHeight | BlockHash;
 export type BlockTag = 'earliest' | 'latest' | 'pending'
 
+export interface BlockOptions {
+  chunks?: boolean;
+  transactions?: 'id' | 'full';
+}
+
 export interface BlockMetadata {
   number: BlockHeight | null;
   hash: BlockHash | null;
@@ -35,7 +40,7 @@ export interface BlockMetadata {
   uncles: BlockHash[];
 }
 
-export class Block {
+export class BlockProxy {
   public readonly number: BlockHeight;
   public readonly hash: BlockHash;
   public readonly parentHash: BlockHash;
@@ -43,20 +48,40 @@ export class Block {
   protected constructor(
       protected readonly provider: NEAR.providers.Provider,
       protected readonly header: BlockHeader,
-      protected readonly chunks: ChunkResult[]) {
+      protected readonly chunks: ChunkResult[],
+      protected readonly outcomes: NEAR.providers.FinalExecutionOutcome[]) {
     this.number = header.height;
     this.hash = base58ToHex(header.hash);
     this.parentHash = base58ToHex(header.prev_hash);
   }
 
-  static async fetch(provider: NEAR.providers.Provider, id: BlockID): Promise<Result<Block, string>> {
+  static async fetch(provider: NEAR.providers.Provider, id: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, string>> {
     try {
       const block = (await provider.block(parseBlockID(id))) as any;
-      const chunkRequests = block.chunks.map(async (chunkHeader: any) => {
-        return await provider.chunk(chunkHeader.chunk_hash);
-      });
-      const chunks = (await Promise.all(chunkRequests)) as ChunkResult[];
-      return Ok(new Block(provider, block.header, chunks));
+
+      let chunks: ChunkResult[] = [];
+      let outcomes: NEAR.providers.FinalExecutionOutcome[] = [];
+      if (options) {
+        if (options.chunks || options.transactions) {
+          const requests = block.chunks.map(async (chunkHeader: any) => {
+            return await provider.chunk(chunkHeader.chunk_hash);
+          });
+          chunks = await Promise.all(requests);
+        }
+        if (options.transactions) {
+          const requests = chunks.flatMap((chunk: any) => {
+            return chunk.transactions.map(async (txHeader: any) => {
+              switch (options.transactions) {
+                case 'id': return base58ToHex(txHeader.hash);
+                default: return await provider.txStatus(base58ToBytes(txHeader.hash), txHeader.signer_id);
+              }
+            });
+          });
+          outcomes = await Promise.all(requests);
+        }
+      }
+
+      return Ok(new BlockProxy(provider, block.header, chunks, outcomes));
     } catch (error) {
       return Err(error.message);
     }

@@ -30,7 +30,7 @@ export function intToHex(input: number | bigint): string {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function exportJSON(object: any): any {
   for (const [k, v] of Object.entries(object)) {
-    console.log(k, v, typeof v);
+    //console.log(k, v, typeof v);
     switch (typeof v) {
       case 'number':
       case 'bigint':
