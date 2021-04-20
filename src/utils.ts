@@ -1,5 +1,8 @@
 /* This is free and unencumbered software released into the public domain. */
 
+import { AccountID, Address } from './account.js';
+import { TransactionID } from './transaction.js';
+
 import { toBufferBE } from 'bigint-buffer';
 import bs58 from 'bs58';
 
@@ -37,9 +40,12 @@ export function exportJSON(object: any): any {
         object[k] = intToHex(v);
         break;
       case 'object':
-        object[k] = (v instanceof Uint8Array) ?
-        `0x${Buffer.from(v).toString('hex')}` :
-        ((v !== null) ? exportJSON(v) : null);
+        object[k] =
+          (v instanceof AccountID) ? v.toString() :
+          (v instanceof Address) ? v.toString() :
+          (v instanceof TransactionID) ? v.toString() :
+          (v instanceof Uint8Array) ? bytesToHex(v) :
+          (v !== null ? exportJSON(v) : null);
         break;
       default: break;
     }

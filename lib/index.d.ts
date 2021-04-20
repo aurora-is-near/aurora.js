@@ -57,7 +57,7 @@ declare const _default: {
     NETWORKS: Map<string, config.NetworkConfig>;
     parseBlockID(blockID: block.BlockID): any;
     BlockProxy: typeof block.BlockProxy;
-    Address: typeof account.Address;
     AccountID: typeof account.AccountID;
+    Address: typeof account.Address;
 };
 export default _default;
