@@ -1,6 +1,6 @@
 import { Address } from './account.js';
-import { Transaction, TransactionID } from './transaction.js';
 import { Quantity, Result } from './prelude.js';
+import { Transaction, TransactionID } from './transaction.js';
 import NEAR from 'near-api-js';
 import { BlockHeader, ChunkResult } from 'near-api-js/lib/providers/provider';
 export declare type BlockHash = string;
@@ -35,12 +35,14 @@ export interface BlockMetadata {
 export declare class BlockProxy {
     protected readonly provider: NEAR.providers.Provider;
     protected readonly header: BlockHeader;
+    protected readonly options: BlockOptions;
     protected readonly chunks: ChunkResult[];
+    protected readonly transactions: TransactionID[];
     protected readonly outcomes: NEAR.providers.FinalExecutionOutcome[];
     readonly number: BlockHeight;
     readonly hash: BlockHash;
     readonly parentHash: BlockHash;
-    protected constructor(provider: NEAR.providers.Provider, header: BlockHeader, chunks: ChunkResult[], outcomes: NEAR.providers.FinalExecutionOutcome[]);
+    protected constructor(provider: NEAR.providers.Provider, header: BlockHeader, options: BlockOptions, chunks: ChunkResult[], transactions: TransactionID[], outcomes: NEAR.providers.FinalExecutionOutcome[]);
     static fetch(provider: NEAR.providers.Provider, id: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, string>>;
     getMetadata(): BlockMetadata;
     toString(): string;

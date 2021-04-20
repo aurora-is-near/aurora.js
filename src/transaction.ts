@@ -32,9 +32,13 @@ export class Transaction {
     public readonly to: Option<Address>,
     public readonly value: U256,
     public readonly input: Uint8Array,
-    public readonly v: U64,
-    public readonly r: U256,
-    public readonly s: U256) {}
+    public readonly v?: U64,
+    public readonly r?: U256,
+    public readonly s?: U256) {}
+
+  isSigned(): boolean {
+    return this.v !== undefined && this.r !== undefined && this.s !== undefined;
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toJSON(): any {
@@ -45,9 +49,9 @@ export class Transaction {
       to: this.to.isSome() ? this.to.unwrap() : null,
       value: intToHex(this.value),
       input: bytesToHex(this.input),
-      v: this.v && intToHex(this.v),
-      r: this.r && intToHex(this.r),
-      s: this.s && intToHex(this.s),
+      v: (this.v !== undefined) ? intToHex(this.v) : undefined,
+      r: (this.r !== undefined) ? intToHex(this.r) : undefined,
+      s: (this.s !== undefined) ? intToHex(this.s) : undefined,
     };
   }
 }

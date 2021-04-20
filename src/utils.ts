@@ -1,7 +1,7 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
-import { TransactionID } from './transaction.js';
+import { Transaction, TransactionID } from './transaction.js';
 
 import { toBufferBE } from 'bigint-buffer';
 import bs58 from 'bs58';
@@ -43,6 +43,7 @@ export function exportJSON(object: any): any {
         object[k] =
           (v instanceof AccountID) ? v.toString() :
           (v instanceof Address) ? v.toString() :
+          (v instanceof Transaction) ? v.toJSON() :
           (v instanceof TransactionID) ? v.toString() :
           (v instanceof Uint8Array) ? bytesToHex(v) :
           (v !== null ? exportJSON(v) : null);

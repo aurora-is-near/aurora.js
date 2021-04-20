@@ -1,8 +1,8 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { Address } from './account.js';
+import { Err, None, Ok, Quantity, Result } from './prelude.js';
 import { Transaction, TransactionID } from './transaction.js';
-import { Err, Ok, Quantity, Result } from './prelude.js';
 import { base58ToBytes, base58ToHex, exportJSON } from './utils.js';
 
 import NEAR from 'near-api-js';
@@ -48,7 +48,9 @@ export class BlockProxy {
   protected constructor(
       protected readonly provider: NEAR.providers.Provider,
       protected readonly header: BlockHeader,
+      protected readonly options: BlockOptions,
       protected readonly chunks: ChunkResult[],
+      protected readonly transactions: TransactionID[],
       protected readonly outcomes: NEAR.providers.FinalExecutionOutcome[]) {
     this.number = header.height;
     this.hash = base58ToHex(header.hash);
@@ -60,6 +62,7 @@ export class BlockProxy {
       const block = (await provider.block(parseBlockID(id))) as any;
 
       let chunks: ChunkResult[] = [];
+      let transactions: TransactionID[] = [];
       let outcomes: NEAR.providers.FinalExecutionOutcome[] = [];
       if (options) {
         if (options.chunks || options.transactions) {
@@ -68,20 +71,25 @@ export class BlockProxy {
           });
           chunks = await Promise.all(requests);
         }
-        if (options.transactions) {
+        if (options.transactions === 'id') {
           const requests = chunks.flatMap((chunk: any) => {
             return chunk.transactions.map(async (txHeader: any) => {
-              switch (options.transactions) {
-                case 'id': return base58ToHex(txHeader.hash);
-                default: return await provider.txStatus(base58ToBytes(txHeader.hash), txHeader.signer_id);
-              }
+              return TransactionID.fromBase58(txHeader.hash);
+            });
+          });
+          transactions = await Promise.all(requests);
+        }
+        else if (options.transactions === 'full') {
+          const requests = chunks.flatMap((chunk: any) => {
+            return chunk.transactions.map(async (txHeader: any) => {
+              return await provider.txStatus(base58ToBytes(txHeader.hash), txHeader.signer_id);
             });
           });
           outcomes = await Promise.all(requests);
         }
       }
 
-      return Ok(new BlockProxy(provider, block.header, chunks, outcomes));
+      return Ok(new BlockProxy(provider, block.header, options || {}, chunks, transactions, outcomes));
     } catch (error) {
       return Err(error.message);
     }
@@ -90,6 +98,16 @@ export class BlockProxy {
   getMetadata(): BlockMetadata {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const header = this.header as any;
+    const transactions = ((opt?: string) => {
+      switch (opt) {
+        case 'id': return this.transactions;
+        case 'full':
+          return this.outcomes.map(_ => {
+            return new Transaction(0n, 0n, 0n, None, 0n, Buffer.alloc(0), 0n, 0n, 0n); // TODO
+          });
+        default: return [] as TransactionID[];
+      }
+    })(this.options.transactions);
     return {
       number: this.number,
       hash: this.hash,
@@ -108,7 +126,7 @@ export class BlockProxy {
       gasLimit: this.chunks.map((chunk) => chunk.header.gas_limit).sort()[0] || 0,
       gasUsed: this.chunks.map((chunk) => chunk.header.gas_used).reduce((a, b) => a + b, 0),
       timestamp: new Date(this.header.timestamp / 1_000_000_000).getTime(),
-      transactions: [], // TODO
+      transactions: transactions,
       uncles: [],
     };
   }

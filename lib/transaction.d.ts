@@ -1,5 +1,5 @@
 import { Address } from './account.js';
-import { Option, U64, U256 } from './prelude.js';
+import { Option, U256 } from './prelude.js';
 export declare class TransactionID {
     readonly id: string;
     protected constructor(id: string);
@@ -15,9 +15,10 @@ export declare class Transaction {
     readonly to: Option<Address>;
     readonly value: U256;
     readonly input: Uint8Array;
-    readonly v: U64;
-    readonly r: U256;
-    readonly s: U256;
-    constructor(nonce: U256, gasPrice: U256, gas: U256, to: Option<Address>, value: U256, input: Uint8Array, v: U64, r: U256, s: U256);
+    readonly v?: bigint | undefined;
+    readonly r?: bigint | undefined;
+    readonly s?: bigint | undefined;
+    constructor(nonce: U256, gasPrice: U256, gas: U256, to: Option<Address>, value: U256, input: Uint8Array, v?: bigint | undefined, r?: bigint | undefined, s?: bigint | undefined);
+    isSigned(): boolean;
     toJSON(): any;
 }
