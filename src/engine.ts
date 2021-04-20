@@ -308,7 +308,8 @@ export class Engine {
   }
 
   protected async callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>> {
-    const result = await this.signer.functionCall(this.contractID.toString(), methodName, this.prepareInput(args));
+    const gas = new BN('300000000000000');
+    const result = await this.signer.functionCall(this.contractID.toString(), methodName, this.prepareInput(args), gas);
     if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
       return Ok({
         id: TransactionID.fromHex(result.transaction.hash),
