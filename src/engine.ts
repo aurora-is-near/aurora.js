@@ -302,7 +302,7 @@ export class Engine {
   protected async callFunction(methodName: string, args?: Uint8Array): Promise<Result<Buffer, Error>> {
     const result = await this.signer.connection.provider.query({
       request_type: 'call_function',
-      account_id: this.contractID,
+      account_id: this.contractID.toString(),
       method_name: methodName,
       args_base64: this.prepareInput(args).toString('base64'),
       finality: 'optimistic',
