@@ -21,6 +21,7 @@ declare const _default: {
     base58ToBytes(input: string): Uint8Array;
     bytesToHex(input: Uint8Array): string;
     hexToBase58(input: string): string;
+    hexToBytes(input: string): Uint8Array;
     intToHex(input: number | bigint): string;
     exportJSON(object: any): any;
     TransactionID: typeof transaction.TransactionID;

@@ -23,7 +23,11 @@ export function bytesToHex(input: Uint8Array): string {
 }
 
 export function hexToBase58(input: string): string {
-  return bs58.encode(Buffer.from(input.substring(2), 'hex'));
+  return bs58.encode(hexToBytes(input));
+}
+
+export function hexToBytes(input: string): Uint8Array {
+  return Buffer.from(input.substring(2), 'hex');
 }
 
 export function intToHex(input: number | bigint): string {
