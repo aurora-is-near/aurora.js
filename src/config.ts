@@ -14,7 +14,7 @@ export interface NetworkConfig {
 export enum NetworkID {
   Local = 'local',
   BetaNet = 'betanet',
-  TestNet = 'testnet',
+  TestNet = 'default',
   MainNet = 'mainnet',
 }
 
