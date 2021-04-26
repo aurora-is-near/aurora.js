@@ -35,7 +35,7 @@ export function intToHex(input: number | bigint): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function exportJSON(object: any): any {
+export function exportJSON(object: Record<string, unknown>): any {
   for (const [k, v] of Object.entries(object)) {
     //console.log(k, v, typeof v);
     switch (typeof v) {
@@ -44,13 +44,14 @@ export function exportJSON(object: any): any {
         object[k] = intToHex(v);
         break;
       case 'object':
-        object[k] =
+        object[k] = (v === null) ? null :
+          Array.isArray(v) ? v.map(exportJSON) :
           (v instanceof AccountID) ? v.toString() :
           (v instanceof Address) ? v.toString() :
           (v instanceof Transaction) ? v.toJSON() :
           (v instanceof TransactionID) ? v.toString() :
           (v instanceof Uint8Array) ? bytesToHex(v) :
-          (v !== null ? exportJSON(v) : null);
+          exportJSON(v as Record<string, unknown>);
         break;
       default: break;
     }
