@@ -19,11 +19,12 @@ declare const _default: {
     formatU256(value: number | bigint): string;
     base58ToHex(input: string): string;
     base58ToBytes(input: string): Uint8Array;
-    bytesToHex(input: Uint8Array): string;
+    bytesToHex(input: Uint8Array | null | undefined): string;
     hexToBase58(input: string): string;
     hexToBytes(input: string): Uint8Array;
+    hexToInt(input: string): number;
     intToHex(input: number | bigint): string;
-    exportJSON(object: any): any;
+    exportJSON(object: Record<string, unknown>): any;
     TransactionID: typeof transaction.TransactionID;
     Transaction: typeof transaction.Transaction;
     NewCallArgs: typeof schema.NewCallArgs;

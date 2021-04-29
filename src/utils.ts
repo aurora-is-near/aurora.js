@@ -18,8 +18,8 @@ export function base58ToBytes(input: string): Uint8Array {
   return Buffer.from(bs58.decode(input));
 }
 
-export function bytesToHex(input: Uint8Array): string {
-  return `0x${Buffer.from(input).toString('hex')}`;
+export function bytesToHex(input: Uint8Array | null | undefined): string {
+  return `0x${input ? Buffer.from(input).toString('hex') : ''}`;
 }
 
 export function hexToBase58(input: string): string {
@@ -28,6 +28,10 @@ export function hexToBase58(input: string): string {
 
 export function hexToBytes(input: string): Uint8Array {
   return Buffer.from(input.substring(2), 'hex');
+}
+
+export function hexToInt(input: string): number {
+  return parseInt(input, 16); // TODO: handle bignums
 }
 
 export function intToHex(input: number | bigint): string {
