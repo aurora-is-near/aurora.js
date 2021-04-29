@@ -9,9 +9,11 @@ export declare class AccountID {
 }
 export declare class Address {
     readonly id: string;
+    static ZERO: string;
     protected constructor(id: string);
     static zero(): Address;
     static parse(id?: string): Result<Address, string>;
+    isZero(): boolean;
     toString(): string;
     toBytes(): Uint8Array;
 }

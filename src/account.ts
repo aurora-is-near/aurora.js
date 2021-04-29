@@ -27,14 +27,20 @@ export class AccountID {
 }
 
 export class Address {
+  static ZERO = `0x${'00'.repeat(20)}`;
+
   protected constructor(public readonly id: string) {}
 
   static zero(): Address {
-    return new Address(`0x${'00'.repeat(20)}`);
+    return new Address(Address.ZERO);
   }
 
   static parse(id?: string): Result<Address, string> {
     return Ok(new Address(parseAddress(id!)));
+  }
+
+  isZero(): boolean {
+    return this.id === Address.ZERO;
   }
 
   toString(): string {
