@@ -1,11 +1,23 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
-import { BlockHash, BlockHeight, BlockID, BlockOptions, BlockProxy, parseBlockID } from './block.js';
+import {
+  BlockHash,
+  BlockHeight,
+  BlockID,
+  BlockOptions,
+  BlockProxy,
+  parseBlockID,
+} from './block.js';
 import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
 import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
-import { FunctionCallArgs, GetStorageAtArgs, NewCallArgs, ViewCallArgs } from './schema.js';
+import {
+  FunctionCallArgs,
+  GetStorageAtArgs,
+  NewCallArgs,
+  ViewCallArgs,
+} from './schema.js';
 import { TransactionID } from './transaction.js';
 
 import { defaultAbiCoder } from '@ethersproject/abi';
@@ -37,18 +49,18 @@ export interface BlockInfo {
 }
 
 export interface ConnectOptions {
-  network?: string;              // network ID
-  endpoint?: string;             // endpoint URL
-  contract?: string;             // engine ID
-  signer?: string;               // signer ID
+  network?: string; // network ID
+  endpoint?: string; // endpoint URL
+  contract?: string; // engine ID
+  signer?: string; // signer ID
 }
 
 export interface ConnectEnv {
-  AURORA_ENGINE?: string;        // engine ID
-  HOME?: string;                 // home directory
-  NEAR_ENV?: string;             // network ID
-  NEAR_MASTER_ACCOUNT?: string;  // signer ID
-  NEAR_URL?: string;             // endpoint URL
+  AURORA_ENGINE?: string; // engine ID
+  HOME?: string; // home directory
+  NEAR_ENV?: string; // network ID
+  NEAR_MASTER_ACCOUNT?: string; // signer ID
+  NEAR_URL?: string; // endpoint URL
 }
 
 export type AddressStorage = Map<U256, U256>;
@@ -59,7 +71,8 @@ export class AddressState {
     public nonce: U256 = BigInt(0),
     public balance: Quantity = BigInt(0),
     public code?: Bytecode,
-    public storage: AddressStorage = new Map()) {}
+    public storage: AddressStorage = new Map()
+  ) {}
 }
 
 export const enum EngineStorageKeyPrefix {
@@ -73,32 +86,40 @@ export const enum EngineStorageKeyPrefix {
 export type EngineStorage = Map<Address, AddressState>;
 
 export class EngineState {
-  constructor(
-    public storage: EngineStorage = new Map()) {}
+  constructor(public storage: EngineStorage = new Map()) {}
 }
 
 const DEFAULT_NETWORK_ID = 'local';
 
 export class Engine {
-
   protected constructor(
     public readonly near: NEAR.Near,
     public readonly keyStore: KeyStore,
     public readonly signer: NEAR.Account,
     public readonly networkID: string,
-    public readonly contractID: AccountID) {}
+    public readonly contractID: AccountID
+  ) {}
 
-  static async connect(options: ConnectOptions, env?: ConnectEnv): Promise<Engine> {
-    const networkID = options.network || env && env.NEAR_ENV || DEFAULT_NETWORK_ID;
+  static async connect(
+    options: ConnectOptions,
+    env?: ConnectEnv
+  ): Promise<Engine> {
+    const networkID =
+      options.network || (env && env.NEAR_ENV) || DEFAULT_NETWORK_ID;
     const network = NETWORKS.get(networkID)!; // TODO: error handling
-    const contractID = AccountID.parse(options.contract || env && env.AURORA_ENGINE || network.contractID).unwrap();
-    const signerID = AccountID.parse(options.signer || env && env.NEAR_MASTER_ACCOUNT).unwrap(); // TODO: error handling
+    const contractID = AccountID.parse(
+      options.contract || (env && env.AURORA_ENGINE) || network.contractID
+    ).unwrap();
+    const signerID = AccountID.parse(
+      options.signer || (env && env.NEAR_MASTER_ACCOUNT)
+    ).unwrap(); // TODO: error handling
 
     const keyStore = KeyStore.load(networkID, env);
     const near = new NEAR.Near({
       deps: { keyStore },
       networkId: networkID,
-      nodeUrl: options.endpoint || env && env.NEAR_URL || network.nearEndpoint,
+      nodeUrl:
+        options.endpoint || (env && env.NEAR_URL) || network.nearEndpoint,
     });
     const signer = await near.account(signerID.toString());
     return new Engine(near, keyStore, signer, networkID, contractID);
@@ -121,7 +142,9 @@ export class Engine {
       options.bridgeProver || '',
       new BN(options.upgradeDelay || 0)
     );
-    return (await this.callMutativeFunction('new', args.encode())).map(({ id }) => id);
+    return (await this.callMutativeFunction('new', args.encode())).map(
+      ({ id }) => id
+    );
   }
 
   async getAccount(): Promise<Result<NEAR.Account, Error>> {
@@ -130,13 +153,13 @@ export class Engine {
 
   async getBlockHash(): Promise<Result<BlockHash, Error>> {
     const contractAccount = (await this.getAccount()).unwrap();
-    const state = await contractAccount.state() as any;
+    const state = (await contractAccount.state()) as any;
     return Ok(state.block_hash);
   }
 
   async getBlockHeight(): Promise<Result<BlockHeight, Error>> {
     const contractAccount = (await this.getAccount()).unwrap();
-    const state = await contractAccount.state() as any;
+    const state = (await contractAccount.state()) as any;
     return Ok(state.block_height);
   }
 
@@ -151,7 +174,9 @@ export class Engine {
     });
   }
 
-  async getBlockTransactionCount(blockID: BlockID): Promise<Result<number, Error>> {
+  async getBlockTransactionCount(
+    blockID: BlockID
+  ): Promise<Result<number, Error>> {
     try {
       const provider = this.near.connection.provider;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,8 +184,7 @@ export class Engine {
       const requests = block.chunks.map(async (chunkHeader: any) => {
         if (chunkHeader.tx_root == '11111111111111111111111111111111') {
           return 0; // no transactions in this chunk
-        }
-        else {
+        } else {
           const chunk = await provider.chunk(chunkHeader.chunk_hash);
           return chunk.transactions.length;
         }
@@ -173,7 +197,10 @@ export class Engine {
     }
   }
 
-  async getBlock(blockID: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, Error>> {
+  async getBlock(
+    blockID: BlockID,
+    options?: BlockOptions
+  ): Promise<Result<BlockProxy, Error>> {
     const provider = this.near.connection.provider;
     return await BlockProxy.fetch(provider, blockID, options);
   }
@@ -188,15 +215,21 @@ export class Engine {
   }
 
   async getVersion(): Promise<Result<string, Error>> {
-    return (await this.callFunction('get_version')).map(output => output.toString());
+    return (await this.callFunction('get_version')).map((output) =>
+      output.toString()
+    );
   }
 
   async getOwner(): Promise<Result<AccountID, Error>> {
-    return (await this.callFunction('get_owner')).andThen(output => AccountID.parse(output.toString()));
+    return (await this.callFunction('get_owner')).andThen((output) =>
+      AccountID.parse(output.toString())
+    );
   }
 
   async getBridgeProvider(): Promise<Result<AccountID, Error>> {
-    return (await this.callFunction('get_bridge_provider')).andThen(output => AccountID.parse(output.toString()));
+    return (await this.callFunction('get_bridge_provider')).andThen((output) =>
+      AccountID.parse(output.toString())
+    );
   }
 
   async getChainID(): Promise<Result<ChainID, Error>> {
@@ -211,30 +244,46 @@ export class Engine {
   async deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>> {
     const args = parseHexString(bytecode);
     const result = await this.callMutativeFunction('deploy_code', args);
-    return result.map(({ output }) => Address.parse(Buffer.from(output).toString('hex')).unwrap());
+    return result.map(({ output }) =>
+      Address.parse(Buffer.from(output).toString('hex')).unwrap()
+    );
   }
 
-  async call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
+  async call(
+    contract: Address,
+    input: Uint8Array | string
+  ): Promise<Result<Uint8Array, Error>> {
     const args = new FunctionCallArgs(
       contract.toBytes(),
-      this.prepareInput(input),
+      this.prepareInput(input)
     );
-    return (await this.callMutativeFunction('call', args.encode())).map(({ output }) => output);
+    return (await this.callMutativeFunction('call', args.encode())).map(
+      ({ output }) => output
+    );
   }
 
-  async rawCall(input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
+  async rawCall(
+    input: Uint8Array | string
+  ): Promise<Result<Uint8Array, Error>> {
     const args = this.prepareInput(input);
-    return (await this.callMutativeFunction('raw_call', args)).map(({ output }) => output);
+    return (await this.callMutativeFunction('raw_call', args)).map(
+      ({ output }) => output
+    );
   }
 
   // TODO: metaCall()
 
-  async view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
+  async view(
+    sender: Address,
+    address: Address,
+    amount: Quantity,
+    input: Uint8Array | string
+  ): Promise<Result<Uint8Array, Error>> {
     const args = new ViewCallArgs(
       sender.toBytes(),
       address.toBytes(),
       toBufferBE(BigInt(amount), 32),
-      this.prepareInput(input),
+      this.prepareInput(input)
     );
     return await this.callFunction('view', args.encode());
   }
@@ -256,10 +305,13 @@ export class Engine {
     return result.map(toBigIntBE);
   }
 
-  async getStorageAt(address: Address, key: U256 | number | string): Promise<Result<U256, Error>> {
+  async getStorageAt(
+    address: Address,
+    key: U256 | number | string
+  ): Promise<Result<U256, Error>> {
     const args = new GetStorageAtArgs(
       address.toBytes(),
-      parseHexString(defaultAbiCoder.encode(['uint256'], [key])),
+      parseHexString(defaultAbiCoder.encode(['uint256'], [key]))
     );
     const result = await this.callFunction('get_storage_at', args.encode());
     return result.map(toBigIntBE);
@@ -276,22 +328,34 @@ export class Engine {
       const record_type = record.key[0];
       if (record_type == EngineStorageKeyPrefix.Config) continue; // skip EVM metadata
 
-      const key = (record_type == EngineStorageKeyPrefix.Storage) ?
-        record.key.subarray(1, 21) : record.key.subarray(1);
+      const key =
+        record_type == EngineStorageKeyPrefix.Storage
+          ? record.key.subarray(1, 21)
+          : record.key.subarray(1);
       const address = Buffer.from(key).toString('hex');
 
-      if (!result.has(address))  {
+      if (!result.has(address)) {
         result.set(address, new AddressState(Address.parse(address).unwrap()));
       }
 
       const state = result.get(address)!;
       switch (record_type) {
-        case EngineStorageKeyPrefix.Config: break; // unreachable
-        case EngineStorageKeyPrefix.Nonce: state.nonce = toBigIntBE(record.value); break;
-        case EngineStorageKeyPrefix.Balance: state.balance = toBigIntBE(record.value); break;
-        case EngineStorageKeyPrefix.Code: state.code = record.value; break;
+        case EngineStorageKeyPrefix.Config:
+          break; // unreachable
+        case EngineStorageKeyPrefix.Nonce:
+          state.nonce = toBigIntBE(record.value);
+          break;
+        case EngineStorageKeyPrefix.Balance:
+          state.balance = toBigIntBE(record.value);
+          break;
+        case EngineStorageKeyPrefix.Code:
+          state.code = record.value;
+          break;
         case EngineStorageKeyPrefix.Storage: {
-          state.storage.set(toBigIntBE(record.key.subarray(21)), toBigIntBE(record.value));
+          state.storage.set(
+            toBigIntBE(record.key.subarray(21)),
+            toBigIntBE(record.value)
+          );
           break;
         }
       }
@@ -299,7 +363,10 @@ export class Engine {
     return Ok(result);
   }
 
-  protected async callFunction(methodName: string, args?: Uint8Array): Promise<Result<Buffer, Error>> {
+  protected async callFunction(
+    methodName: string,
+    args?: Uint8Array
+  ): Promise<Result<Buffer, Error>> {
     const result = await this.signer.connection.provider.query({
       request_type: 'call_function',
       account_id: this.contractID.toString(),
@@ -307,15 +374,25 @@ export class Engine {
       args_base64: this.prepareInput(args).toString('base64'),
       finality: 'optimistic',
     });
-    if (result.logs && result.logs.length > 0)
-      console.debug(result.logs); // TODO
+    if (result.logs && result.logs.length > 0) console.debug(result.logs); // TODO
     return Ok(Buffer.from(result.result));
   }
 
-  protected async callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>> {
+  protected async callMutativeFunction(
+    methodName: string,
+    args?: Uint8Array
+  ): Promise<Result<TransactionOutcome, Error>> {
     const gas = new BN('300000000000000');
-    const result = await this.signer.functionCall(this.contractID.toString(), methodName, this.prepareInput(args), gas);
-    if (typeof result.status === 'object' && typeof result.status.SuccessValue === 'string') {
+    const result = await this.signer.functionCall(
+      this.contractID.toString(),
+      methodName,
+      this.prepareInput(args),
+      gas
+    );
+    if (
+      typeof result.status === 'object' &&
+      typeof result.status.SuccessValue === 'string'
+    ) {
       return Ok({
         id: TransactionID.fromHex(result.transaction.hash),
         output: Buffer.from(result.status.SuccessValue, 'base64'),
@@ -325,8 +402,7 @@ export class Engine {
   }
 
   private prepareInput(args?: Uint8Array | string): Buffer {
-    if (typeof args === 'undefined')
-      return Buffer.alloc(0);
+    if (typeof args === 'undefined') return Buffer.alloc(0);
     if (typeof args === 'string')
       return Buffer.from(parseHexString(args as string));
     return Buffer.from(args);

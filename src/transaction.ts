@@ -39,27 +39,35 @@ export class Transaction {
     public readonly r?: U256,
     public readonly s?: U256,
     public readonly from?: Address,
-    public readonly hash?: string) {}
+    public readonly hash?: string
+  ) {}
 
-  static fromOutcome(outcome: NEAR.providers.FinalExecutionOutcome, contractID?: AccountID): Option<Transaction> {
+  static fromOutcome(
+    outcome: NEAR.providers.FinalExecutionOutcome,
+    contractID?: AccountID
+  ): Option<Transaction> {
     const contractID_ = contractID || AccountID.aurora();
     if (outcome.transaction.receiver_id != contractID_.id) return None;
     const actions = outcome.transaction.actions as any[];
-    const action = actions.find(a => a.FunctionCall && a.FunctionCall.method_name === 'raw_call');
+    const action = actions.find(
+      (a) => a.FunctionCall && a.FunctionCall.method_name === 'raw_call'
+    );
     const transaction = parse(Buffer.from(action.FunctionCall.args, 'base64'));
-    return Some(new Transaction(
-      transaction.nonce,
-      BigInt(transaction.gasPrice.toString()),
-      BigInt(transaction.gasLimit.toString()),
-      Address.parse(transaction.to).ok(),
-      BigInt(transaction.value.toString()),
-      Buffer.from(transaction.data, 'hex'),
-      BigInt(transaction.v),
-      BigInt(transaction.r),
-      BigInt(transaction.s),
-      transaction.from ? Address.parse(transaction.from).unwrap() : undefined,
-      transaction.hash,
-    ));
+    return Some(
+      new Transaction(
+        transaction.nonce,
+        BigInt(transaction.gasPrice.toString()),
+        BigInt(transaction.gasLimit.toString()),
+        Address.parse(transaction.to).ok(),
+        BigInt(transaction.value.toString()),
+        Buffer.from(transaction.data, 'hex'),
+        BigInt(transaction.v),
+        BigInt(transaction.r),
+        BigInt(transaction.s),
+        transaction.from ? Address.parse(transaction.from).unwrap() : undefined,
+        transaction.hash
+      )
+    );
   }
 
   isSigned(): boolean {
@@ -75,9 +83,9 @@ export class Transaction {
       to: this.to.isSome() ? this.to.unwrap().toString() : null,
       value: intToHex(this.value),
       input: bytesToHex(this.data),
-      v: (this.v !== undefined) ? intToHex(this.v) : undefined,
-      r: (this.r !== undefined) ? intToHex(this.r) : undefined,
-      s: (this.s !== undefined) ? intToHex(this.s) : undefined,
+      v: this.v !== undefined ? intToHex(this.v) : undefined,
+      r: this.r !== undefined ? intToHex(this.r) : undefined,
+      s: this.s !== undefined ? intToHex(this.s) : undefined,
       from: this.from ? this.from.toString() : undefined,
       hash: this.hash,
     };

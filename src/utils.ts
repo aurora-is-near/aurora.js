@@ -48,16 +48,25 @@ export function exportJSON(object: Record<string, unknown>): any {
         object[k] = intToHex(v);
         break;
       case 'object':
-        object[k] = (v === null) ? null :
-          Array.isArray(v) ? v.map(exportJSON) :
-          (v instanceof AccountID) ? v.toString() :
-          (v instanceof Address) ? v.toString() :
-          (v instanceof Transaction) ? v.toJSON() :
-          (v instanceof TransactionID) ? v.toString() :
-          (v instanceof Uint8Array) ? bytesToHex(v) :
-          exportJSON(v as Record<string, unknown>);
+        object[k] =
+          v === null
+            ? null
+            : Array.isArray(v)
+            ? v.map(exportJSON)
+            : v instanceof AccountID
+            ? v.toString()
+            : v instanceof Address
+            ? v.toString()
+            : v instanceof Transaction
+            ? v.toJSON()
+            : v instanceof TransactionID
+            ? v.toString()
+            : v instanceof Uint8Array
+            ? bytesToHex(v)
+            : exportJSON(v as Record<string, unknown>);
         break;
-      default: break;
+      default:
+        break;
     }
   }
   return object;

@@ -9,14 +9,18 @@ export const KeyPair = NEAR.KeyPair;
 
 const InMemoryKeyStore = NEAR.keyStores.InMemoryKeyStore;
 const MergeKeyStore = NEAR.keyStores.MergeKeyStore;
-const UnencryptedFileSystemKeyStore = NEAR.keyStores.UnencryptedFileSystemKeyStore;
+const UnencryptedFileSystemKeyStore =
+  NEAR.keyStores.UnencryptedFileSystemKeyStore;
 
 export interface KeyStoreEnv {
   HOME?: string;
 }
 
 export class KeyStore extends MergeKeyStore {
-  protected constructor(public readonly networkID: string, keyStores: NEAR.keyStores.KeyStore[]) {
+  protected constructor(
+    public readonly networkID: string,
+    keyStores: NEAR.keyStores.KeyStore[]
+  ) {
     super(keyStores);
   }
 
@@ -24,10 +28,11 @@ export class KeyStore extends MergeKeyStore {
     const memKeyStore = new InMemoryKeyStore();
     if (env && env.HOME) {
       const devKeyStore = KeyStore.loadLocalKeys(env);
-      const cliKeyStore = new UnencryptedFileSystemKeyStore(`${env.HOME}/.near-credentials`);
+      const cliKeyStore = new UnencryptedFileSystemKeyStore(
+        `${env.HOME}/.near-credentials`
+      );
       return new KeyStore(networkID, [memKeyStore, devKeyStore, cliKeyStore]);
-    }
-    else {
+    } else {
       return new KeyStore(networkID, [memKeyStore]);
     }
   }
@@ -49,11 +54,13 @@ export class KeyStore extends MergeKeyStore {
   }
 
   async getSigningAccounts(): Promise<AccountID[]> {
-    return (await this.getAccounts()).map(id => AccountID.parse(id).unwrap());
+    return (await this.getAccounts()).map((id) => AccountID.parse(id).unwrap());
   }
 
   async getSigningAddresses(): Promise<Address[]> {
-    return (await this.getAccounts()).map(id => AccountID.parse(id).unwrap().toAddress());
+    return (await this.getAccounts()).map((id) =>
+      AccountID.parse(id).unwrap().toAddress()
+    );
   }
 }
 

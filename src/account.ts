@@ -10,7 +10,7 @@ export class AccountID {
   constructor(public readonly id: string) {} // TODO: validate the ID
 
   static aurora(): AccountID {
-    return new AccountID("aurora");
+    return new AccountID('aurora');
   }
 
   static parse(id?: string): Result<AccountID, string> {
@@ -22,7 +22,9 @@ export class AccountID {
   }
 
   toAddress(): Address {
-    return Address.parse(keccak256(Buffer.from(this.id)).slice(26, 66)).unwrap();
+    return Address.parse(
+      keccak256(Buffer.from(this.id)).slice(26, 66)
+    ).unwrap();
   }
 }
 
