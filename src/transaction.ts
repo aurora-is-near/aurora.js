@@ -52,6 +52,7 @@ export class Transaction {
     const action = actions.find(
       (a) => a.FunctionCall && a.FunctionCall.method_name === 'raw_call'
     );
+    if (!action) return None;
     const transaction = parse(Buffer.from(action.FunctionCall.args, 'base64'));
     return Some(
       new Transaction(

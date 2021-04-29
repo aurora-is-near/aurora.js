@@ -6,4 +6,4 @@ export declare function hexToBase58(input: string): string;
 export declare function hexToBytes(input: string): Uint8Array;
 export declare function hexToInt(input: string): number;
 export declare function intToHex(input: number | bigint): string;
-export declare function exportJSON(object: Record<string, unknown>): any;
+export declare function exportJSON(input?: Record<string, unknown> | Record<string, unknown>[]): any;

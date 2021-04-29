@@ -39,16 +39,22 @@ export function intToHex(input: number | bigint): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function exportJSON(object: Record<string, unknown>): any {
-  for (const [k, v] of Object.entries(object)) {
+export function exportJSON(
+  input?: Record<string, unknown> | Record<string, unknown>[]
+): any {
+  if (input === undefined) return input;
+  if (Array.isArray(input)) {
+    return input.map(exportJSON);
+  }
+  for (const [k, v] of Object.entries(input)) {
     //console.log(k, v, typeof v);
     switch (typeof v) {
       case 'number':
       case 'bigint':
-        object[k] = intToHex(v);
+        input[k] = intToHex(v);
         break;
       case 'object':
-        object[k] =
+        input[k] =
           v === null
             ? null
             : Array.isArray(v)
@@ -69,5 +75,5 @@ export function exportJSON(object: Record<string, unknown>): any {
         break;
     }
   }
-  return object;
+  return input;
 }
