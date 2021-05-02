@@ -36,7 +36,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "make check"
+    "test": "jest"
   },
   "keywords": [
     "Aurora",
@@ -66,15 +66,25 @@
     "@tsconfig/node14": "^1.0.0",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",
+    "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "bs58": "^4.0.1",
     "eslint": "^7.24.0",
+    "jest": "^v27.0.0-next.8",
     "prettier": "2.2.1",
+    "ts-jest": "^v27.0.0-next.11",
     "typedoc": "^0.20.35",
     "typescript": "^4.2.3"
   },
   "prettier": {
     "singleQuote": true
+  },
+  "jest": {
+    "preset": "ts-jest/presets/default-esm",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.[tj]sx?$": "ts-jest"
+    }
   }
 }
