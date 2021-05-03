@@ -23,6 +23,9 @@ export interface BlockInfo {
     difficulty: number;
     gasLimit: Quantity;
 }
+export interface ViewOptions {
+    block?: BlockID;
+}
 export interface ConnectOptions {
     network?: string;
     endpoint?: string;
@@ -76,20 +79,20 @@ export declare class Engine {
     getBlock(blockID: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, Error>>;
     hasBlock(blockID: BlockID): Promise<Result<boolean, Error>>;
     getCoinbase(): Promise<Result<Address, Error>>;
-    getVersion(): Promise<Result<string, Error>>;
-    getOwner(): Promise<Result<AccountID, Error>>;
-    getBridgeProvider(): Promise<Result<AccountID, Error>>;
-    getChainID(): Promise<Result<ChainID, Error>>;
+    getVersion(options?: ViewOptions): Promise<Result<string, Error>>;
+    getOwner(options?: ViewOptions): Promise<Result<AccountID, Error>>;
+    getBridgeProvider(options?: ViewOptions): Promise<Result<AccountID, Error>>;
+    getChainID(options?: ViewOptions): Promise<Result<ChainID, Error>>;
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
     rawCall(input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
-    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
-    getCode(address: Address): Promise<Result<Bytecode, Error>>;
-    getBalance(address: Address): Promise<Result<U256, Error>>;
-    getNonce(address: Address): Promise<Result<U256, Error>>;
-    getStorageAt(address: Address, key: U256 | number | string): Promise<Result<U256, Error>>;
+    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array, Error>>;
+    getCode(address: Address, options?: ViewOptions): Promise<Result<Bytecode, Error>>;
+    getBalance(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
+    getNonce(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
+    getStorageAt(address: Address, key: U256 | number | string, options?: ViewOptions): Promise<Result<U256, Error>>;
     getStorage(): Promise<Result<EngineStorage, Error>>;
-    protected callFunction(methodName: string, args?: Uint8Array): Promise<Result<Buffer, Error>>;
+    protected callFunction(methodName: string, args?: Uint8Array, options?: ViewOptions): Promise<Result<Buffer, Error>>;
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;
 }

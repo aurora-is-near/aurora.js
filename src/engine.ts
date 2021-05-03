@@ -48,6 +48,10 @@ export interface BlockInfo {
   gasLimit: Quantity;
 }
 
+export interface ViewOptions {
+  block?: BlockID;
+}
+
 export interface ConnectOptions {
   network?: string; // network ID
   endpoint?: string; // endpoint URL
@@ -214,26 +218,28 @@ export class Engine {
     return Ok(Address.zero()); // TODO
   }
 
-  async getVersion(): Promise<Result<string, Error>> {
-    return (await this.callFunction('get_version')).map((output) =>
-      output.toString()
-    );
+  async getVersion(options?: ViewOptions): Promise<Result<string, Error>> {
+    return (
+      await this.callFunction('get_version', undefined, options)
+    ).map((output) => output.toString());
   }
 
-  async getOwner(): Promise<Result<AccountID, Error>> {
-    return (await this.callFunction('get_owner')).andThen((output) =>
-      AccountID.parse(output.toString())
-    );
+  async getOwner(options?: ViewOptions): Promise<Result<AccountID, Error>> {
+    return (
+      await this.callFunction('get_owner', undefined, options)
+    ).andThen((output) => AccountID.parse(output.toString()));
   }
 
-  async getBridgeProvider(): Promise<Result<AccountID, Error>> {
-    return (await this.callFunction('get_bridge_provider')).andThen((output) =>
-      AccountID.parse(output.toString())
-    );
+  async getBridgeProvider(
+    options?: ViewOptions
+  ): Promise<Result<AccountID, Error>> {
+    return (
+      await this.callFunction('get_bridge_provider', undefined, options)
+    ).andThen((output) => AccountID.parse(output.toString()));
   }
 
-  async getChainID(): Promise<Result<ChainID, Error>> {
-    const result = await this.callFunction('get_chain_id');
+  async getChainID(options?: ViewOptions): Promise<Result<ChainID, Error>> {
+    const result = await this.callFunction('get_chain_id', undefined, options);
     return result.map(toBigIntBE);
   }
 
@@ -277,7 +283,8 @@ export class Engine {
     sender: Address,
     address: Address,
     amount: Quantity,
-    input: Uint8Array | string
+    input: Uint8Array | string,
+    options?: ViewOptions
   ): Promise<Result<Uint8Array, Error>> {
     const args = new ViewCallArgs(
       sender.toBytes(),
@@ -285,35 +292,49 @@ export class Engine {
       toBufferBE(BigInt(amount), 32),
       this.prepareInput(input)
     );
-    return await this.callFunction('view', args.encode());
+    return await this.callFunction('view', args.encode(), options);
   }
 
-  async getCode(address: Address): Promise<Result<Bytecode, Error>> {
+  async getCode(
+    address: Address,
+    options?: ViewOptions
+  ): Promise<Result<Bytecode, Error>> {
     const args = address.toBytes();
-    return await this.callFunction('get_code', args);
+    return await this.callFunction('get_code', args, options);
   }
 
-  async getBalance(address: Address): Promise<Result<U256, Error>> {
+  async getBalance(
+    address: Address,
+    options?: ViewOptions
+  ): Promise<Result<U256, Error>> {
     const args = address.toBytes();
-    const result = await this.callFunction('get_balance', args);
+    const result = await this.callFunction('get_balance', args, options);
     return result.map(toBigIntBE);
   }
 
-  async getNonce(address: Address): Promise<Result<U256, Error>> {
+  async getNonce(
+    address: Address,
+    options?: ViewOptions
+  ): Promise<Result<U256, Error>> {
     const args = address.toBytes();
-    const result = await this.callFunction('get_nonce', args);
+    const result = await this.callFunction('get_nonce', args, options);
     return result.map(toBigIntBE);
   }
 
   async getStorageAt(
     address: Address,
-    key: U256 | number | string
+    key: U256 | number | string,
+    options?: ViewOptions
   ): Promise<Result<U256, Error>> {
     const args = new GetStorageAtArgs(
       address.toBytes(),
       parseHexString(defaultAbiCoder.encode(['uint256'], [key]))
     );
-    const result = await this.callFunction('get_storage_at', args.encode());
+    const result = await this.callFunction(
+      'get_storage_at',
+      args.encode(),
+      options
+    );
     return result.map(toBigIntBE);
   }
 
@@ -365,14 +386,22 @@ export class Engine {
 
   protected async callFunction(
     methodName: string,
-    args?: Uint8Array
+    args?: Uint8Array,
+    options?: ViewOptions
   ): Promise<Result<Buffer, Error>> {
     const result = await this.signer.connection.provider.query({
       request_type: 'call_function',
       account_id: this.contractID.toString(),
       method_name: methodName,
       args_base64: this.prepareInput(args).toString('base64'),
-      finality: 'optimistic',
+      finality:
+        options?.block === undefined || options?.block === null
+          ? 'final'
+          : undefined,
+      block_id:
+        options?.block !== undefined && options?.block !== null
+          ? options.block
+          : undefined,
     });
     if (result.logs && result.logs.length > 0) console.debug(result.logs); // TODO
     return Ok(Buffer.from(result.result));
