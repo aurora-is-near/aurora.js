@@ -50,7 +50,7 @@ export class Transaction {
     if (outcome.transaction.receiver_id != contractID_.id) return None;
     const actions = outcome.transaction.actions as any[];
     const action = actions.find(
-      (a) => a.FunctionCall && a.FunctionCall.method_name === 'raw_call'
+      (a) => a.FunctionCall && ['raw_call', 'submit'].includes(a.FunctionCall.method_name)
     );
     if (!action) return None;
     const transaction = parse(Buffer.from(action.FunctionCall.args, 'base64'));

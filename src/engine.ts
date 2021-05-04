@@ -268,11 +268,9 @@ export class Engine {
     );
   }
 
-  async rawCall(
-    input: Uint8Array | string
-  ): Promise<Result<Uint8Array, Error>> {
+  async submit(input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
     const args = this.prepareInput(input);
-    return (await this.callMutativeFunction('raw_call', args)).map(
+    return (await this.callMutativeFunction('submit', args)).map(
       ({ output }) => output
     );
   }
