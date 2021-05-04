@@ -27,19 +27,43 @@ abstract class Assignable {
   }
 }
 
-// Borsh-encoded parameters for the `new` method.
-export class NewCallArgs extends Assignable {
+// Borsh-encoded parameters for the `begin_block` method.
+export class BeginBlockArgs extends Assignable {
   constructor(
-    public chainID: Uint8Array,
-    public ownerID: string,
-    public bridgeProverID: string,
-    public upgradeDelayBlocks: number | BN
+    public hash: Uint8Array,
+    public coinbase: Uint8Array,
+    public timestamp: Uint8Array,
+    public number: Uint8Array,
+    public difficulty: Uint8Array,
+    public gaslimit: Uint8Array
   ) {
     super();
   }
 
   functionName(): string {
-    return 'new';
+    return 'begin_block';
+  }
+}
+
+// Borsh-encoded parameters for the `begin_chain` method.
+export class BeginChainArgs extends Assignable {
+  constructor(public chainID: Uint8Array) {
+    super();
+  }
+
+  functionName(): string {
+    return 'begin_chain';
+  }
+}
+
+// Borsh-encoded parameters for the `call` method.
+export class FunctionCallArgs extends Assignable {
+  constructor(public contract: Uint8Array, public input: Uint8Array) {
+    super();
+  }
+
+  functionName(): string {
+    return 'call';
   }
 }
 
@@ -51,6 +75,17 @@ export class GetChainID extends Assignable {
 
   functionName(): string {
     return 'get_chain_id';
+  }
+}
+
+// Borsh-encoded parameters for the `get_storage_at` method.
+export class GetStorageAtArgs extends Assignable {
+  constructor(public address: Uint8Array, public key: Uint8Array) {
+    super();
+  }
+
+  functionName(): string {
+    return 'get_storage_at';
   }
 }
 
@@ -75,14 +110,19 @@ export class MetaCallArgs extends Assignable {
   }
 }
 
-// Borsh-encoded parameters for the `call` method.
-export class FunctionCallArgs extends Assignable {
-  constructor(public contract: Uint8Array, public input: Uint8Array) {
+// Borsh-encoded parameters for the `new` method.
+export class NewCallArgs extends Assignable {
+  constructor(
+    public chainID: Uint8Array,
+    public ownerID: string,
+    public bridgeProverID: string,
+    public upgradeDelayBlocks: number | BN
+  ) {
     super();
   }
 
   functionName(): string {
-    return 'call';
+    return 'new';
   }
 }
 
@@ -102,61 +142,44 @@ export class ViewCallArgs extends Assignable {
   }
 }
 
-// Borsh-encoded parameters for the `get_storage_at` method.
-export class GetStorageAtArgs extends Assignable {
-  constructor(public address: Uint8Array, public key: Uint8Array) {
-    super();
-  }
-
-  functionName(): string {
-    return 'get_storage_at';
-  }
-}
-
-// Borsh-encoded parameters for the `begin_chain` method.
-export class BeginChainArgs extends Assignable {
-  constructor(public chainID: Uint8Array) {
-    super();
-  }
-
-  functionName(): string {
-    return 'begin_chain';
-  }
-}
-
-// Borsh-encoded parameters for the `begin_block` method.
-export class BeginBlockArgs extends Assignable {
-  constructor(
-    public hash: Uint8Array,
-    public coinbase: Uint8Array,
-    public timestamp: Uint8Array,
-    public number: Uint8Array,
-    public difficulty: Uint8Array,
-    public gaslimit: Uint8Array
-  ) {
-    super();
-  }
-
-  functionName(): string {
-    return 'begin_block';
-  }
-}
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 const SCHEMA = new Map<Function, any>([
   [
-    NewCallArgs,
+    BeginBlockArgs,
     {
       kind: 'struct',
       fields: [
-        ['chainID', [32]],
-        ['ownerID', 'string'],
-        ['bridgeProverID', 'string'],
-        ['upgradeDelayBlocks', 'u64'],
+        ['hash', [32]],
+        ['coinbase', [32]],
+        ['timestamp', [32]],
+        ['number', [32]],
+        ['difficulty', [32]],
+        ['gaslimit', [32]],
+      ],
+    },
+  ],
+  [BeginChainArgs, { kind: 'struct', fields: [['chainID', [32]]] }],
+  [
+    FunctionCallArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['contract', [20]],
+        ['input', ['u8']],
       ],
     },
   ],
   [GetChainID, { kind: 'struct', fields: [] }],
+  [
+    GetStorageAtArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['address', [20]],
+        ['key', [32]],
+      ],
+    },
+  ],
   [
     MetaCallArgs,
     {
@@ -175,12 +198,14 @@ const SCHEMA = new Map<Function, any>([
     },
   ],
   [
-    FunctionCallArgs,
+    NewCallArgs,
     {
       kind: 'struct',
       fields: [
-        ['contract', [20]],
-        ['input', ['u8']],
+        ['chainID', [32]],
+        ['ownerID', 'string'],
+        ['bridgeProverID', 'string'],
+        ['upgradeDelayBlocks', 'u64'],
       ],
     },
   ],
@@ -193,31 +218,6 @@ const SCHEMA = new Map<Function, any>([
         ['address', [20]],
         ['amount', [32]],
         ['input', ['u8']],
-      ],
-    },
-  ],
-  [
-    GetStorageAtArgs,
-    {
-      kind: 'struct',
-      fields: [
-        ['address', [20]],
-        ['key', [32]],
-      ],
-    },
-  ],
-  [BeginChainArgs, { kind: 'struct', fields: [['chainID', [32]]] }],
-  [
-    BeginBlockArgs,
-    {
-      kind: 'struct',
-      fields: [
-        ['hash', [32]],
-        ['coinbase', [32]],
-        ['timestamp', [32]],
-        ['number', [32]],
-        ['difficulty', [32]],
-        ['gaslimit', [32]],
       ],
     },
   ],
