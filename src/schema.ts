@@ -3,27 +3,9 @@
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
 
-interface FunctionCall {
-  methodName: string;
-  args: Uint8Array;
-  gas: BN;
-  deposit: BN;
-}
-
 abstract class Assignable {
-  abstract functionName(): string;
-
   encode(): Uint8Array {
     return NEAR.utils.serialize.serialize(SCHEMA, this);
-  }
-
-  toFunctionCall(): FunctionCall {
-    return {
-      methodName: this.functionName(),
-      args: this.encode(),
-      gas: new BN('300000000000000'),
-      deposit: new BN(0),
-    };
   }
 }
 
@@ -39,20 +21,12 @@ export class BeginBlockArgs extends Assignable {
   ) {
     super();
   }
-
-  functionName(): string {
-    return 'begin_block';
-  }
 }
 
 // Borsh-encoded parameters for the `begin_chain` method.
 export class BeginChainArgs extends Assignable {
   constructor(public chainID: Uint8Array) {
     super();
-  }
-
-  functionName(): string {
-    return 'begin_chain';
   }
 }
 
@@ -61,20 +35,12 @@ export class FunctionCallArgs extends Assignable {
   constructor(public contract: Uint8Array, public input: Uint8Array) {
     super();
   }
-
-  functionName(): string {
-    return 'call';
-  }
 }
 
 // Borsh-encoded parameters for the `get_chain_id` method.
 export class GetChainID extends Assignable {
   constructor() {
     super();
-  }
-
-  functionName(): string {
-    return 'get_chain_id';
   }
 }
 
@@ -83,9 +49,12 @@ export class GetStorageAtArgs extends Assignable {
   constructor(public address: Uint8Array, public key: Uint8Array) {
     super();
   }
+}
 
-  functionName(): string {
-    return 'get_storage_at';
+// Borsh-encoded log for use in a `SubmitResult`.
+export class LogResult extends Assignable {
+  constructor(public topics: RawU256[], public data: Uint8Array) {
+    super();
   }
 }
 
@@ -104,10 +73,6 @@ export class MetaCallArgs extends Assignable {
   ) {
     super();
   }
-
-  functionName(): string {
-    return 'meta_call';
-  }
 }
 
 // Borsh-encoded parameters for the `new` method.
@@ -120,9 +85,28 @@ export class NewCallArgs extends Assignable {
   ) {
     super();
   }
+}
 
-  functionName(): string {
-    return 'new';
+// Borsh-encoded U256 integer.
+export class RawU256 extends Assignable {
+  constructor(public value: Uint8Array) {
+    super();
+  }
+}
+
+// Borsh-encoded result from the `submit` method.
+export class SubmitResult extends Assignable {
+  constructor(
+    public status: boolean,
+    public gasUsed: number | BN,
+    public result: Uint8Array,
+    public logs: LogResult[]
+  ) {
+    super();
+  }
+
+  static decode(input: Buffer): SubmitResult {
+    return NEAR.utils.serialize.deserialize(SCHEMA, SubmitResult, input);
   }
 }
 
@@ -135,10 +119,6 @@ export class ViewCallArgs extends Assignable {
     public input: Uint8Array
   ) {
     super();
-  }
-
-  functionName(): string {
-    return 'view';
   }
 }
 
@@ -181,6 +161,16 @@ const SCHEMA = new Map<Function, any>([
     },
   ],
   [
+    LogResult,
+    {
+      kind: 'struct',
+      fields: [
+        ['topics', [RawU256]],
+        ['data', ['u8']],
+      ],
+    },
+  ],
+  [
     MetaCallArgs,
     {
       kind: 'struct',
@@ -210,6 +200,18 @@ const SCHEMA = new Map<Function, any>([
     },
   ],
   [
+    SubmitResult,
+    {
+      kind: 'struct',
+      fields: [
+        ['status', 'u8'],
+        ['gasUsed', 'u64'],
+        ['result', ['u8']],
+        ['logs', [LogResult]],
+      ],
+    },
+  ],
+  [
     ViewCallArgs,
     {
       kind: 'struct',
@@ -221,4 +223,5 @@ const SCHEMA = new Map<Function, any>([
       ],
     },
   ],
+  [RawU256, { kind: 'struct', fields: [['value', [32]]] }],
 ]);

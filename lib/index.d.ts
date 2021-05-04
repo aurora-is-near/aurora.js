@@ -32,8 +32,11 @@ declare const _default: {
     FunctionCallArgs: typeof schema.FunctionCallArgs;
     GetChainID: typeof schema.GetChainID;
     GetStorageAtArgs: typeof schema.GetStorageAtArgs;
+    LogResult: typeof schema.LogResult;
     MetaCallArgs: typeof schema.MetaCallArgs;
     NewCallArgs: typeof schema.NewCallArgs;
+    RawU256: typeof schema.RawU256;
+    SubmitResult: typeof schema.SubmitResult;
     ViewCallArgs: typeof schema.ViewCallArgs;
     Left: typeof prelude.Left;
     Right: typeof prelude.Right;
