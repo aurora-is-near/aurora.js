@@ -13,6 +13,7 @@ import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
 import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
 import {
+  ExecutionResult,
   FunctionCallArgs,
   GetStorageAtArgs,
   NewCallArgs,
@@ -268,10 +269,12 @@ export class Engine {
     );
   }
 
-  async submit(input: Uint8Array | string): Promise<Result<Uint8Array, Error>> {
+  async submit(
+    input: Uint8Array | string
+  ): Promise<Result<ExecutionResult, Error>> {
     const args = this.prepareInput(input);
-    return (await this.callMutativeFunction('submit', args)).map(
-      ({ output }) => output
+    return (await this.callMutativeFunction('submit', args)).map(({ output }) =>
+      ExecutionResult.decode(Buffer.from(output))
     );
   }
 
@@ -439,9 +442,12 @@ export class Engine {
             );
             return Err(errorCode);
           }
-          return Err(error.toString());
+          return Err(error.message);
         }
+        case 'MethodNotFound':
+          return Err(error.message);
         default:
+          console.debug(error);
           return Err(error.toString());
       }
     }

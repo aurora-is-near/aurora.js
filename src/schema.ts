@@ -2,6 +2,7 @@
 
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
+import { bytesToHex } from './utils.js';
 
 abstract class Assignable {
   encode(): Uint8Array {
@@ -30,6 +31,31 @@ export class BeginChainArgs extends Assignable {
   }
 }
 
+// Borsh-encoded result from the `submit` method.
+export class ExecutionResult extends Assignable {
+  public status: boolean;
+  public gasUsed: number | bigint;
+  public output: Uint8Array;
+  public logs: LogEvent[];
+
+  constructor(args: {
+    status: boolean | number;
+    gasUsed: number | bigint | BN;
+    output: Uint8Array;
+    logs: LogEvent[];
+  }) {
+    super();
+    this.status = !!args.status;
+    this.gasUsed = BigInt(args.gasUsed.toString());
+    this.output = args.output;
+    this.logs = args.logs;
+  }
+
+  static decode(input: Buffer): ExecutionResult {
+    return NEAR.utils.serialize.deserialize(SCHEMA, ExecutionResult, input);
+  }
+}
+
 // Borsh-encoded parameters for the `call` method.
 export class FunctionCallArgs extends Assignable {
   constructor(public contract: Uint8Array, public input: Uint8Array) {
@@ -51,10 +77,15 @@ export class GetStorageAtArgs extends Assignable {
   }
 }
 
-// Borsh-encoded log for use in a `SubmitResult`.
-export class LogResult extends Assignable {
-  constructor(public topics: RawU256[], public data: Uint8Array) {
+// Borsh-encoded log for use in a `ExecutionResult`.
+export class LogEvent extends Assignable {
+  topics: RawU256[];
+  data: Uint8Array;
+
+  constructor(args: { topics: RawU256[]; data: Uint8Array }) {
     super();
+    this.topics = args.topics;
+    this.data = args.data;
   }
 }
 
@@ -89,24 +120,15 @@ export class NewCallArgs extends Assignable {
 
 // Borsh-encoded U256 integer.
 export class RawU256 extends Assignable {
-  constructor(public value: Uint8Array) {
-    super();
-  }
-}
+  public value: Uint8Array;
 
-// Borsh-encoded result from the `submit` method.
-export class SubmitResult extends Assignable {
-  constructor(
-    public status: boolean,
-    public gasUsed: number | BN,
-    public result: Uint8Array,
-    public logs: LogResult[]
-  ) {
+  constructor(args: { value: Uint8Array }) {
     super();
+    this.value = args.value;
   }
 
-  static decode(input: Buffer): SubmitResult {
-    return NEAR.utils.serialize.deserialize(SCHEMA, SubmitResult, input);
+  toString(): string {
+    return `RawU256(${bytesToHex(this.value)})`;
   }
 }
 
@@ -140,6 +162,18 @@ const SCHEMA = new Map<Function, any>([
   ],
   [BeginChainArgs, { kind: 'struct', fields: [['chainID', [32]]] }],
   [
+    ExecutionResult,
+    {
+      kind: 'struct',
+      fields: [
+        ['status', 'u8'],
+        ['gasUsed', 'u64'],
+        ['output', ['u8']],
+        ['logs', [LogEvent]],
+      ],
+    },
+  ],
+  [
     FunctionCallArgs,
     {
       kind: 'struct',
@@ -161,7 +195,7 @@ const SCHEMA = new Map<Function, any>([
     },
   ],
   [
-    LogResult,
+    LogEvent,
     {
       kind: 'struct',
       fields: [
@@ -196,18 +230,6 @@ const SCHEMA = new Map<Function, any>([
         ['ownerID', 'string'],
         ['bridgeProverID', 'string'],
         ['upgradeDelayBlocks', 'u64'],
-      ],
-    },
-  ],
-  [
-    SubmitResult,
-    {
-      kind: 'struct',
-      fields: [
-        ['status', 'u8'],
-        ['gasUsed', 'u64'],
-        ['result', ['u8']],
-        ['logs', [LogResult]],
       ],
     },
   ],

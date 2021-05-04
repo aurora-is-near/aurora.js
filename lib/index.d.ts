@@ -29,14 +29,14 @@ declare const _default: {
     Transaction: typeof transaction.Transaction;
     BeginBlockArgs: typeof schema.BeginBlockArgs;
     BeginChainArgs: typeof schema.BeginChainArgs;
+    ExecutionResult: typeof schema.ExecutionResult;
     FunctionCallArgs: typeof schema.FunctionCallArgs;
     GetChainID: typeof schema.GetChainID;
     GetStorageAtArgs: typeof schema.GetStorageAtArgs;
-    LogResult: typeof schema.LogResult;
+    LogEvent: typeof schema.LogEvent;
     MetaCallArgs: typeof schema.MetaCallArgs;
     NewCallArgs: typeof schema.NewCallArgs;
     RawU256: typeof schema.RawU256;
-    SubmitResult: typeof schema.SubmitResult;
     ViewCallArgs: typeof schema.ViewCallArgs;
     Left: typeof prelude.Left;
     Right: typeof prelude.Right;

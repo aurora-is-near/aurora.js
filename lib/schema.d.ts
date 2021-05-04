@@ -16,6 +16,19 @@ export declare class BeginChainArgs extends Assignable {
     chainID: Uint8Array;
     constructor(chainID: Uint8Array);
 }
+export declare class ExecutionResult extends Assignable {
+    status: boolean;
+    gasUsed: number | bigint;
+    output: Uint8Array;
+    logs: LogEvent[];
+    constructor(args: {
+        status: boolean | number;
+        gasUsed: number | bigint | BN;
+        output: Uint8Array;
+        logs: LogEvent[];
+    });
+    static decode(input: Buffer): ExecutionResult;
+}
 export declare class FunctionCallArgs extends Assignable {
     contract: Uint8Array;
     input: Uint8Array;
@@ -29,10 +42,13 @@ export declare class GetStorageAtArgs extends Assignable {
     key: Uint8Array;
     constructor(address: Uint8Array, key: Uint8Array);
 }
-export declare class LogResult extends Assignable {
+export declare class LogEvent extends Assignable {
     topics: RawU256[];
     data: Uint8Array;
-    constructor(topics: RawU256[], data: Uint8Array);
+    constructor(args: {
+        topics: RawU256[];
+        data: Uint8Array;
+    });
 }
 export declare class MetaCallArgs extends Assignable {
     signature: Uint8Array;
@@ -55,15 +71,10 @@ export declare class NewCallArgs extends Assignable {
 }
 export declare class RawU256 extends Assignable {
     value: Uint8Array;
-    constructor(value: Uint8Array);
-}
-export declare class SubmitResult extends Assignable {
-    status: boolean;
-    gasUsed: number | BN;
-    result: Uint8Array;
-    logs: LogResult[];
-    constructor(status: boolean, gasUsed: number | BN, result: Uint8Array, logs: LogResult[]);
-    static decode(input: Buffer): SubmitResult;
+    constructor(args: {
+        value: Uint8Array;
+    });
+    toString(): string;
 }
 export declare class ViewCallArgs extends Assignable {
     sender: Uint8Array;
