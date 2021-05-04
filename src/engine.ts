@@ -409,23 +409,42 @@ export class Engine {
     methodName: string,
     args?: Uint8Array
   ): Promise<Result<TransactionOutcome, Error>> {
-    const gas = new BN('300000000000000');
-    const result = await this.signer.functionCall(
-      this.contractID.toString(),
-      methodName,
-      this.prepareInput(args),
-      gas
-    );
-    if (
-      typeof result.status === 'object' &&
-      typeof result.status.SuccessValue === 'string'
-    ) {
-      return Ok({
-        id: TransactionID.fromHex(result.transaction.hash),
-        output: Buffer.from(result.status.SuccessValue, 'base64'),
-      });
+    const gas = new BN('300000000000000'); // TODO?
+    try {
+      const result = await this.signer.functionCall(
+        this.contractID.toString(),
+        methodName,
+        this.prepareInput(args),
+        gas
+      );
+      if (
+        typeof result.status === 'object' &&
+        typeof result.status.SuccessValue === 'string'
+      ) {
+        return Ok({
+          id: TransactionID.fromHex(result.transaction.hash),
+          output: Buffer.from(result.status.SuccessValue, 'base64'),
+        });
+      }
+      return Err(result.toString()); // FIXME: unreachable?
+    } catch (error) {
+      //assert(error instanceof ServerTransactionError);
+      switch (error?.type) {
+        case 'FunctionCallError': {
+          const errorKind = error?.kind?.ExecutionError;
+          if (errorKind) {
+            const errorCode = errorKind.replace(
+              'Smart contract panicked: ',
+              ''
+            );
+            return Err(errorCode);
+          }
+          return Err(error.toString());
+        }
+        default:
+          return Err(error.toString());
+      }
     }
-    return Err(result.toString()); // TODO
   }
 
   private prepareInput(args?: Uint8Array | string): Buffer {
