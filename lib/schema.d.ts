@@ -74,6 +74,7 @@ export declare class RawU256 extends Assignable {
     constructor(args?: Uint8Array | {
         value: Uint8Array;
     });
+    toBytes(): Uint8Array;
     toString(): string;
 }
 export declare class ViewCallArgs extends Assignable {

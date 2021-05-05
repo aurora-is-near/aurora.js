@@ -133,6 +133,10 @@ export class RawU256 extends Assignable {
     }
   }
 
+  toBytes(): Uint8Array {
+    return this.value;
+  }
+
   toString(): string {
     return bytesToHex(this.value);
   }
