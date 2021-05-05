@@ -122,13 +122,19 @@ export class NewCallArgs extends Assignable {
 export class RawU256 extends Assignable {
   public value: Uint8Array;
 
-  constructor(args: { value: Uint8Array }) {
+  constructor(args?: Uint8Array | { value: Uint8Array }) {
     super();
-    this.value = args.value;
+    if (!args) {
+      this.value = Buffer.alloc(32);
+    } else {
+      const bytes = args instanceof Uint8Array ? args : args.value;
+      //assert(bytes.length == 32); // TODO
+      this.value = bytes;
+    }
   }
 
   toString(): string {
-    return `RawU256(${bytesToHex(this.value)})`;
+    return bytesToHex(this.value);
   }
 }
 

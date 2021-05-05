@@ -71,7 +71,7 @@ export declare class NewCallArgs extends Assignable {
 }
 export declare class RawU256 extends Assignable {
     value: Uint8Array;
-    constructor(args: {
+    constructor(args?: Uint8Array | {
         value: Uint8Array;
     });
     toString(): string;
