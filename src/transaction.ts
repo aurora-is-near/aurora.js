@@ -2,10 +2,22 @@
 
 import { AccountID, Address } from './account.js';
 import { None, Option, Some, U64, U256 } from './prelude.js';
+import { ExecutionResult } from './schema.js';
 import { base58ToHex, bytesToHex, intToHex } from './utils.js';
 
 import NEAR from 'near-api-js';
 import { parse } from '@ethersproject/transactions';
+
+interface NEARFunctionCall {
+  method_name: string;
+  args: string;
+  gas: number | string;
+  deposit: number | string;
+}
+
+interface NEARAction {
+  FunctionCall?: NEARFunctionCall;
+}
 
 export class TransactionID {
   protected constructor(public readonly id: string) {}
@@ -27,6 +39,8 @@ export class TransactionID {
   }
 }
 
+const evmMethods = ['raw_call', 'submit']; // TODO: support all EVM methods
+
 export class Transaction {
   constructor(
     public readonly nonce: U256,
@@ -39,7 +53,8 @@ export class Transaction {
     public readonly r?: U256,
     public readonly s?: U256,
     public readonly from?: Address,
-    public readonly hash?: string
+    public readonly hash?: string,
+    public readonly result?: ExecutionResult
   ) {}
 
   static fromOutcome(
@@ -47,28 +62,62 @@ export class Transaction {
     contractID?: AccountID
   ): Option<Transaction> {
     const contractID_ = contractID || AccountID.aurora();
-    if (outcome.transaction.receiver_id != contractID_.id) return None;
-    const actions = outcome.transaction.actions as any[];
+    if (outcome.transaction.receiver_id != contractID_.id) {
+      return None; // not an EVM transaction
+    }
+
+    const actions = outcome.transaction.actions as NEARAction[];
     const action = actions.find(
-      (a) => a.FunctionCall && ['raw_call', 'submit'].includes(a.FunctionCall.method_name)
+      (action) =>
+        action.FunctionCall &&
+        evmMethods.includes(action.FunctionCall.method_name)
     );
-    if (!action) return None;
-    const transaction = parse(Buffer.from(action.FunctionCall.args, 'base64'));
-    return Some(
-      new Transaction(
-        transaction.nonce,
-        BigInt(transaction.gasPrice.toString()),
-        BigInt(transaction.gasLimit.toString()),
-        Address.parse(transaction.to).ok(),
-        BigInt(transaction.value.toString()),
-        Buffer.from(transaction.data, 'hex'),
-        BigInt(transaction.v),
-        BigInt(transaction.r),
-        BigInt(transaction.s),
-        transaction.from ? Address.parse(transaction.from).unwrap() : undefined,
-        transaction.hash
-      )
-    );
+    if (!action) {
+      return None; // not an EVM transaction
+    }
+
+    switch (action.FunctionCall?.method_name) {
+      case 'raw_call':
+      case 'submit':
+        return this.fromSubmitCall(outcome, action.FunctionCall);
+      default:
+        return None; // unreachable
+    }
+  }
+
+  static fromSubmitCall(
+    outcome: NEAR.providers.FinalExecutionOutcome,
+    functionCall: NEARFunctionCall
+  ): Option<Transaction> {
+    try {
+      const transaction = parse(Buffer.from(functionCall.args, 'base64')); // throws Error
+      const outcomeBuffer = Buffer.from(
+        (outcome.status as any).SuccessValue,
+        'base64'
+      );
+      const executionResult = ExecutionResult.decode(outcomeBuffer); // throws BorshError
+      return Some(
+        new Transaction(
+          transaction.nonce,
+          BigInt(transaction.gasPrice.toString()),
+          BigInt(transaction.gasLimit.toString()),
+          Address.parse(transaction.to).ok(),
+          BigInt(transaction.value.toString()),
+          Buffer.from(transaction.data, 'hex'),
+          BigInt(transaction.v),
+          BigInt(transaction.r),
+          BigInt(transaction.s),
+          transaction.from
+            ? Address.parse(transaction.from).unwrap()
+            : undefined,
+          transaction.hash,
+          executionResult
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      return None;
+    }
   }
 
   isSigned(): boolean {
