@@ -118,7 +118,7 @@ export class BlockProxy {
           chunks,
           transactions,
           outcomes,
-          { hash: base58ToBytes(block.hash) }
+          { hash: base58ToBytes(block.header.hash) }
         )
       );
     } catch (error) {
