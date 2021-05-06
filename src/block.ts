@@ -1,11 +1,11 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
+import NEAR, { NEARBlock } from './near.js';
 import { Err, Ok, Quantity, Result } from './prelude.js';
 import { Transaction, TransactionID } from './transaction.js';
 import { base58ToBytes, base58ToHex, exportJSON } from './utils.js';
 
-import NEAR from 'near-api-js';
 import { BlockHeader, ChunkResult } from 'near-api-js/lib/providers/provider';
 
 export type BlockHash = string;
@@ -52,7 +52,8 @@ export class BlockProxy {
     protected readonly options: BlockOptions,
     protected readonly chunks: ChunkResult[],
     protected readonly transactions: TransactionID[],
-    protected readonly outcomes: NEAR.providers.FinalExecutionOutcome[]
+    protected readonly outcomes: NEAR.providers.FinalExecutionOutcome[],
+    public readonly near?: NEARBlock
   ) {
     this.number = header.height;
     this.hash = base58ToHex(header.hash);
@@ -116,7 +117,8 @@ export class BlockProxy {
           options || {},
           chunks,
           transactions,
-          outcomes
+          outcomes,
+          { hash: base58ToBytes(block.hash) }
         )
       );
     } catch (error) {

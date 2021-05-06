@@ -1,11 +1,11 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
+import NEAR, { NEARTransaction } from './near.js';
 import { None, Option, Some, U64, U256 } from './prelude.js';
 import { ExecutionResult } from './schema.js';
-import { base58ToHex, bytesToHex, intToHex } from './utils.js';
+import { base58ToBytes, base58ToHex, bytesToHex, intToHex } from './utils.js';
 
-import NEAR from 'near-api-js';
 import { parse } from '@ethersproject/transactions';
 
 interface NEARFunctionCall {
@@ -54,7 +54,8 @@ export class Transaction {
     public readonly s?: U256,
     public readonly from?: Address,
     public readonly hash?: string,
-    public readonly result?: ExecutionResult
+    public readonly result?: ExecutionResult,
+    public readonly near?: NEARTransaction
   ) {}
 
   static fromOutcome(
@@ -111,7 +112,8 @@ export class Transaction {
             ? Address.parse(transaction.from).unwrap()
             : undefined,
           transaction.hash,
-          executionResult
+          executionResult,
+          { hash: base58ToBytes(outcome.transaction_outcome.id) }
         )
       );
     } catch (error) {

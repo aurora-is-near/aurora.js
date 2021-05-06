@@ -1,7 +1,7 @@
 import { AccountID, Address } from './account.js';
+import NEAR, { NEARTransaction } from './near.js';
 import { Option, U64, U256 } from './prelude.js';
 import { ExecutionResult } from './schema.js';
-import NEAR from 'near-api-js';
 interface NEARFunctionCall {
     method_name: string;
     args: string;
@@ -29,7 +29,8 @@ export declare class Transaction {
     readonly from?: Address | undefined;
     readonly hash?: string | undefined;
     readonly result?: ExecutionResult | undefined;
-    constructor(nonce: U256, gasPrice: U256, gasLimit: U256, to: Option<Address>, value: U256, data: Uint8Array, v?: U64 | undefined, r?: U256 | undefined, s?: U256 | undefined, from?: Address | undefined, hash?: string | undefined, result?: ExecutionResult | undefined);
+    readonly near?: NEARTransaction | undefined;
+    constructor(nonce: U256, gasPrice: U256, gasLimit: U256, to: Option<Address>, value: U256, data: Uint8Array, v?: U64 | undefined, r?: U256 | undefined, s?: U256 | undefined, from?: Address | undefined, hash?: string | undefined, result?: ExecutionResult | undefined, near?: NEARTransaction | undefined);
     static fromOutcome(outcome: NEAR.providers.FinalExecutionOutcome, contractID?: AccountID): Option<Transaction>;
     static fromSubmitCall(outcome: NEAR.providers.FinalExecutionOutcome, functionCall: NEARFunctionCall): Option<Transaction>;
     isSigned(): boolean;

@@ -1,7 +1,7 @@
 import { AccountID, Address } from './account.js';
+import NEAR, { NEARBlock } from './near.js';
 import { Quantity, Result } from './prelude.js';
 import { Transaction, TransactionID } from './transaction.js';
-import NEAR from 'near-api-js';
 import { BlockHeader, ChunkResult } from 'near-api-js/lib/providers/provider';
 export declare type BlockHash = string;
 export declare type BlockHeight = Quantity;
@@ -40,10 +40,11 @@ export declare class BlockProxy {
     protected readonly chunks: ChunkResult[];
     protected readonly transactions: TransactionID[];
     protected readonly outcomes: NEAR.providers.FinalExecutionOutcome[];
+    readonly near?: NEARBlock | undefined;
     readonly number: BlockHeight;
     readonly hash: BlockHash;
     readonly parentHash: BlockHash;
-    protected constructor(provider: NEAR.providers.Provider, header: BlockHeader, options: BlockOptions, chunks: ChunkResult[], transactions: TransactionID[], outcomes: NEAR.providers.FinalExecutionOutcome[]);
+    protected constructor(provider: NEAR.providers.Provider, header: BlockHeader, options: BlockOptions, chunks: ChunkResult[], transactions: TransactionID[], outcomes: NEAR.providers.FinalExecutionOutcome[], near?: NEARBlock | undefined);
     static lookup(provider: NEAR.providers.Provider, id: BlockID): Promise<Result<boolean, string>>;
     static fetch(provider: NEAR.providers.Provider, id: BlockID, options?: BlockOptions): Promise<Result<BlockProxy, string>>;
     getMetadata(): BlockMetadata;
