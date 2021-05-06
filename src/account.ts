@@ -1,6 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-import { Ok, Result } from './prelude.js';
+import { Err, Ok, Result } from './prelude.js';
 
 import { getAddress as parseAddress } from '@ethersproject/address';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
@@ -38,7 +38,11 @@ export class Address {
   }
 
   static parse(id?: string): Result<Address, string> {
-    return Ok(new Address(parseAddress(id!)));
+    try {
+      return Ok(new Address(parseAddress(id!)));
+    } catch (error) {
+      return Err(error.message);
+    }
   }
 
   isZero(): boolean {
