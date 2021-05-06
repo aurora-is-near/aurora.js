@@ -13,12 +13,12 @@ abstract class Assignable {
 // Borsh-encoded parameters for the `begin_block` method.
 export class BeginBlockArgs extends Assignable {
   constructor(
-    public hash: Uint8Array,
-    public coinbase: Uint8Array,
-    public timestamp: Uint8Array,
-    public number: Uint8Array,
-    public difficulty: Uint8Array,
-    public gaslimit: Uint8Array
+    public readonly hash: Uint8Array,
+    public readonly coinbase: Uint8Array,
+    public readonly timestamp: Uint8Array,
+    public readonly number: Uint8Array,
+    public readonly difficulty: Uint8Array,
+    public readonly gaslimit: Uint8Array
   ) {
     super();
   }
@@ -33,21 +33,21 @@ export class BeginChainArgs extends Assignable {
 
 // Borsh-encoded result from the `submit` method.
 export class ExecutionResult extends Assignable {
-  public status: boolean;
-  public gasUsed: number | bigint;
-  public output: Uint8Array;
-  public logs: LogEvent[];
+  public readonly status: boolean;
+  public readonly gasUsed: number | bigint;
+  public readonly output: Uint8Array;
+  public readonly logs: LogEvent[];
 
   constructor(args: {
     status: boolean | number;
     gasUsed: number | bigint | BN;
-    output: Uint8Array;
+    output: Uint8Array | number[];
     logs: LogEvent[];
   }) {
     super();
-    this.status = !!args.status;
+    this.status = Boolean(args.status);
     this.gasUsed = BigInt(args.gasUsed.toString());
-    this.output = args.output;
+    this.output = Buffer.from(args.output);
     this.logs = args.logs;
   }
 
@@ -79,28 +79,28 @@ export class GetStorageAtArgs extends Assignable {
 
 // Borsh-encoded log for use in a `ExecutionResult`.
 export class LogEvent extends Assignable {
-  topics: RawU256[];
-  data: Uint8Array;
+  public readonly topics: RawU256[];
+  public readonly data: Uint8Array;
 
-  constructor(args: { topics: RawU256[]; data: Uint8Array }) {
+  constructor(args: { topics: RawU256[]; data: Uint8Array | number[] }) {
     super();
     this.topics = args.topics;
-    this.data = args.data;
+    this.data = Buffer.from(args.data);
   }
 }
 
 // Borsh-encoded parameters for the `meta_call` method.
 export class MetaCallArgs extends Assignable {
   constructor(
-    public signature: Uint8Array,
-    public v: number,
-    public nonce: Uint8Array,
-    public feeAmount: Uint8Array,
-    public feeAddress: Uint8Array,
-    public contractAddress: Uint8Array,
-    public value: Uint8Array,
-    public methodDef: string,
-    public args: Uint8Array
+    public readonly signature: Uint8Array,
+    public readonly v: number,
+    public readonly nonce: Uint8Array,
+    public readonly feeAmount: Uint8Array,
+    public readonly feeAddress: Uint8Array,
+    public readonly contractAddress: Uint8Array,
+    public readonly value: Uint8Array,
+    public readonly methodDef: string,
+    public readonly args: Uint8Array
   ) {
     super();
   }
@@ -109,10 +109,10 @@ export class MetaCallArgs extends Assignable {
 // Borsh-encoded parameters for the `new` method.
 export class NewCallArgs extends Assignable {
   constructor(
-    public chainID: Uint8Array,
-    public ownerID: string,
-    public bridgeProverID: string,
-    public upgradeDelayBlocks: number | BN
+    public readonly chainID: Uint8Array,
+    public readonly ownerID: string,
+    public readonly bridgeProverID: string,
+    public readonly upgradeDelayBlocks: number | BN
   ) {
     super();
   }
@@ -120,14 +120,14 @@ export class NewCallArgs extends Assignable {
 
 // Borsh-encoded U256 integer.
 export class RawU256 extends Assignable {
-  public value: Uint8Array;
+  public readonly value: Uint8Array;
 
-  constructor(args?: Uint8Array | { value: Uint8Array }) {
+  constructor(args?: Uint8Array | { value: Uint8Array | number[] }) {
     super();
     if (!args) {
       this.value = Buffer.alloc(32);
     } else {
-      const bytes = args instanceof Uint8Array ? args : args.value;
+      const bytes = Buffer.from(args instanceof Uint8Array ? args : args.value);
       //assert(bytes.length == 32); // TODO
       this.value = bytes;
     }
@@ -145,10 +145,10 @@ export class RawU256 extends Assignable {
 // Borsh-encoded parameters for the `view` method.
 export class ViewCallArgs extends Assignable {
   constructor(
-    public sender: Uint8Array,
-    public address: Uint8Array,
-    public amount: Uint8Array,
-    public input: Uint8Array
+    public readonly sender: Uint8Array,
+    public readonly address: Uint8Array,
+    public readonly amount: Uint8Array,
+    public readonly input: Uint8Array
   ) {
     super();
   }

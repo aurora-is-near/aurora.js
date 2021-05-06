@@ -4,12 +4,12 @@ declare abstract class Assignable {
     encode(): Uint8Array;
 }
 export declare class BeginBlockArgs extends Assignable {
-    hash: Uint8Array;
-    coinbase: Uint8Array;
-    timestamp: Uint8Array;
-    number: Uint8Array;
-    difficulty: Uint8Array;
-    gaslimit: Uint8Array;
+    readonly hash: Uint8Array;
+    readonly coinbase: Uint8Array;
+    readonly timestamp: Uint8Array;
+    readonly number: Uint8Array;
+    readonly difficulty: Uint8Array;
+    readonly gaslimit: Uint8Array;
     constructor(hash: Uint8Array, coinbase: Uint8Array, timestamp: Uint8Array, number: Uint8Array, difficulty: Uint8Array, gaslimit: Uint8Array);
 }
 export declare class BeginChainArgs extends Assignable {
@@ -17,14 +17,14 @@ export declare class BeginChainArgs extends Assignable {
     constructor(chainID: Uint8Array);
 }
 export declare class ExecutionResult extends Assignable {
-    status: boolean;
-    gasUsed: number | bigint;
-    output: Uint8Array;
-    logs: LogEvent[];
+    readonly status: boolean;
+    readonly gasUsed: number | bigint;
+    readonly output: Uint8Array;
+    readonly logs: LogEvent[];
     constructor(args: {
         status: boolean | number;
         gasUsed: number | bigint | BN;
-        output: Uint8Array;
+        output: Uint8Array | number[];
         logs: LogEvent[];
     });
     static decode(input: Buffer): ExecutionResult;
@@ -43,45 +43,45 @@ export declare class GetStorageAtArgs extends Assignable {
     constructor(address: Uint8Array, key: Uint8Array);
 }
 export declare class LogEvent extends Assignable {
-    topics: RawU256[];
-    data: Uint8Array;
+    readonly topics: RawU256[];
+    readonly data: Uint8Array;
     constructor(args: {
         topics: RawU256[];
-        data: Uint8Array;
+        data: Uint8Array | number[];
     });
 }
 export declare class MetaCallArgs extends Assignable {
-    signature: Uint8Array;
-    v: number;
-    nonce: Uint8Array;
-    feeAmount: Uint8Array;
-    feeAddress: Uint8Array;
-    contractAddress: Uint8Array;
-    value: Uint8Array;
-    methodDef: string;
-    args: Uint8Array;
+    readonly signature: Uint8Array;
+    readonly v: number;
+    readonly nonce: Uint8Array;
+    readonly feeAmount: Uint8Array;
+    readonly feeAddress: Uint8Array;
+    readonly contractAddress: Uint8Array;
+    readonly value: Uint8Array;
+    readonly methodDef: string;
+    readonly args: Uint8Array;
     constructor(signature: Uint8Array, v: number, nonce: Uint8Array, feeAmount: Uint8Array, feeAddress: Uint8Array, contractAddress: Uint8Array, value: Uint8Array, methodDef: string, args: Uint8Array);
 }
 export declare class NewCallArgs extends Assignable {
-    chainID: Uint8Array;
-    ownerID: string;
-    bridgeProverID: string;
-    upgradeDelayBlocks: number | BN;
+    readonly chainID: Uint8Array;
+    readonly ownerID: string;
+    readonly bridgeProverID: string;
+    readonly upgradeDelayBlocks: number | BN;
     constructor(chainID: Uint8Array, ownerID: string, bridgeProverID: string, upgradeDelayBlocks: number | BN);
 }
 export declare class RawU256 extends Assignable {
-    value: Uint8Array;
+    readonly value: Uint8Array;
     constructor(args?: Uint8Array | {
-        value: Uint8Array;
+        value: Uint8Array | number[];
     });
     toBytes(): Uint8Array;
     toString(): string;
 }
 export declare class ViewCallArgs extends Assignable {
-    sender: Uint8Array;
-    address: Uint8Array;
-    amount: Uint8Array;
-    input: Uint8Array;
+    readonly sender: Uint8Array;
+    readonly address: Uint8Array;
+    readonly amount: Uint8Array;
+    readonly input: Uint8Array;
     constructor(sender: Uint8Array, address: Uint8Array, amount: Uint8Array, input: Uint8Array);
 }
 export {};
