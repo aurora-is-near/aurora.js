@@ -96,6 +96,7 @@ export class Transaction {
         (outcome.status as any).SuccessValue,
         'base64'
       );
+      const receiptIDs = outcome.transaction_outcome?.outcome?.receipt_ids;
       const executionResult = ExecutionResult.decode(outcomeBuffer); // throws BorshError
       return Some(
         new Transaction(
@@ -113,7 +114,13 @@ export class Transaction {
             : undefined,
           transaction.hash,
           executionResult,
-          { hash: base58ToBytes(outcome.transaction_outcome.id) }
+          {
+            hash: base58ToBytes(outcome.transaction_outcome.id),
+            receiptHash:
+              Array.isArray(receiptIDs) && receiptIDs?.length
+                ? base58ToBytes(receiptIDs[0]!)
+                : undefined,
+          }
         )
       );
     } catch (error) {

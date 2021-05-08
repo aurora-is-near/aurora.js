@@ -5,4 +5,5 @@ export interface NEARBlock {
 }
 export interface NEARTransaction {
     hash: Uint8Array;
+    receiptHash?: Uint8Array;
 }
