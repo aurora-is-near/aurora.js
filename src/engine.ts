@@ -250,10 +250,12 @@ export class Engine {
 
   async deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>> {
     const args = parseHexString(bytecode);
-    const result = await this.callMutativeFunction('deploy_code', args);
-    return result.map(({ output }) =>
-      Address.parse(Buffer.from(output).toString('hex')).unwrap()
-    );
+    const outcome = await this.callMutativeFunction('deploy_code', args);
+    return outcome.map(({ output }) => {
+      const result = ExecutionResult.decode(Buffer.from(output));
+      // TODO: error handling if !result.status
+      return Address.parse(Buffer.from(result.output).toString('hex')).unwrap();
+    });
   }
 
   async call(
