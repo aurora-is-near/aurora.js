@@ -42,7 +42,7 @@ export class KeyStore extends MergeKeyStore {
     if (env && env.HOME) {
       const localValidatorKeyPath = `${env.HOME}/.near/validator_key.json`;
       if (existsSync(localValidatorKeyPath)) {
-        const [accountID, keyPair] = loadKeyFile(localValidatorKeyPath);
+        const [accountID, keyPair] = _loadKeyFile(localValidatorKeyPath);
         keyStore.setKey('local', accountID, keyPair);
       }
     }
@@ -62,9 +62,14 @@ export class KeyStore extends MergeKeyStore {
       AccountID.parse(id).unwrap().toAddress()
     );
   }
+
+  loadKeyFile(keyFilePath: string) {
+    const [accountID, keyPair] = _loadKeyFile(keyFilePath);
+    this.keyStores[0]!.setKey(this.networkID, accountID, keyPair);
+  }
 }
 
-function loadKeyFile(keyFilePath: string) {
+function _loadKeyFile(keyFilePath: string) {
   const keyJSON = JSON.parse(readFileSync(keyFilePath, 'utf8'));
   const keyPair = KeyPair.fromString(keyJSON.private_key || keyJSON.secret_key);
   return [keyJSON.account_id, keyPair];
