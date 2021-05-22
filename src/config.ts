@@ -20,13 +20,24 @@ export enum NetworkID {
 
 export const NETWORKS: Map<string, NetworkConfig> = new Map(
   Object.entries({
+    // deprecated in favor of 'localnet'
     local: {
       id: 'local',
       label: 'LocalNet',
       chainID: 1313161556,
       contractID: 'aurora.test.near',
       nearEndpoint: 'http://127.0.0.1:3030',
-      web3Endpoint: undefined, // TODO
+      web3Endpoint: 'http://127.0.0.1:8545',
+      walletLink: 'http://127.0.0.1:4000',
+      explorerLink: 'http://127.0.0.1:3019',
+    },
+    localnet: {
+      id: 'local',
+      label: 'LocalNet',
+      chainID: 1313161556,
+      contractID: 'aurora.test.near',
+      nearEndpoint: 'http://127.0.0.1:3030',
+      web3Endpoint: 'http://127.0.0.1:8545',
       walletLink: 'http://127.0.0.1:4000',
       explorerLink: 'http://127.0.0.1:3019',
     },
