@@ -23,6 +23,7 @@ import { TransactionID } from './transaction.js';
 
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
+import { parse as parseRawTransaction } from '@ethersproject/transactions';
 import { toBigIntBE, toBufferBE } from 'bigint-buffer';
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
@@ -274,10 +275,19 @@ export class Engine {
   async submit(
     input: Uint8Array | string
   ): Promise<Result<ExecutionResult, Error>> {
-    const args = this.prepareInput(input);
-    return (await this.callMutativeFunction('submit', args)).map(({ output }) =>
-      ExecutionResult.decode(Buffer.from(output))
-    );
+    try {
+      const inputBytes = this.prepareInput(input);
+      const rawTransaction = parseRawTransaction(inputBytes); // throws Error
+      if (rawTransaction.gasLimit.toBigInt() < 21000n) {
+        // See: https://github.com/aurora-is-near/aurora-relayer/issues/17
+        return Err('ERR_INTRINSIC_GAS');
+      }
+      return (
+        await this.callMutativeFunction('submit', inputBytes)
+      ).map(({ output }) => ExecutionResult.decode(Buffer.from(output)));
+    } catch (error) {
+      return Err(error.message);
+    }
   }
 
   // TODO: metaCall()

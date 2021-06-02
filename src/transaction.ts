@@ -6,7 +6,7 @@ import { None, Option, Some, U64, U256 } from './prelude.js';
 import { ExecutionResult } from './schema.js';
 import { base58ToBytes, base58ToHex, bytesToHex, intToHex } from './utils.js';
 
-import { parse } from '@ethersproject/transactions';
+import { parse as parseRawTransaction } from '@ethersproject/transactions';
 
 interface NEARFunctionCall {
   method_name: string;
@@ -91,7 +91,9 @@ export class Transaction {
     functionCall: NEARFunctionCall
   ): Option<Transaction> {
     try {
-      const transaction = parse(Buffer.from(functionCall.args, 'base64')); // throws Error
+      const transaction = parseRawTransaction(
+        Buffer.from(functionCall.args, 'base64')
+      ); // throws Error
       const outcomeBuffer = Buffer.from(
         (outcome.status as any).SuccessValue,
         'base64'
@@ -102,7 +104,7 @@ export class Transaction {
         new Transaction(
           transaction.nonce,
           BigInt(transaction.gasPrice.toString()),
-          BigInt(transaction.gasLimit.toString()),
+          BigInt(transaction.gasLimit.toString()), // FIXME: #16, #17
           Address.parse(transaction.to).ok(),
           BigInt(transaction.value.toString()),
           Buffer.from(transaction.data, 'hex'),
