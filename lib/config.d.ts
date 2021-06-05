@@ -10,8 +10,8 @@ export interface NetworkConfig {
 }
 export declare enum NetworkID {
     Local = "local",
-    BetaNet = "betanet",
-    TestNet = "testnet",
-    MainNet = "mainnet"
+    Betanet = "betanet",
+    Testnet = "testnet",
+    Mainnet = "mainnet"
 }
 export declare const NETWORKS: Map<string, NetworkConfig>;

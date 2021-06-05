@@ -13,9 +13,9 @@ export interface NetworkConfig {
 
 export enum NetworkID {
   Local = 'local',
-  BetaNet = 'betanet',
-  TestNet = 'testnet',
-  MainNet = 'mainnet',
+  Betanet = 'betanet',
+  Testnet = 'testnet',
+  Mainnet = 'mainnet',
 }
 
 export const NETWORKS: Map<string, NetworkConfig> = new Map(
@@ -23,7 +23,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
     // deprecated in favor of 'localnet'
     local: {
       id: 'local',
-      label: 'LocalNet',
+      label: 'Localnet',
       chainID: 1313161556,
       contractID: 'aurora.test.near',
       nearEndpoint: 'http://127.0.0.1:3030',
@@ -33,7 +33,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
     },
     localnet: {
       id: 'local',
-      label: 'LocalNet',
+      label: 'Localnet',
       chainID: 1313161556,
       contractID: 'aurora.test.near',
       nearEndpoint: 'http://127.0.0.1:3030',
@@ -43,7 +43,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
     },
     betanet: {
       id: 'betanet',
-      label: 'BetaNet',
+      label: 'Betanet',
       chainID: 1313161556,
       contractID: 'aurora',
       nearEndpoint: 'https://rpc.betanet.near.org',
@@ -53,7 +53,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
     },
     testnet: {
       id: 'default', // N.B.
-      label: 'TestNet',
+      label: 'Testnet',
       chainID: 1313161555,
       contractID: 'aurora',
       nearEndpoint: 'https://rpc.testnet.near.org',
@@ -63,7 +63,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
     },
     mainnet: {
       id: 'mainnet',
-      label: 'MainNet',
+      label: 'Mainnet',
       chainID: 1313161554,
       contractID: 'aurora',
       nearEndpoint: 'https://rpc.mainnet.near.org',
