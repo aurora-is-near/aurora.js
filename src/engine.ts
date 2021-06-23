@@ -157,7 +157,7 @@ export class Engine {
 
     // TODO: this should be able to be a single transaction with multiple actions,
     // but there doesn't seem to be a good way to do that in `near-api-js` presently.
-    let tx = await this.promiseAndThen(
+    const tx = await this.promiseAndThen(
       this.callMutativeFunction('new', newArgs.encode()),
       (_) => this.callMutativeFunction('new_eth_connector', connectorArgs.encode())
     );
@@ -172,9 +172,9 @@ export class Engine {
     p: Promise<Result<T, E>>,
     f: (x: T) => Promise<Result<U, E>>
   ): Promise<Result<U, E>> {
-    let r = await p;
+    const r = await p;
     if (r.isOk()) {
-      let t = r.unwrap();
+      const t = r.unwrap();
       return await f(t);
     } else {
       return Err(r.unwrapErr());
