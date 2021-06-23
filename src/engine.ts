@@ -16,6 +16,7 @@ import {
   ExecutionResult,
   FunctionCallArgs,
   GetStorageAtArgs,
+  InitCallArgs,
   NewCallArgs,
   ViewCallArgs,
 } from './schema.js';
@@ -142,15 +143,42 @@ export class Engine {
   }
 
   async initialize(options: any): Promise<Result<TransactionID, Error>> {
-    const args = new NewCallArgs(
+    const newArgs = new NewCallArgs(
       parseHexString(defaultAbiCoder.encode(['uint256'], [options.chain || 0])),
       options.owner || '',
       options.bridgeProver || '',
       new BN(options.upgradeDelay || 0)
     );
-    return (await this.callMutativeFunction('new', args.encode())).map(
+    // default values are the testnet values
+    const connectorArgs = new InitCallArgs(
+      options.prover || 'prover.ropsten.testnet',
+      options.ethCustodian || '9006a6D7d08A388Eeea0112cc1b6b6B15a4289AF'
+    )
+
+    // TODO: this should be able to be a single transaction with multiple actions,
+    // but there doesn't seem to be a good way to do that in `near-api-js` presently.
+    let tx = await this.promiseAndThen(
+      this.callMutativeFunction('new', newArgs.encode()),
+      (_) => this.callMutativeFunction('new_eth_connector', connectorArgs.encode())
+    );
+
+    return tx.map(
       ({ id }) => id
     );
+  }
+
+  // Like Result.andThen, but wrapped up in Promises
+  private async promiseAndThen<T, U, E>(
+    p: Promise<Result<T, E>>,
+    f: (x: T) => Promise<Result<U, E>>
+  ): Promise<Result<U, E>> {
+    let r = await p;
+    if (r.isOk()) {
+      let t = r.unwrap();
+      return await f(t);
+    } else {
+      return Err(r.unwrapErr());
+    }
   }
 
   async getAccount(): Promise<Result<NEAR.Account, Error>> {

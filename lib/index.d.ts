@@ -36,6 +36,7 @@ declare const _default: {
     LogEvent: typeof schema.LogEvent;
     MetaCallArgs: typeof schema.MetaCallArgs;
     NewCallArgs: typeof schema.NewCallArgs;
+    InitCallArgs: typeof schema.InitCallArgs;
     RawU256: typeof schema.RawU256;
     ViewCallArgs: typeof schema.ViewCallArgs;
     Left: typeof prelude.Left;

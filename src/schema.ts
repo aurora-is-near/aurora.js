@@ -118,6 +118,16 @@ export class NewCallArgs extends Assignable {
   }
 }
 
+// Borsh-encoded parameters for the `new_eth_connector` method.
+export class InitCallArgs extends Assignable {
+  constructor(
+    public readonly prover_account: string,
+    public readonly eth_custodian_address: string
+  ) {
+    super();
+  }
+}
+
 // Borsh-encoded U256 integer.
 export class RawU256 extends Assignable {
   public readonly value: Uint8Array;
