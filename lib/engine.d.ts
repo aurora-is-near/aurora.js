@@ -72,6 +72,7 @@ export declare class Engine {
     install(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     upgrade(contractCode: Bytecode): Promise<Result<TransactionID, Error>>;
     initialize(options: any): Promise<Result<TransactionID, Error>>;
+    private promiseAndThen;
     getAccount(): Promise<Result<NEAR.Account, Error>>;
     getBlockHash(): Promise<Result<BlockHash, Error>>;
     getBlockHeight(): Promise<Result<BlockHeight, Error>>;

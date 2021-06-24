@@ -69,6 +69,11 @@ export declare class NewCallArgs extends Assignable {
     readonly upgradeDelayBlocks: number | BN;
     constructor(chainID: Uint8Array, ownerID: string, bridgeProverID: string, upgradeDelayBlocks: number | BN);
 }
+export declare class InitCallArgs extends Assignable {
+    readonly prover_account: string;
+    readonly eth_custodian_address: string;
+    constructor(prover_account: string, eth_custodian_address: string);
+}
 export declare class RawU256 extends Assignable {
     readonly value: Uint8Array;
     constructor(args?: Uint8Array | {
