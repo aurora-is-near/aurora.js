@@ -254,6 +254,16 @@ const SCHEMA = new Map<Function, any>([
     },
   ],
   [
+    InitCallArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['prover_account', 'string'],
+        ['eth_custodian_address', 'string'],
+      ],
+    },
+  ],
+  [
     ViewCallArgs,
     {
       kind: 'struct',
