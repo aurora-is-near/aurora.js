@@ -13,6 +13,7 @@ import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
 import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
 import {
+  DeployErc20TokenArgs,
   ExecutionResult,
   FunctionCallArgs,
   GetStorageAtArgs,
@@ -153,18 +154,17 @@ export class Engine {
     const connectorArgs = new InitCallArgs(
       options.prover || 'prover.ropsten.testnet',
       options.ethCustodian || '9006a6D7d08A388Eeea0112cc1b6b6B15a4289AF'
-    )
+    );
 
     // TODO: this should be able to be a single transaction with multiple actions,
     // but there doesn't seem to be a good way to do that in `near-api-js` presently.
     const tx = await this.promiseAndThen(
       this.callMutativeFunction('new', newArgs.encode()),
-      (_) => this.callMutativeFunction('new_eth_connector', connectorArgs.encode())
+      (_) =>
+        this.callMutativeFunction('new_eth_connector', connectorArgs.encode())
     );
 
-    return tx.map(
-      ({ id }) => id
-    );
+    return tx.map(({ id }) => id);
   }
 
   // Like Result.andThen, but wrapped up in Promises
@@ -285,6 +285,13 @@ export class Engine {
       // TODO: error handling if !result.status
       return Address.parse(Buffer.from(result.output).toString('hex')).unwrap();
     });
+  }
+
+  async deploy_erc20_token(nep141: string): Promise<Result<Uint8Array, Error>> {
+    const args = new DeployErc20TokenArgs(nep141);
+    return (
+      await this.callMutativeFunction('deploy_erc20_token', args.encode())
+    ).map(({ output }) => output);
   }
 
   async call(

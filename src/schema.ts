@@ -63,6 +63,12 @@ export class FunctionCallArgs extends Assignable {
   }
 }
 
+export class DeployErc20TokenArgs extends Assignable {
+  constructor(public nep141: string) {
+    super();
+  }
+}
+
 // Borsh-encoded parameters for the `get_chain_id` method.
 export class GetChainID extends Assignable {
   constructor() {
@@ -201,6 +207,13 @@ const SCHEMA = new Map<Function, any>([
         ['contract', [20]],
         ['input', ['u8']],
       ],
+    },
+  ],
+  [
+    DeployErc20TokenArgs,
+    {
+      kind: 'struct',
+      fields: [['nep141', 'string']],
     },
   ],
   [GetChainID, { kind: 'struct', fields: [] }],
