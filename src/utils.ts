@@ -5,6 +5,7 @@ import { Transaction, TransactionID } from './transaction.js';
 
 import { toBufferBE } from 'bigint-buffer';
 import bs58 from 'bs58';
+import { NetworkID } from './config.js';
 
 export function formatU256(value: number | bigint): string {
   return `0x${toBufferBE(BigInt(value), 32).toString('hex')}`;
@@ -36,6 +37,27 @@ export function hexToInt(input: string): number {
 
 export function intToHex(input: number | bigint): string {
   return `0x${input.toString(16)}`;
+}
+
+export function nep141FromErc20(
+  tokenAddress: Address,
+  networkId = NetworkID.Mainnet
+): AccountID {
+  const prefix = tokenAddress.toString().substring(2).toLowerCase();
+  let suffix;
+
+  switch (networkId) {
+    case NetworkID.Mainnet:
+      suffix = 'factory.bridge.near';
+      break;
+    case NetworkID.Testnet:
+      suffix = 'f.ropsten.testnet';
+      break;
+    default:
+      throw new Error(`Network ${networkId} not supported.`);
+  }
+
+  return AccountID.parse(prefix + '.' + suffix).unwrap();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

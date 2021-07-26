@@ -438,6 +438,23 @@ export class Engine {
     return Ok(result);
   }
 
+  async getAuroraErc20Address(
+    nep141: AccountID,
+    options?: ViewOptions
+  ): Promise<void> {
+    // const args = address.to
+    // const args = nep141.encode();
+    let buf = new ArrayBuffer(4);
+    let data32 = new Uint32Array(buf);
+
+    const result = await this.callFunction(
+      'get_nep141_from_erc20',
+      args,
+      options
+    );
+    console.log(result);
+  }
+
   protected async callFunction(
     methodName: string,
     args?: Uint8Array,

@@ -24,13 +24,16 @@ declare const _default: {
     hexToBytes(input: string): Uint8Array;
     hexToInt(input: string): number;
     intToHex(input: number | bigint): string;
+    nep141FromErc20(tokenAddress: account.Address, networkId?: config.NetworkID): account.AccountID;
     exportJSON(input?: Record<string, unknown> | Record<string, unknown>[] | undefined): any;
     TransactionID: typeof transaction.TransactionID;
     Transaction: typeof transaction.Transaction;
+    Assignable: typeof schema.Assignable;
     BeginBlockArgs: typeof schema.BeginBlockArgs;
     BeginChainArgs: typeof schema.BeginChainArgs;
     ExecutionResult: typeof schema.ExecutionResult;
     FunctionCallArgs: typeof schema.FunctionCallArgs;
+    DeployErc20TokenArgs: typeof schema.DeployErc20TokenArgs;
     GetChainID: typeof schema.GetChainID;
     GetStorageAtArgs: typeof schema.GetStorageAtArgs;
     LogEvent: typeof schema.LogEvent;

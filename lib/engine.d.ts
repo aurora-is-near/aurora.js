@@ -86,6 +86,7 @@ export declare class Engine {
     getBridgeProvider(options?: ViewOptions): Promise<Result<AccountID, Error>>;
     getChainID(options?: ViewOptions): Promise<Result<ChainID, Error>>;
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
+    deploy_erc20_token(nep141: string): Promise<Result<Uint8Array, Error>>;
     call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
     submit(input: Uint8Array | string): Promise<Result<ExecutionResult, Error>>;
     view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array, Error>>;
@@ -94,6 +95,7 @@ export declare class Engine {
     getNonce(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
     getStorageAt(address: Address, key: U256 | number | string, options?: ViewOptions): Promise<Result<U256, Error>>;
     getStorage(): Promise<Result<EngineStorage, Error>>;
+    getAuroraErc20Address(nep141: AccountID, options?: ViewOptions): Promise<void>;
     protected callFunction(methodName: string, args?: Uint8Array, options?: ViewOptions): Promise<Result<Buffer, Error>>;
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;

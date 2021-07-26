@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import BN from 'bn.js';
-declare abstract class Assignable {
+export declare abstract class Assignable {
     encode(): Uint8Array;
 }
 export declare class BeginBlockArgs extends Assignable {
@@ -33,6 +33,10 @@ export declare class FunctionCallArgs extends Assignable {
     contract: Uint8Array;
     input: Uint8Array;
     constructor(contract: Uint8Array, input: Uint8Array);
+}
+export declare class DeployErc20TokenArgs extends Assignable {
+    nep141: string;
+    constructor(nep141: string);
 }
 export declare class GetChainID extends Assignable {
     constructor();
@@ -89,4 +93,3 @@ export declare class ViewCallArgs extends Assignable {
     readonly input: Uint8Array;
     constructor(sender: Uint8Array, address: Uint8Array, amount: Uint8Array, input: Uint8Array);
 }
-export {};

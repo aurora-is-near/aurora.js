@@ -4,7 +4,7 @@ import BN from 'bn.js';
 import NEAR from 'near-api-js';
 import { bytesToHex } from './utils.js';
 
-abstract class Assignable {
+export abstract class Assignable {
   encode(): Uint8Array {
     return NEAR.utils.serialize.serialize(SCHEMA, this);
   }
