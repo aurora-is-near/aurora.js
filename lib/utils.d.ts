@@ -1,3 +1,5 @@
+import { AccountID, Address } from './account.js';
+import { NetworkID } from './config.js';
 export declare function formatU256(value: number | bigint): string;
 export declare function base58ToHex(input: string): string;
 export declare function base58ToBytes(input: string): Uint8Array;
@@ -6,4 +8,5 @@ export declare function hexToBase58(input: string): string;
 export declare function hexToBytes(input: string): Uint8Array;
 export declare function hexToInt(input: string): number;
 export declare function intToHex(input: number | bigint): string;
+export declare function ethErc20ToNep141(tokenAddress: Address, networkId: NetworkID): AccountID;
 export declare function exportJSON(input?: Record<string, unknown> | Record<string, unknown>[]): any;

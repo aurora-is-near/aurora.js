@@ -1,6 +1,7 @@
 /* This is free and unencumbered software released into the public domain. */
 
 import { AccountID, Address } from './account.js';
+import { NetworkID } from './config.js';
 import { Transaction, TransactionID } from './transaction.js';
 
 import { toBufferBE } from 'bigint-buffer';
@@ -36,6 +37,27 @@ export function hexToInt(input: string): number {
 
 export function intToHex(input: number | bigint): string {
   return `0x${input.toString(16)}`;
+}
+
+export function ethErc20ToNep141(
+  tokenAddress: Address,
+  networkId: NetworkID,
+): AccountID {
+  const prefix = tokenAddress.toString().substring(2).toLowerCase();
+  let suffix;
+
+  switch (networkId) {
+    case NetworkID.Mainnet:
+      suffix = 'factory.bridge.near';
+      break;
+    case NetworkID.Testnet:
+      suffix = 'f.ropsten.testnet';
+      break;
+    default:
+      throw new Error(`Network ${networkId} not supported.`);
+  }
+
+  return AccountID.parse(prefix + '.' + suffix).unwrap();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
