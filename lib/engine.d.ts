@@ -93,6 +93,8 @@ export declare class Engine {
     getBalance(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
     getNonce(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
     getStorageAt(address: Address, key: U256 | number | string, options?: ViewOptions): Promise<Result<U256, Error>>;
+    getAuroraErc20Address(nep141: AccountID, options?: ViewOptions): Promise<Result<Address, Error>>;
+    getNEP141Account(erc20: Address, options?: ViewOptions): Promise<Result<AccountID, Error>>;
     getStorage(): Promise<Result<EngineStorage, Error>>;
     protected callFunction(methodName: string, args?: Uint8Array, options?: ViewOptions): Promise<Result<Buffer, Error>>;
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
