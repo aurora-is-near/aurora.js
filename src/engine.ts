@@ -26,6 +26,7 @@ import { defaultAbiCoder } from '@ethersproject/abi';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
 import { parse as parseRawTransaction } from '@ethersproject/transactions';
 import { toBigIntBE, toBufferBE } from 'bigint-buffer';
+import { Buffer } from 'buffer';
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
 
@@ -383,6 +384,40 @@ export class Engine {
       options
     );
     return result.map(toBigIntBE);
+  }
+
+  async getAuroraErc20Address(
+    nep141: AccountID,
+    options?: ViewOptions
+  ): Promise<Result<Address, Error>> {
+    const args = Buffer.from(nep141.id, 'utf-8');
+
+    const result = await this.callFunction(
+      'get_erc20_from_nep141',
+      args,
+      options
+    );
+
+    return result.map(output => {
+      return Address.parse(output.toString('hex')).unwrap();
+    });
+  }
+
+  async getNEP141Account(
+    erc20: Address,
+    options?: ViewOptions
+  ): Promise<Result<AccountID, Error>> {
+    const args = erc20.toBytes();
+
+    const result = await this.callFunction(
+      'get_nep141_from_erc20',
+      args,
+      options
+    );
+
+    return result.map(output => {
+      return AccountID.parse(output.toString('utf-8')).unwrap();
+    });
   }
 
   // TODO: beginChain()

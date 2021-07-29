@@ -24,6 +24,7 @@ declare const _default: {
     hexToBytes(input: string): Uint8Array;
     hexToInt(input: string): number;
     intToHex(input: number | bigint): string;
+    ethErc20ToNep141(tokenAddress: account.Address, networkId: config.NetworkID): account.AccountID;
     exportJSON(input?: Record<string, unknown> | Record<string, unknown>[] | undefined): any;
     TransactionID: typeof transaction.TransactionID;
     Transaction: typeof transaction.Transaction;
