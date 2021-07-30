@@ -154,18 +154,17 @@ export class Engine {
     const connectorArgs = new InitCallArgs(
       options.prover || 'prover.ropsten.testnet',
       options.ethCustodian || '9006a6D7d08A388Eeea0112cc1b6b6B15a4289AF'
-    )
+    );
 
     // TODO: this should be able to be a single transaction with multiple actions,
     // but there doesn't seem to be a good way to do that in `near-api-js` presently.
     const tx = await this.promiseAndThen(
       this.callMutativeFunction('new', newArgs.encode()),
-      (_) => this.callMutativeFunction('new_eth_connector', connectorArgs.encode())
+      (_) =>
+        this.callMutativeFunction('new_eth_connector', connectorArgs.encode())
     );
 
-    return tx.map(
-      ({ id }) => id
-    );
+    return tx.map(({ id }) => id);
   }
 
   // Like Result.andThen, but wrapped up in Promises
@@ -250,15 +249,15 @@ export class Engine {
   }
 
   async getVersion(options?: ViewOptions): Promise<Result<string, Error>> {
-    return (
-      await this.callFunction('get_version', undefined, options)
-    ).map((output) => output.toString());
+    return (await this.callFunction('get_version', undefined, options)).map(
+      (output) => output.toString()
+    );
   }
 
   async getOwner(options?: ViewOptions): Promise<Result<AccountID, Error>> {
-    return (
-      await this.callFunction('get_owner', undefined, options)
-    ).andThen((output) => AccountID.parse(output.toString()));
+    return (await this.callFunction('get_owner', undefined, options)).andThen(
+      (output) => AccountID.parse(output.toString())
+    );
   }
 
   async getBridgeProvider(
@@ -316,9 +315,9 @@ export class Engine {
         //console.error(error); // DEBUG
         return Err('ERR_INVALID_TX');
       }
-      return (
-        await this.callMutativeFunction('submit', inputBytes)
-      ).map(({ output }) => ExecutionResult.decode(Buffer.from(output)));
+      return (await this.callMutativeFunction('submit', inputBytes)).map(
+        ({ output }) => ExecutionResult.decode(Buffer.from(output))
+      );
     } catch (error) {
       //console.error(error); // DEBUG
       return Err(error.message);
@@ -398,7 +397,7 @@ export class Engine {
       options
     );
 
-    return result.map(output => {
+    return result.map((output) => {
       return Address.parse(output.toString('hex')).unwrap();
     });
   }
@@ -415,7 +414,7 @@ export class Engine {
       options
     );
 
-    return result.map(output => {
+    return result.map((output) => {
       return AccountID.parse(output.toString('utf-8')).unwrap();
     });
   }

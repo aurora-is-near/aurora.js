@@ -41,7 +41,7 @@ export function intToHex(input: number | bigint): string {
 
 export function ethErc20ToNep141(
   tokenAddress: Address,
-  networkId: NetworkID,
+  networkId: NetworkID
 ): AccountID {
   const prefix = tokenAddress.toString().substring(2).toLowerCase();
   let suffix;
