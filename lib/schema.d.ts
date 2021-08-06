@@ -1,5 +1,7 @@
 /// <reference types="node" />
+import { Result } from '@hqoss/monads';
 import BN from 'bn.js';
+import { utils } from 'near-api-js';
 declare abstract class Assignable {
     encode(): Uint8Array;
 }
@@ -16,7 +18,56 @@ export declare class BeginChainArgs extends Assignable {
     chainID: Uint8Array;
     constructor(chainID: Uint8Array);
 }
-export declare class ExecutionResult extends Assignable {
+export declare class SubmitResult {
+    readonly result: SubmitResultV1 | LegacyExecutionResult;
+    constructor(result: SubmitResultV1 | LegacyExecutionResult);
+    output(): Result<Uint8Array, ExecutionError>;
+    static decode(input: Buffer): SubmitResult;
+}
+export declare type LegacyStatusFalse = 'LegacyStatusFalse';
+export declare type ExecutionError = RevertStatus | OutOfGas | OutOfFund | OutOfOffset | CallTooDeep | LegacyStatusFalse;
+export declare class SuccessStatus extends utils.enums.Assignable {
+    readonly output: Uint8Array;
+    constructor(args: {
+        output: Uint8Array;
+    });
+}
+export declare class RevertStatus extends utils.enums.Assignable {
+    readonly output: Uint8Array;
+    constructor(args: {
+        output: Uint8Array;
+    });
+}
+export declare class OutOfGas extends utils.enums.Assignable {
+}
+export declare class OutOfFund extends utils.enums.Assignable {
+}
+export declare class OutOfOffset extends utils.enums.Assignable {
+}
+export declare class CallTooDeep extends utils.enums.Assignable {
+}
+export declare class TransactionStatus extends utils.enums.Enum {
+    readonly success?: SuccessStatus;
+    readonly revert?: RevertStatus;
+    readonly outOfGas?: OutOfGas;
+    readonly outOfFund?: OutOfFund;
+    readonly outOfOffset?: OutOfOffset;
+    readonly callTooDeep?: CallTooDeep;
+}
+export declare class SubmitResultV1 extends Assignable {
+    kind: 'SubmitResultV1';
+    readonly status: TransactionStatus;
+    readonly gasUsed: number | bigint;
+    readonly logs: LogEvent[];
+    constructor(args: {
+        status: TransactionStatus;
+        gasUsed: number | bigint | BN;
+        logs: LogEvent[];
+    });
+    static decode(input: Buffer): SubmitResultV1;
+}
+export declare class LegacyExecutionResult extends Assignable {
+    kind: 'LegacyExecutionResult';
     readonly status: boolean;
     readonly gasUsed: number | bigint;
     readonly output: Uint8Array;
@@ -27,7 +78,7 @@ export declare class ExecutionResult extends Assignable {
         output: Uint8Array | number[];
         logs: LogEvent[];
     });
-    static decode(input: Buffer): ExecutionResult;
+    static decode(input: Buffer): LegacyExecutionResult;
 }
 export declare class FunctionCallArgs extends Assignable {
     contract: Uint8Array;
