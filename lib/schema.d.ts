@@ -27,15 +27,15 @@ export declare class SubmitResult {
 export declare type LegacyStatusFalse = 'LegacyStatusFalse';
 export declare type ExecutionError = RevertStatus | OutOfGas | OutOfFund | OutOfOffset | CallTooDeep | LegacyStatusFalse;
 export declare class SuccessStatus extends utils.enums.Assignable {
-    readonly output: Uint8Array;
+    readonly output: Uint8Array | number[];
     constructor(args: {
-        output: Uint8Array;
+        output: Uint8Array | number[];
     });
 }
 export declare class RevertStatus extends utils.enums.Assignable {
-    readonly output: Uint8Array;
+    readonly output: Uint8Array | number[];
     constructor(args: {
-        output: Uint8Array;
+        output: Uint8Array | number[];
     });
 }
 export declare class OutOfGas extends utils.enums.Assignable {

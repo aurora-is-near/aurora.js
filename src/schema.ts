@@ -2,13 +2,12 @@
 
 import { Err, Ok, Result } from '@hqoss/monads';
 import BN from 'bn.js';
-import NEAR from 'near-api-js';
 import { utils } from 'near-api-js';
 import { bytesToHex } from './utils.js';
 
 abstract class Assignable {
   encode(): Uint8Array {
-    return NEAR.utils.serialize.serialize(SCHEMA, this);
+    return utils.serialize.serialize(SCHEMA, this);
   }
 }
 
@@ -44,7 +43,7 @@ export class SubmitResult {
     switch (this.result.kind) {
       case 'SubmitResultV1':
         if (this.result.status.success) {
-          return Ok(this.result.status.success.output);
+          return Ok(Buffer.from(this.result.status.success.output));
         } else if (this.result.status.revert) {
           return Err(this.result.status.revert);
         } else if (this.result.status.outOfFund) {
@@ -89,20 +88,20 @@ export type ExecutionError =
   | LegacyStatusFalse;
 
 export class SuccessStatus extends utils.enums.Assignable {
-  public readonly output: Uint8Array;
+  public readonly output: Uint8Array | number[];
 
-  constructor(args: { output: Uint8Array }) {
+  constructor(args: { output: Uint8Array | number[] }) {
     super(args);
-    this.output = args.output;
+    this.output = Buffer.from(args.output);
   }
 }
 
 export class RevertStatus extends utils.enums.Assignable {
-  public readonly output: Uint8Array;
+  public readonly output: Uint8Array | number[];
 
-  constructor(args: { output: Uint8Array }) {
+  constructor(args: { output: Uint8Array | number[] }) {
     super(args);
-    this.output = args.output;
+    this.output = Buffer.from(args.output);
   }
 }
 
@@ -140,7 +139,7 @@ export class SubmitResultV1 extends Assignable {
   }
 
   static decode(input: Buffer): SubmitResultV1 {
-    return NEAR.utils.serialize.deserialize(SCHEMA, SubmitResultV1, input);
+    return utils.serialize.deserialize(SCHEMA, SubmitResultV1, input);
   }
 }
 
@@ -167,11 +166,7 @@ export class LegacyExecutionResult extends Assignable {
   }
 
   static decode(input: Buffer): LegacyExecutionResult {
-    return NEAR.utils.serialize.deserialize(
-      SCHEMA,
-      LegacyExecutionResult,
-      input
-    );
+    return utils.serialize.deserialize(SCHEMA, LegacyExecutionResult, input);
   }
 }
 
@@ -363,7 +358,7 @@ const SCHEMA = new Map<Function, any>([
     {
       kind: 'struct',
       fields: [
-        ['status', [TransactionStatus]],
+        ['status', TransactionStatus],
         ['gasUsed', 'u64'],
         ['logs', [LogEvent]],
       ],
