@@ -303,7 +303,6 @@ const SCHEMA = new Map<Function, any>([
       values: [
         ['success', SuccessStatus],
         ['revert', RevertStatus],
-        ['revert', RevertStatus],
         ['outOfGas', OutOfGas],
         ['outOfFund', OutOfFund],
         ['outOfOffset', OutOfOffset],
