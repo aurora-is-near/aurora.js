@@ -3,7 +3,7 @@ import { AccountID, Address } from './account.js';
 import { BlockHash, BlockHeight, BlockID, BlockOptions, BlockProxy } from './block.js';
 import { KeyStore } from './key_store.js';
 import { Quantity, Result, U256 } from './prelude.js';
-import { ExecutionResult } from './schema.js';
+import { SubmitResult } from './schema.js';
 import { TransactionID } from './transaction.js';
 import NEAR from 'near-api-js';
 export { getAddress as parseAddress } from '@ethersproject/address';
@@ -87,7 +87,7 @@ export declare class Engine {
     getChainID(options?: ViewOptions): Promise<Result<ChainID, Error>>;
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
-    submit(input: Uint8Array | string): Promise<Result<ExecutionResult, Error>>;
+    submit(input: Uint8Array | string): Promise<Result<SubmitResult, Error>>;
     view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array, Error>>;
     getCode(address: Address, options?: ViewOptions): Promise<Result<Bytecode, Error>>;
     getBalance(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;

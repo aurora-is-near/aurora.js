@@ -3,7 +3,7 @@
 import { AccountID, Address } from './account.js';
 import NEAR, { NEARTransaction } from './near.js';
 import { None, Option, Some, U64, U256 } from './prelude.js';
-import { ExecutionResult } from './schema.js';
+import { SubmitResult } from './schema.js';
 import { base58ToBytes, base58ToHex, bytesToHex, intToHex } from './utils.js';
 
 import { parse as parseRawTransaction } from '@ethersproject/transactions';
@@ -54,7 +54,7 @@ export class Transaction {
     public readonly s?: U256,
     public readonly from?: Address,
     public readonly hash?: string,
-    public readonly result?: ExecutionResult,
+    public readonly result?: SubmitResult,
     public readonly near?: NEARTransaction
   ) {}
 
@@ -99,7 +99,7 @@ export class Transaction {
         'base64'
       );
       const receiptIDs = outcome.transaction_outcome?.outcome?.receipt_ids;
-      const executionResult = ExecutionResult.decode(outcomeBuffer); // throws BorshError
+      const executionResult = SubmitResult.decode(outcomeBuffer); // throws BorshError
       return Some(
         new Transaction(
           transaction.nonce,

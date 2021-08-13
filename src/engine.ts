@@ -13,7 +13,7 @@ import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
 import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
 import {
-  ExecutionResult,
+  SubmitResult,
   FunctionCallArgs,
   GetStorageAtArgs,
   InitCallArgs,
@@ -249,15 +249,15 @@ export class Engine {
   }
 
   async getVersion(options?: ViewOptions): Promise<Result<string, Error>> {
-    return (await this.callFunction('get_version', undefined, options)).map(
-      (output) => output.toString()
-    );
+    return (
+      await this.callFunction('get_version', undefined, options)
+    ).map((output) => output.toString());
   }
 
   async getOwner(options?: ViewOptions): Promise<Result<AccountID, Error>> {
-    return (await this.callFunction('get_owner', undefined, options)).andThen(
-      (output) => AccountID.parse(output.toString())
-    );
+    return (
+      await this.callFunction('get_owner', undefined, options)
+    ).andThen((output) => AccountID.parse(output.toString()));
   }
 
   async getBridgeProvider(
@@ -281,9 +281,10 @@ export class Engine {
     const args = parseHexString(bytecode);
     const outcome = await this.callMutativeFunction('deploy_code', args);
     return outcome.map(({ output }) => {
-      const result = ExecutionResult.decode(Buffer.from(output));
-      // TODO: error handling if !result.status
-      return Address.parse(Buffer.from(result.output).toString('hex')).unwrap();
+      const result = SubmitResult.decode(Buffer.from(output));
+      return Address.parse(
+        Buffer.from(result.output().unwrap()).toString('hex')
+      ).unwrap();
     });
   }
 
@@ -302,7 +303,7 @@ export class Engine {
 
   async submit(
     input: Uint8Array | string
-  ): Promise<Result<ExecutionResult, Error>> {
+  ): Promise<Result<SubmitResult, Error>> {
     try {
       const inputBytes = this.prepareInput(input);
       try {
@@ -315,9 +316,9 @@ export class Engine {
         //console.error(error); // DEBUG
         return Err('ERR_INVALID_TX');
       }
-      return (await this.callMutativeFunction('submit', inputBytes)).map(
-        ({ output }) => ExecutionResult.decode(Buffer.from(output))
-      );
+      return (
+        await this.callMutativeFunction('submit', inputBytes)
+      ).map(({ output }) => SubmitResult.decode(Buffer.from(output)));
     } catch (error) {
       //console.error(error); // DEBUG
       return Err(error.message);

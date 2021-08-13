@@ -30,7 +30,16 @@ declare const _default: {
     Transaction: typeof transaction.Transaction;
     BeginBlockArgs: typeof schema.BeginBlockArgs;
     BeginChainArgs: typeof schema.BeginChainArgs;
-    ExecutionResult: typeof schema.ExecutionResult;
+    SubmitResult: typeof schema.SubmitResult;
+    SuccessStatus: typeof schema.SuccessStatus;
+    RevertStatus: typeof schema.RevertStatus;
+    OutOfGas: typeof schema.OutOfGas;
+    OutOfFund: typeof schema.OutOfFund;
+    OutOfOffset: typeof schema.OutOfOffset;
+    CallTooDeep: typeof schema.CallTooDeep;
+    TransactionStatus: typeof schema.TransactionStatus;
+    SubmitResultV1: typeof schema.SubmitResultV1;
+    LegacyExecutionResult: typeof schema.LegacyExecutionResult;
     FunctionCallArgs: typeof schema.FunctionCallArgs;
     GetChainID: typeof schema.GetChainID;
     GetStorageAtArgs: typeof schema.GetStorageAtArgs;
