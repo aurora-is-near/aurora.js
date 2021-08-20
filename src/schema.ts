@@ -236,7 +236,16 @@ export class NewCallArgs extends Assignable {
 export class InitCallArgs extends Assignable {
   constructor(
     public readonly prover_account: string,
-    public readonly eth_custodian_address: string
+    public readonly eth_custodian_address: string,
+    public readonly metadata: {
+      spec: string,
+      name: string,
+      symbol: string,
+      icon: string,
+      reference: string,
+      reference_hash: Uint8Array,
+      decimals: number,
+    }
   ) {
     super();
   }
