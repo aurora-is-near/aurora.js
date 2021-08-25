@@ -123,7 +123,24 @@ export declare class NewCallArgs extends Assignable {
 export declare class InitCallArgs extends Assignable {
     readonly prover_account: string;
     readonly eth_custodian_address: string;
-    constructor(prover_account: string, eth_custodian_address: string);
+    readonly metadata: {
+        spec: string;
+        name: string;
+        symbol: string;
+        icon: string;
+        reference: string;
+        reference_hash: Uint8Array;
+        decimals: number;
+    };
+    constructor(prover_account: string, eth_custodian_address: string, metadata: {
+        spec: string;
+        name: string;
+        symbol: string;
+        icon: string;
+        reference: string;
+        reference_hash: Uint8Array;
+        decimals: number;
+    });
 }
 export declare class RawU256 extends Assignable {
     readonly value: Uint8Array;
