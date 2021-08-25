@@ -19,6 +19,8 @@ import {
   InitCallArgs,
   NewCallArgs,
   ViewCallArgs,
+  TransactionStatus,
+  OutOfGas,
 } from './schema.js';
 import { TransactionID } from './transaction.js';
 
@@ -29,6 +31,7 @@ import { toBigIntBE, toBufferBE } from 'bigint-buffer';
 import { Buffer } from 'buffer';
 import BN from 'bn.js';
 import NEAR from 'near-api-js';
+import { ResErr } from '@hqoss/monads/dist/lib/result/result';
 
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
@@ -333,14 +336,24 @@ export class Engine {
     amount: Quantity,
     input: Uint8Array | string,
     options?: ViewOptions
-  ): Promise<Result<Uint8Array, Error>> {
+  ): Promise<Result<Uint8Array | number[] | ResErr<unknown, OutOfGas>, Error>> {
     const args = new ViewCallArgs(
       sender.toBytes(),
       address.toBytes(),
       toBufferBE(BigInt(amount), 32),
       this.prepareInput(input)
     );
-    return await this.callFunction('view', args.encode(), options);
+    const result = await this.callFunction('view', args.encode(), options);
+    return result.map((output) => {
+      const status = TransactionStatus.decode(output);
+      if (status.success !== undefined) return status.success.output;
+      else if(status.revert !== undefined) return Err(status.revert);
+      else if(status.outOfGas !== undefined) return Err(status.outOfGas);
+      else if(status.outOfFund !== undefined) return Err(status.outOfFund);
+      else if(status.outOfOffset !== undefined) return Err(status.outOfOffset);
+      else if(status.callTooDeep !== undefined) return Err(status.callTooDeep);   
+      else return Err("Failed to retrieve data from the contract");
+  });
   }
 
   async getCode(
