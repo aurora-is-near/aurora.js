@@ -53,6 +53,7 @@ export declare class TransactionStatus extends utils.enums.Enum {
     readonly outOfFund?: OutOfFund;
     readonly outOfOffset?: OutOfOffset;
     readonly callTooDeep?: CallTooDeep;
+    static decode(input: Buffer): TransactionStatus;
 }
 export declare class SubmitResultV1 extends Assignable {
     kind: 'SubmitResultV1';
