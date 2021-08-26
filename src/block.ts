@@ -179,7 +179,9 @@ export class BlockProxy {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toJSON(): any {
-    return exportJSON(this.getMetadata() as unknown as Record<string, unknown>);
+    return exportJSON(
+      (this.getMetadata() as unknown) as Record<string, unknown>
+    );
   }
 }
 

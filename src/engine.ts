@@ -160,13 +160,13 @@ export class Engine {
       given_ft_metadata.icon || default_ft_metadata.icon,
       given_ft_metadata.reference || default_ft_metadata.reference,
       given_ft_metadata.reference_hash || default_ft_metadata.reference_hash,
-      given_ft_metadata.decimals || default_ft_metadata.decimals,
-    )
+      given_ft_metadata.decimals || default_ft_metadata.decimals
+    );
     // default values are the testnet values
     const connectorArgs = new InitCallArgs(
       options.prover || 'prover.ropsten.testnet',
       options.ethCustodian || '9006a6D7d08A388Eeea0112cc1b6b6B15a4289AF',
-      ft_metadata,
+      ft_metadata
     );
 
     // TODO: this should be able to be a single transaction with multiple actions,
