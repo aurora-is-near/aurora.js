@@ -117,6 +117,10 @@ export class TransactionStatus extends utils.enums.Enum {
   public readonly outOfFund?: OutOfFund;
   public readonly outOfOffset?: OutOfOffset;
   public readonly callTooDeep?: CallTooDeep;
+
+  static decode(input: Buffer): TransactionStatus {
+    return utils.serialize.deserialize(SCHEMA, TransactionStatus, input);
+  }
 }
 
 // New Borsh-encoded result from the `submit` method.
