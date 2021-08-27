@@ -19,6 +19,7 @@ import {
   InitCallArgs,
   NewCallArgs,
   ViewCallArgs,
+  FungibleTokenMetadata,
   TransactionStatus,
   OutOfGas,
 } from './schema.js';
@@ -153,10 +154,22 @@ export class Engine {
       options.bridgeProver || '',
       new BN(options.upgradeDelay || 0)
     );
+    const default_ft_metadata = FungibleTokenMetadata.default();
+    const given_ft_metadata = options.metadata || default_ft_metadata;
+    const ft_metadata = new FungibleTokenMetadata(
+      given_ft_metadata.spec || default_ft_metadata.spec,
+      given_ft_metadata.name || default_ft_metadata.name,
+      given_ft_metadata.symbol || default_ft_metadata.symbol,
+      given_ft_metadata.icon || default_ft_metadata.icon,
+      given_ft_metadata.reference || default_ft_metadata.reference,
+      given_ft_metadata.reference_hash || default_ft_metadata.reference_hash,
+      given_ft_metadata.decimals || default_ft_metadata.decimals
+    );
     // default values are the testnet values
     const connectorArgs = new InitCallArgs(
       options.prover || 'prover.ropsten.testnet',
-      options.ethCustodian || '9006a6D7d08A388Eeea0112cc1b6b6B15a4289AF'
+      options.ethCustodian || '9006a6D7d08A388Eeea0112cc1b6b6B15a4289AF',
+      ft_metadata
     );
 
     // TODO: this should be able to be a single transaction with multiple actions,
@@ -347,13 +360,13 @@ export class Engine {
     return result.map((output) => {
       const status = TransactionStatus.decode(output);
       if (status.success !== undefined) return status.success.output;
-      else if(status.revert !== undefined) return Err(status.revert);
-      else if(status.outOfGas !== undefined) return Err(status.outOfGas);
-      else if(status.outOfFund !== undefined) return Err(status.outOfFund);
-      else if(status.outOfOffset !== undefined) return Err(status.outOfOffset);
-      else if(status.callTooDeep !== undefined) return Err(status.callTooDeep);   
-      else return Err("Failed to retrieve data from the contract");
-  });
+      else if (status.revert !== undefined) return Err(status.revert);
+      else if (status.outOfGas !== undefined) return Err(status.outOfGas);
+      else if (status.outOfFund !== undefined) return Err(status.outOfFund);
+      else if (status.outOfOffset !== undefined) return Err(status.outOfOffset);
+      else if (status.callTooDeep !== undefined) return Err(status.callTooDeep);
+      else return Err('Failed to retrieve data from the contract');
+    });
   }
 
   async getCode(

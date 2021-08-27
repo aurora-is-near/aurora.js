@@ -121,10 +121,22 @@ export declare class NewCallArgs extends Assignable {
     readonly upgradeDelayBlocks: number | BN;
     constructor(chainID: Uint8Array, ownerID: string, bridgeProverID: string, upgradeDelayBlocks: number | BN);
 }
+export declare class FungibleTokenMetadata extends Assignable {
+    readonly spec: string;
+    readonly name: string;
+    readonly symbol: string;
+    readonly icon: string | null;
+    readonly reference: string | null;
+    readonly reference_hash: Uint8Array | null;
+    readonly decimals: number;
+    constructor(spec: string, name: string, symbol: string, icon: string | null, reference: string | null, reference_hash: Uint8Array | null, decimals: number);
+    static default(): FungibleTokenMetadata;
+}
 export declare class InitCallArgs extends Assignable {
     readonly prover_account: string;
     readonly eth_custodian_address: string;
-    constructor(prover_account: string, eth_custodian_address: string);
+    readonly metadata: FungibleTokenMetadata;
+    constructor(prover_account: string, eth_custodian_address: string, metadata: FungibleTokenMetadata);
 }
 export declare class RawU256 extends Assignable {
     readonly value: Uint8Array;
