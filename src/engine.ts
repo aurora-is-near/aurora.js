@@ -360,7 +360,7 @@ export class Engine {
     return result.map((output) => {
       const status = TransactionStatus.decode(output);
       if (status.success !== undefined) return status.success.output;
-      else if (status.revert !== undefined) return Err(status.revert);
+      else if (status.revert !== undefined) return status.revert.output;
       else if (status.outOfGas !== undefined) return Err(status.outOfGas);
       else if (status.outOfFund !== undefined) return Err(status.outOfFund);
       else if (status.outOfOffset !== undefined) return Err(status.outOfOffset);
