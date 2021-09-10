@@ -4,7 +4,7 @@ import { AccountID, Address } from './account.js';
 import NEAR, { NEARTransaction } from './near.js';
 import { None, Option, Some, U64, U256 } from './prelude.js';
 import { SubmitResult } from './schema.js';
-import { base58ToBytes, base58ToHex, hexToBytes, intToHex } from './utils.js';
+import { base58ToBytes, base58ToHex, bytesToHex, hexToBytes, intToHex } from './utils.js';
 
 import { parse as parseRawTransaction } from '@ethersproject/transactions';
 
@@ -143,7 +143,7 @@ export class Transaction {
       gas: intToHex(this.gasLimit),
       to: this.to.isSome() ? this.to.unwrap().toString() : null,
       value: intToHex(this.value),
-      input: this.data,
+      input: bytesToHex(this.data),
       v: this.v !== undefined ? intToHex(this.v) : undefined,
       r: this.r !== undefined ? intToHex(this.r) : undefined,
       s: this.s !== undefined ? intToHex(this.s) : undefined,
