@@ -4,7 +4,13 @@ import { AccountID, Address } from './account.js';
 import NEAR, { NEARTransaction } from './near.js';
 import { None, Option, Some, U64, U256 } from './prelude.js';
 import { SubmitResult } from './schema.js';
-import { base58ToBytes, base58ToHex, bytesToHex, hexToBytes, intToHex } from './utils.js';
+import {
+  base58ToBytes,
+  base58ToHex,
+  bytesToHex,
+  hexToBytes,
+  intToHex,
+} from './utils.js';
 
 import { parse as parseRawTransaction } from '@ethersproject/transactions';
 
