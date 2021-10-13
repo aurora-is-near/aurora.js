@@ -33,14 +33,34 @@ export class BeginChainArgs extends Assignable {
 }
 
 export class SubmitResult {
-  public readonly result: SubmitResultV1 | LegacyExecutionResult;
+  public readonly result:
+    | SubmitResultV2
+    | SubmitResultV1
+    | LegacyExecutionResult;
 
-  constructor(result: SubmitResultV1 | LegacyExecutionResult) {
+  constructor(result: SubmitResultV2 | SubmitResultV1 | LegacyExecutionResult) {
     this.result = result;
   }
 
   output(): Result<Uint8Array, ExecutionError> {
     switch (this.result.kind) {
+      case 'SubmitResultV2':
+        if (this.result.status.success) {
+          return Ok(Buffer.from(this.result.status.success.output));
+        } else if (this.result.status.revert) {
+          return Err(this.result.status.revert);
+        } else if (this.result.status.outOfFund) {
+          return Err(this.result.status.outOfFund);
+        } else if (this.result.status.outOfGas) {
+          return Err(this.result.status.outOfGas);
+        } else if (this.result.status.outOfOffset) {
+          return Err(this.result.status.outOfOffset);
+        } else if (this.result.status.callTooDeep) {
+          return Err(this.result.status.callTooDeep);
+        } else {
+          // Should be unreachable since one enum variant should be assigned
+          return Err('LegacyStatusFalse');
+        }
       case 'SubmitResultV1':
         if (this.result.status.success) {
           return Ok(Buffer.from(this.result.status.success.output));
@@ -68,6 +88,14 @@ export class SubmitResult {
   }
 
   static decode(input: Buffer): SubmitResult {
+    // Note: SubmitResultV1 and LegacyExecutionResult binary formats
+    // will never start with the version byte of SubmitResultV2
+    // because SubmitResultV1 starts with an enum with fewer than 7
+    // variants and LegacyExecutionResult starts with a boolean.
+    if (input[0] == SubmitResultV2.VERSION) {
+      const v2 = SubmitResultV2.decode(input);
+      return new SubmitResult(v2);
+    }
     try {
       const v1 = SubmitResultV1.decode(input);
       return new SubmitResult(v1);
@@ -123,7 +151,34 @@ export class TransactionStatus extends utils.enums.Enum {
   }
 }
 
-// New Borsh-encoded result from the `submit` method.
+// Latest Borsh-encoded result from the `submit` method.
+export class SubmitResultV2 extends Assignable {
+  // discriminator to match on type in `SubmitResult`
+  kind: 'SubmitResultV2' = 'SubmitResultV2';
+  public static VERSION: 7 = 7;
+  public readonly version: 7;
+  public readonly status: TransactionStatus;
+  public readonly gasUsed: number | bigint;
+  public readonly logs: LogEventWithAddress[];
+
+  constructor(args: {
+    status: TransactionStatus;
+    gasUsed: number | bigint | BN;
+    logs: LogEventWithAddress[];
+  }) {
+    super();
+    this.version = 7;
+    this.status = args.status;
+    this.gasUsed = BigInt(args.gasUsed.toString());
+    this.logs = args.logs;
+  }
+
+  static decode(input: Buffer): SubmitResultV2 {
+    return utils.serialize.deserialize(SCHEMA, SubmitResultV2, input);
+  }
+}
+
+// Previous Borsh-encoded result from the `submit` method.
 export class SubmitResultV1 extends Assignable {
   // discriminator to match on type in `SubmitResult`
   kind: 'SubmitResultV1' = 'SubmitResultV1';
@@ -192,6 +247,24 @@ export class GetChainID extends Assignable {
 export class GetStorageAtArgs extends Assignable {
   constructor(public address: Uint8Array, public key: Uint8Array) {
     super();
+  }
+}
+
+// Borsh-encoded log for use in a latest `SubmitResult`.
+export class LogEventWithAddress extends Assignable {
+  public readonly address: Uint8Array;
+  public readonly topics: RawU256[];
+  public readonly data: Uint8Array;
+
+  constructor(args: {
+    address: Uint8Array | number[];
+    topics: RawU256[];
+    data: Uint8Array | number[];
+  }) {
+    super();
+    this.address = Buffer.from(args.address);
+    this.topics = args.topics;
+    this.data = Buffer.from(args.data);
   }
 }
 
@@ -385,6 +458,18 @@ const SCHEMA = new Map<Function, any>([
     },
   ],
   [
+    SubmitResultV2,
+    {
+      kind: 'struct',
+      fields: [
+        ['version', 'u8'],
+        ['status', TransactionStatus],
+        ['gasUsed', 'u64'],
+        ['logs', [LogEventWithAddress]],
+      ],
+    },
+  ],
+  [
     SubmitResultV1,
     {
       kind: 'struct',
@@ -425,6 +510,17 @@ const SCHEMA = new Map<Function, any>([
       fields: [
         ['address', [20]],
         ['key', [32]],
+      ],
+    },
+  ],
+  [
+    LogEventWithAddress,
+    {
+      kind: 'struct',
+      fields: [
+        ['address', [20]],
+        ['topics', [RawU256]],
+        ['data', ['u8']],
       ],
     },
   ],
