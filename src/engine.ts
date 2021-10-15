@@ -349,7 +349,7 @@ export class Engine {
     amount: Quantity,
     input: Uint8Array | string,
     options?: ViewOptions
-  ): Promise<Result<Uint8Array | number[] | ResErr<unknown, OutOfGas>, Error>> {
+  ): Promise<Result<Uint8Array | ResErr<unknown, OutOfGas>, Error>> {
     const args = new ViewCallArgs(
       sender.toBytes(),
       address.toBytes(),
@@ -359,8 +359,10 @@ export class Engine {
     const result = await this.callFunction('view', args.encode(), options);
     return result.map((output) => {
       const status = TransactionStatus.decode(output);
-      if (status.success !== undefined) return status.success.output;
-      else if (status.revert !== undefined) return status.revert.output;
+      if (status.success !== undefined)
+        return status.success.output as Uint8Array;
+      else if (status.revert !== undefined)
+        return status.revert.output as Uint8Array;
       else if (status.outOfGas !== undefined) return Err(status.outOfGas);
       else if (status.outOfFund !== undefined) return Err(status.outOfFund);
       else if (status.outOfOffset !== undefined) return Err(status.outOfOffset);

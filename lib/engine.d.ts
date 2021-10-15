@@ -89,7 +89,7 @@ export declare class Engine {
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
     submit(input: Uint8Array | string): Promise<Result<SubmitResult, Error>>;
-    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array | number[] | ResErr<unknown, OutOfGas>, Error>>;
+    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array | ResErr<unknown, OutOfGas>, Error>>;
     getCode(address: Address, options?: ViewOptions): Promise<Result<Bytecode, Error>>;
     getBalance(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
     getNonce(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
