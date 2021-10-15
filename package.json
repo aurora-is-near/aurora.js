@@ -36,6 +36,8 @@
   ],
   "scripts": {
     "build": "tsc",
+    "format": "prettier -w src",
+    "lint": "eslint test && eslint **/*.ts",
     "test": "jest"
   },
   "keywords": [
