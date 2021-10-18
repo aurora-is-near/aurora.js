@@ -3,6 +3,7 @@ export interface NetworkConfig {
     label: string;
     chainID: number;
     contractID: string;
+    firstBlock: number;
     nearEndpoint: string;
     web3Endpoint?: string;
     walletLink: string;

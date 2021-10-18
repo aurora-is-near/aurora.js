@@ -5,6 +5,7 @@ export interface NetworkConfig {
   label: string;
   chainID: number;
   contractID: string;
+  firstBlock: number;
   nearEndpoint: string;
   web3Endpoint?: string;
   walletLink: string;
@@ -26,6 +27,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       label: 'Localnet',
       chainID: 1313161556,
       contractID: 'aurora.test.near',
+      firstBlock: 0,
       nearEndpoint: 'http://127.0.0.1:3030',
       web3Endpoint: 'http://127.0.0.1:8545',
       walletLink: 'http://127.0.0.1:4000',
@@ -36,6 +38,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       label: 'Localnet',
       chainID: 1313161556,
       contractID: 'aurora.test.near',
+      firstBlock: 0,
       nearEndpoint: 'http://127.0.0.1:3030',
       web3Endpoint: 'http://127.0.0.1:8545',
       walletLink: 'http://127.0.0.1:4000',
@@ -46,6 +49,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       label: 'Betanet',
       chainID: 1313161556,
       contractID: 'aurora',
+      firstBlock: 22997030,
       nearEndpoint: 'https://rpc.betanet.near.org',
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.betanet.near.org',
@@ -56,6 +60,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       label: 'Testnet',
       chainID: 1313161555,
       contractID: 'aurora',
+      firstBlock: 47354108,
       nearEndpoint: 'https://rpc.testnet.near.org',
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.testnet.near.org',
@@ -66,6 +71,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       label: 'Mainnet',
       chainID: 1313161554,
       contractID: 'aurora',
+      firstBlock: 37157758,
       nearEndpoint: 'https://rpc.mainnet.near.org',
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.near.org',
