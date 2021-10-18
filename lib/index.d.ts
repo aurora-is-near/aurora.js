@@ -38,11 +38,13 @@ declare const _default: {
     OutOfOffset: typeof schema.OutOfOffset;
     CallTooDeep: typeof schema.CallTooDeep;
     TransactionStatus: typeof schema.TransactionStatus;
+    SubmitResultV2: typeof schema.SubmitResultV2;
     SubmitResultV1: typeof schema.SubmitResultV1;
     LegacyExecutionResult: typeof schema.LegacyExecutionResult;
     FunctionCallArgs: typeof schema.FunctionCallArgs;
     GetChainID: typeof schema.GetChainID;
     GetStorageAtArgs: typeof schema.GetStorageAtArgs;
+    LogEventWithAddress: typeof schema.LogEventWithAddress;
     LogEvent: typeof schema.LogEvent;
     MetaCallArgs: typeof schema.MetaCallArgs;
     NewCallArgs: typeof schema.NewCallArgs;

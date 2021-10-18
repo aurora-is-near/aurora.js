@@ -19,8 +19,8 @@ export declare class BeginChainArgs extends Assignable {
     constructor(chainID: Uint8Array);
 }
 export declare class SubmitResult {
-    readonly result: SubmitResultV1 | LegacyExecutionResult;
-    constructor(result: SubmitResultV1 | LegacyExecutionResult);
+    readonly result: SubmitResultV2 | SubmitResultV1 | LegacyExecutionResult;
+    constructor(result: SubmitResultV2 | SubmitResultV1 | LegacyExecutionResult);
     output(): Result<Uint8Array, ExecutionError>;
     static decode(input: Buffer): SubmitResult;
 }
@@ -54,6 +54,20 @@ export declare class TransactionStatus extends utils.enums.Enum {
     readonly outOfOffset?: OutOfOffset;
     readonly callTooDeep?: CallTooDeep;
     static decode(input: Buffer): TransactionStatus;
+}
+export declare class SubmitResultV2 extends Assignable {
+    kind: 'SubmitResultV2';
+    static VERSION: 7;
+    readonly version: 7;
+    readonly status: TransactionStatus;
+    readonly gasUsed: number | bigint;
+    readonly logs: LogEventWithAddress[];
+    constructor(args: {
+        status: TransactionStatus;
+        gasUsed: number | bigint | BN;
+        logs: LogEventWithAddress[];
+    });
+    static decode(input: Buffer): SubmitResultV2;
 }
 export declare class SubmitResultV1 extends Assignable {
     kind: 'SubmitResultV1';
@@ -93,6 +107,16 @@ export declare class GetStorageAtArgs extends Assignable {
     address: Uint8Array;
     key: Uint8Array;
     constructor(address: Uint8Array, key: Uint8Array);
+}
+export declare class LogEventWithAddress extends Assignable {
+    readonly address: Uint8Array;
+    readonly topics: RawU256[];
+    readonly data: Uint8Array;
+    constructor(args: {
+        address: Uint8Array | number[];
+        topics: RawU256[];
+        data: Uint8Array | number[];
+    });
 }
 export declare class LogEvent extends Assignable {
     readonly topics: RawU256[];

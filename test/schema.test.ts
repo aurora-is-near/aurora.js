@@ -14,7 +14,55 @@ import {
   OutOfOffset,
   FungibleTokenMetadata,
   InitCallArgs,
+  SubmitResultV2,
+  LogEventWithAddress,
 } from '../lib/schema.js';
+
+test('SubmitResult.decode binary format include address in logs', () => {
+  const expected = new SubmitResult(
+    new SubmitResultV2({
+      status: new TransactionStatus({
+        success: new SuccessStatus({
+          output: new Uint8Array([]),
+        }),
+      }),
+      gasUsed: 68586,
+      logs: [
+        new LogEventWithAddress({
+          address: hexToBytes('0x085a144bc0c2bd3b57c55fa1a5742620218832bc'),
+          topics: [
+            new RawU256(
+              hexToBytes(
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+              )
+            ),
+            new RawU256(
+              hexToBytes(
+                '0x0000000000000000000000000000000000000000000000000000000000000000'
+              )
+            ),
+            new RawU256(
+              hexToBytes(
+                '0x00000000000000000000000011e84de622b5728cea4f465a25cbebfea22957db'
+              )
+            ),
+          ],
+          data: hexToBytes(
+            '0x000000000000000000000000000000000000000000000000000000000000000a'
+          ),
+        }),
+      ],
+    })
+  );
+
+  const bytes = expected.result.encode();
+  const bytes_hex = bytesToHex(bytes);
+  const expected_hex =
+    '0x070000000000ea0b01000000000001000000085a144bc0c2bd3b57c55fa1a5742620218832bc03000000ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011e84de622b5728cea4f465a25cbebfea22957db20000000000000000000000000000000000000000000000000000000000000000000000a';
+  expect(bytes_hex).toBe(expected_hex);
+  const decoded = SubmitResult.decode(Buffer.from(bytes));
+  expect(decoded).toEqual(expected);
+});
 
 test('SubmitResult.decode new binary format -- Success', () => {
   const expected = new SubmitResult(
