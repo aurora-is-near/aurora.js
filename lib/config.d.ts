@@ -8,6 +8,7 @@ export interface NetworkConfig {
     web3Endpoint?: string;
     walletLink: string;
     explorerLink: string;
+    archiveURL?: string;
 }
 export declare enum NetworkID {
     Local = "local",

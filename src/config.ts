@@ -10,6 +10,7 @@ export interface NetworkConfig {
   web3Endpoint?: string;
   walletLink: string;
   explorerLink: string;
+  archiveURL?: string;
 }
 
 export enum NetworkID {
@@ -32,6 +33,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       web3Endpoint: 'http://127.0.0.1:8545',
       walletLink: 'http://127.0.0.1:4000',
       explorerLink: 'http://127.0.0.1:3019',
+      archiveURL: undefined,
     },
     localnet: {
       id: 'local',
@@ -43,6 +45,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       web3Endpoint: 'http://127.0.0.1:8545',
       walletLink: 'http://127.0.0.1:4000',
       explorerLink: 'http://127.0.0.1:3019',
+      archiveURL: undefined,
     },
     betanet: {
       id: 'betanet',
@@ -54,6 +57,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.betanet.near.org',
       explorerLink: 'https://explorer.betanet.near.org',
+      archiveURL: undefined,
     },
     testnet: {
       id: 'default', // N.B.
@@ -65,6 +69,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.testnet.near.org',
       explorerLink: 'https://explorer.testnet.near.org',
+      archiveURL: 'postgres://public_readonly:nearprotocol@35.184.214.98/testnet_explorer',
     },
     mainnet: {
       id: 'mainnet',
@@ -76,6 +81,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.near.org',
       explorerLink: 'https://explorer.near.org',
+      archiveURL: 'postgres://public_readonly:nearprotocol@104.199.89.51/mainnet_explorer',
     },
   })
 );
