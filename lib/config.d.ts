@@ -9,6 +9,7 @@ export interface NetworkConfig {
     walletLink: string;
     explorerLink: string;
     archiveURL?: string;
+    genesisDate?: string;
 }
 export declare enum NetworkID {
     Local = "local",

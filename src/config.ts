@@ -11,6 +11,7 @@ export interface NetworkConfig {
   walletLink: string;
   explorerLink: string;
   archiveURL?: string;
+  genesisDate?: string;
 }
 
 export enum NetworkID {
@@ -34,6 +35,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       walletLink: 'http://127.0.0.1:4000',
       explorerLink: 'http://127.0.0.1:3019',
       archiveURL: undefined,
+      genesisDate: undefined,
     },
     localnet: {
       id: 'local',
@@ -46,6 +48,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       walletLink: 'http://127.0.0.1:4000',
       explorerLink: 'http://127.0.0.1:3019',
       archiveURL: undefined,
+      genesisDate: undefined,
     },
     betanet: {
       id: 'betanet',
@@ -58,6 +61,7 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       walletLink: 'https://wallet.betanet.near.org',
       explorerLink: 'https://explorer.betanet.near.org',
       archiveURL: undefined,
+      genesisDate: undefined,
     },
     testnet: {
       id: 'default', // N.B.
@@ -69,7 +73,9 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.testnet.near.org',
       explorerLink: 'https://explorer.testnet.near.org',
-      archiveURL: 'postgres://public_readonly:nearprotocol@35.184.214.98/testnet_explorer',
+      archiveURL:
+        'postgres://public_readonly:nearprotocol@35.184.214.98/testnet_explorer',
+      genesisDate: '2020-07-31T03:39:42.911378Z',
     },
     mainnet: {
       id: 'mainnet',
@@ -81,7 +87,9 @@ export const NETWORKS: Map<string, NetworkConfig> = new Map(
       web3Endpoint: undefined, // TODO
       walletLink: 'https://wallet.near.org',
       explorerLink: 'https://explorer.near.org',
-      archiveURL: 'postgres://public_readonly:nearprotocol@104.199.89.51/mainnet_explorer',
+      archiveURL:
+        'postgres://public_readonly:nearprotocol@104.199.89.51/mainnet_explorer',
+      genesisDate: '2020-07-21T16:55:51.591948Z',
     },
   })
 );
