@@ -3,7 +3,7 @@
 import { AccountID, Address } from './account.js';
 
 import { existsSync, readFileSync } from 'fs';
-import NEAR from 'near-api-js';
+import * as NEAR from 'near-api-js';
 
 export const KeyPair = NEAR.KeyPair;
 
@@ -17,7 +17,7 @@ export interface KeyStoreEnv {
 }
 
 export class KeyStore extends MergeKeyStore {
-  protected constructor(
+  public constructor(
     public readonly networkID: string,
     keyStores: NEAR.keyStores.KeyStore[]
   ) {
