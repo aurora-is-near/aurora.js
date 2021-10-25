@@ -13,6 +13,7 @@ export declare class KeyStore extends MergeKeyStore {
     getAccounts(): Promise<string[]>;
     getSigningAccounts(): Promise<AccountID[]>;
     getSigningAddresses(): Promise<Address[]>;
+    loadKeyFiles(keyFilePaths: string[]): void;
     loadKeyFile(keyFilePath: string): void;
 }
 export {};

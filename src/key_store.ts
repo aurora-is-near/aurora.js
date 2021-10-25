@@ -63,6 +63,13 @@ export class KeyStore extends MergeKeyStore {
     );
   }
 
+  loadKeyFiles(keyFilePaths: string[]) {
+    for (const keyFilePath of keyFilePaths) {
+      const [accountID, keyPair] = _loadKeyFile(keyFilePath);
+      this.keyStores[0]!.setKey(this.networkID, accountID, keyPair); // FIXME
+    }
+  }
+
   loadKeyFile(keyFilePath: string) {
     const [accountID, keyPair] = _loadKeyFile(keyFilePath);
     this.keyStores[0]!.setKey(this.networkID, accountID, keyPair);
