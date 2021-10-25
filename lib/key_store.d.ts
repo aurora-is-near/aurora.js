@@ -13,7 +13,20 @@ export declare class KeyStore extends MergeKeyStore {
     getAccounts(): Promise<string[]>;
     getSigningAccounts(): Promise<AccountID[]>;
     getSigningAddresses(): Promise<Address[]>;
+    getKey(networkID: string, accountID: string): Promise<NEAR.KeyPair>;
     loadKeyFiles(keyFilePaths: string[]): void;
     loadKeyFile(keyFilePath: string): void;
+}
+export declare class InMemoryMultiKeyStore extends NEAR.keyStores.KeyStore {
+    readonly networkID: string;
+    private store;
+    constructor(networkID: string);
+    setKey(networkID: string, accountID: string, keyPair: NEAR.KeyPair): Promise<void>;
+    getKey(networkID: string, accountID: string): Promise<NEAR.KeyPair>;
+    removeKey(networkID: string, accountID: string): Promise<void>;
+    clear(): Promise<void>;
+    getNetworks(): Promise<string[]>;
+    getAccounts(networkID: string): Promise<string[]>;
+    toString(): string;
 }
 export {};

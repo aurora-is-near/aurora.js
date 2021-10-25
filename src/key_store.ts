@@ -25,7 +25,7 @@ export class KeyStore extends MergeKeyStore {
   }
 
   static load(networkID: string, env?: KeyStoreEnv): KeyStore {
-    const memKeyStore = new InMemoryKeyStore();
+    const memKeyStore = new InMemoryMultiKeyStore(networkID);
     if (env && env.HOME) {
       const devKeyStore = KeyStore.loadLocalKeys(env);
       const cliKeyStore = new UnencryptedFileSystemKeyStore(
@@ -64,6 +64,10 @@ export class KeyStore extends MergeKeyStore {
     );
   }
 
+  async getKey(networkID: string, accountID: string): Promise<NEAR.KeyPair> {
+    return super.getKey(networkID, accountID);
+  }
+
   loadKeyFiles(keyFilePaths: string[]) {
     for (const keyFilePath of keyFilePaths) {
       const [accountID, keyPair] = _loadKeyFile(keyFilePath);
@@ -81,4 +85,55 @@ function _loadKeyFile(keyFilePath: string) {
   const keyJSON = JSON.parse(readFileSync(keyFilePath, 'utf8'));
   const keyPair = KeyPair.fromString(keyJSON.private_key || keyJSON.secret_key);
   return [keyJSON.account_id, keyPair];
+}
+
+export class InMemoryMultiKeyStore extends NEAR.keyStores.KeyStore {
+  private store: Map<string, Set<NEAR.KeyPair>>;
+
+  public constructor(public readonly networkID: string) {
+    super();
+    this.store = new Map();
+  }
+
+  async setKey(
+    networkID: string,
+    accountID: string,
+    keyPair: NEAR.KeyPair
+  ): Promise<void> {
+    if (networkID != this.networkID) return;
+    const keyPairs = this.store.get(accountID) || new Set();
+    keyPairs.add(keyPair);
+    this.store.set(accountID, keyPairs);
+  }
+
+  async getKey(networkID: string, accountID: string): Promise<NEAR.KeyPair> {
+    if (networkID != this.networkID) return undefined!;
+    const keyPairs = this.store.get(accountID) || new Set();
+    for (const [keyPair, _] of keyPairs.entries()) {
+      return keyPair;
+    }
+    return undefined!;
+  }
+
+  async removeKey(networkID: string, accountID: string): Promise<void> {
+    if (networkID != this.networkID) return;
+    this.store.delete(accountID);
+  }
+
+  async clear(): Promise<void> {
+    this.store.clear();
+  }
+
+  async getNetworks(): Promise<string[]> {
+    return [this.networkID];
+  }
+
+  async getAccounts(networkID: string): Promise<string[]> {
+    if (networkID != this.networkID) return [];
+    return [...this.store.keys()];
+  }
+
+  toString(): string {
+    return 'InMemoryMultiKeyStore';
+  }
 }

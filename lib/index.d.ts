@@ -66,6 +66,7 @@ declare const _default: {
     isErr: typeof prelude.isErr;
     KeyPair: typeof import("near-api-js").KeyPair;
     KeyStore: typeof keyStore.KeyStore;
+    InMemoryMultiKeyStore: typeof keyStore.InMemoryMultiKeyStore;
     parseAddress: typeof engine.parseAddress;
     parseHexString: typeof engine.parseHexString;
     AddressState: typeof engine.AddressState;
