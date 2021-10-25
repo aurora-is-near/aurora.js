@@ -97,13 +97,15 @@ export class Transaction {
     functionCall: NEARFunctionCall
   ): Option<Transaction> {
     try {
+      const outcomeStatus = outcome.status as any;
+      if (outcomeStatus.Failure) {
+        console.error('Failure outcome:', outcomeStatus.Failure);
+        return None;
+      }
+      const outcomeBuffer = Buffer.from(outcomeStatus.SuccessValue, 'base64');
       const transaction = parseRawTransaction(
         Buffer.from(functionCall.args, 'base64')
       ); // throws Error
-      const outcomeBuffer = Buffer.from(
-        (outcome.status as any).SuccessValue,
-        'base64'
-      );
       const receiptIDs = outcome.transaction_outcome?.outcome?.receipt_ids;
       const executionResult = SubmitResult.decode(outcomeBuffer); // throws BorshError
       return Some(
