@@ -109,10 +109,9 @@ export class InMemoryMultiKeyStore extends NEAR.keyStores.KeyStore {
   async getKey(networkID: string, accountID: string): Promise<NEAR.KeyPair> {
     if (networkID != this.networkID) return undefined!;
     const keyPairs = this.store.get(accountID) || new Set();
-    for (const [keyPair, _] of keyPairs.entries()) {
-      return keyPair;
-    }
-    return undefined!;
+    if (keyPairs.size == 0) return undefined!;
+    const keyIndex = Math.floor(Math.random() * keyPairs.size);
+    return [...keyPairs][keyIndex]!;
   }
 
   async removeKey(networkID: string, accountID: string): Promise<void> {
