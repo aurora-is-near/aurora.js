@@ -19,9 +19,10 @@ export interface KeyStoreEnv {
 export class KeyStore extends MergeKeyStore {
   public constructor(
     public readonly networkID: string,
+    readonly keyStore: InMemoryMultiKeyStore,
     keyStores: NEAR.keyStores.KeyStore[]
   ) {
-    super(keyStores);
+    super([keyStore, ...keyStores]);
   }
 
   static load(networkID: string, env?: KeyStoreEnv): KeyStore {
@@ -31,9 +32,9 @@ export class KeyStore extends MergeKeyStore {
       const cliKeyStore = new UnencryptedFileSystemKeyStore(
         `${env.HOME}/.near-credentials`
       );
-      return new KeyStore(networkID, [memKeyStore, devKeyStore, cliKeyStore]);
+      return new KeyStore(networkID, memKeyStore, [devKeyStore, cliKeyStore]);
     } else {
-      return new KeyStore(networkID, [memKeyStore]);
+      return new KeyStore(networkID, memKeyStore, []);
     }
   }
 
@@ -64,6 +65,10 @@ export class KeyStore extends MergeKeyStore {
     );
   }
 
+  async reKey(): Promise<void> {
+    this.keyStore.reKey();
+  }
+
   async getKey(networkID: string, accountID: string): Promise<NEAR.KeyPair> {
     return super.getKey(networkID, accountID);
   }
@@ -89,10 +94,15 @@ function _loadKeyFile(keyFilePath: string) {
 
 export class InMemoryMultiKeyStore extends NEAR.keyStores.KeyStore {
   private store: Map<string, Set<NEAR.KeyPair>>;
+  private reKeyCounter = 0;
 
   public constructor(public readonly networkID: string) {
     super();
     this.store = new Map();
+  }
+
+  async reKey(): Promise<void> {
+    this.reKeyCounter += 1;
   }
 
   async setKey(
@@ -110,7 +120,7 @@ export class InMemoryMultiKeyStore extends NEAR.keyStores.KeyStore {
     if (networkID != this.networkID) return undefined!;
     const keyPairs = this.store.get(accountID) || new Set();
     if (keyPairs.size == 0) return undefined!;
-    const keyIndex = Math.floor(Math.random() * keyPairs.size);
+    const keyIndex = this.reKeyCounter % keyPairs.size;
     return [...keyPairs][keyIndex]!;
   }
 

@@ -521,6 +521,7 @@ export class Engine {
     methodName: string,
     args?: Uint8Array
   ): Promise<Result<TransactionOutcome, Error>> {
+    this.keyStore.reKey();
     const gas = new BN('300000000000000'); // TODO?
     try {
       const result = await this.signer.functionCall(

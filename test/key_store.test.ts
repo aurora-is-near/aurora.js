@@ -7,11 +7,11 @@ const NETWORK_ID = 'mainnet';
 const keyPair1 = NEAR.utils.key_pair.KeyPairEd25519.fromRandom();
 const keyPair2 = NEAR.utils.key_pair.KeyPairEd25519.fromRandom();
 let memKeyStore = new InMemoryMultiKeyStore(NETWORK_ID);
-let keyStore = new KeyStore(NETWORK_ID, [memKeyStore]);
+let keyStore = new KeyStore(NETWORK_ID, memKeyStore, []);
 
 beforeEach(() => {
   memKeyStore = new InMemoryMultiKeyStore(NETWORK_ID);
-  keyStore = new KeyStore(NETWORK_ID, [memKeyStore]);
+  keyStore = new KeyStore(NETWORK_ID, memKeyStore, []);
 });
 
 test('KeyStore#getAccounts()', async () => {
@@ -39,6 +39,7 @@ test('InMemoryMultiKeyStore#getKey() x2', async () => {
   for (let i = 0; i < 100; i++) {
     const key = (await keyStore.getKey(NETWORK_ID, 'a')).toString();
     results.set(key, (results.get(key) || 0) + 1);
+    keyStore.reKey();
   }
   expect(results.get(keyPair1.toString())).toBeGreaterThan(30);
   expect(results.get(keyPair2.toString())).toBeGreaterThan(30);
