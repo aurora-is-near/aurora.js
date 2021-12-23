@@ -85,12 +85,9 @@ export class BlockProxy {
       let outcomes: NEAR.providers.FinalExecutionOutcome[] = [];
       if (options) {
         if (options.chunks || options.transactions) {
-          const chunk_mask: boolean[] = block.header.chunk_mask;
-
-          const requests = (block.chunks as any[])
-            .filter((_: any, index) => chunk_mask[index])
-            .map((chunkHeader: any) => provider.chunk(chunkHeader.chunk_hash));
-
+          const requests = block.chunks.map(async (chunkHeader: any) => {
+            return await provider.chunk(chunkHeader.chunk_hash);
+          });
           chunks = await Promise.all(requests);
         }
         if (options.transactions === 'id') {
