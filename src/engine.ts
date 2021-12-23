@@ -231,17 +231,23 @@ export class Engine {
       const provider = this.near.connection.provider;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const block = (await provider.block(parseBlockID(blockID))) as any;
-      const requests = block.chunks.map(async (chunkHeader: any) => {
-        if (chunkHeader.tx_root == '11111111111111111111111111111111') {
-          return 0; // no transactions in this chunk
-        } else {
-          const chunk = await provider.chunk(chunkHeader.chunk_hash);
-          return chunk.transactions.length;
-        }
-      });
+
+      const chunk_mask: boolean[] = block.header.chunk_mask;
+
+      const requests = (block.chunks as any[])
+        .filter((_: any, index) => chunk_mask[index])
+        .map(async (chunkHeader: any) => {
+          if (chunkHeader.tx_root == '11111111111111111111111111111111') {
+            return 0; // no transactions in this chunk
+          } else {
+            const chunk = await provider.chunk(chunkHeader.chunk_hash);
+            return chunk.transactions.length;
+          }
+        });
+
       const counts = (await Promise.all(requests)) as number[];
       return Ok(counts.reduce((a, b) => a + b, 0));
-    } catch (error) {
+    } catch (error: any) {
       //console.error('Engine#getBlockTransactionCount', error);
       return Err(error.message);
     }
