@@ -5,7 +5,7 @@ import { KeyStore } from './key_store.js';
 import { Quantity, Result, U256 } from './prelude.js';
 import { SubmitResult, OutOfGas } from './schema.js';
 import { TransactionID } from './transaction.js';
-import NEAR from 'near-api-js';
+import * as NEAR from 'near-api-js';
 import { ResErr } from '@hqoss/monads/dist/lib/result/result';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';

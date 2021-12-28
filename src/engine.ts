@@ -31,7 +31,7 @@ import { parse as parseRawTransaction } from '@ethersproject/transactions';
 import { toBigIntBE, toBufferBE } from 'bigint-buffer';
 import { Buffer } from 'buffer';
 import BN from 'bn.js';
-import NEAR from 'near-api-js';
+import * as NEAR from 'near-api-js';
 import { ResErr } from '@hqoss/monads/dist/lib/result/result';
 
 export { getAddress as parseAddress } from '@ethersproject/address';
