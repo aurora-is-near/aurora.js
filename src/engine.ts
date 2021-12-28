@@ -382,6 +382,9 @@ export class Engine {
     options?: ViewOptions
   ): Promise<Result<Bytecode, Error>> {
     const args = address.toBytes();
+    if (typeof options === 'object' && options.block) {
+      options.block = ((options.block as number) + 1) as BlockID;
+    }
     return await this.callFunction('get_code', args, options);
   }
 
