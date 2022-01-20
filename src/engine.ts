@@ -550,15 +550,16 @@ export class Engine {
       //assert(error instanceof ServerTransactionError);
       switch (error?.type) {
         case 'FunctionCallError': {
+          const gasBurned = error?.transaction_outcome?.outcome?.gas_burnt || 0
           const errorKind = error?.kind?.ExecutionError;
           if (errorKind) {
             const errorCode = errorKind.replace(
               'Smart contract panicked: ',
               ''
             );
-            return Err(errorCode);
+            return Err(this.errorWithBurnedGas(errorCode, gasBurned));
           }
-          return Err(error.message);
+          return Err(this.errorWithBurnedGas(error.message, gasBurned));
         }
         case 'MethodNotFound':
           return Err(error.message);
@@ -575,4 +576,9 @@ export class Engine {
       return Buffer.from(parseHexString(args as string));
     return Buffer.from(args);
   }
+
+  private errorWithBurnedGas(message: string, gasBurned: number): string {
+    return `${message}|${gasBurned.toString()}`
+  }
+
 }
