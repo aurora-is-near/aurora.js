@@ -62,6 +62,10 @@ export declare class EngineState {
     storage: EngineStorage;
     constructor(storage?: EngineStorage);
 }
+export interface TransactionErrorDetails {
+    tx?: string;
+    gasBurned?: string;
+}
 export declare class Engine {
     readonly near: NEAR.Near;
     readonly keyStore: KeyStore;
@@ -100,5 +104,5 @@ export declare class Engine {
     protected callFunction(methodName: string, args?: Uint8Array, options?: ViewOptions): Promise<Result<Buffer, Error>>;
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;
-    private errorWithBurnedGas;
+    private errorWithDetails;
 }

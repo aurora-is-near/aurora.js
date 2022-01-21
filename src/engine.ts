@@ -101,6 +101,11 @@ export class EngineState {
   constructor(public storage: EngineStorage = new Map()) {}
 }
 
+export interface TransactionErrorDetails {
+  tx?: string;
+  gasBurned?: string;
+}
+
 const DEFAULT_NETWORK_ID = 'local';
 
 export class Engine {
@@ -550,16 +555,19 @@ export class Engine {
       //assert(error instanceof ServerTransactionError);
       switch (error?.type) {
         case 'FunctionCallError': {
-          const gasBurned = error?.transaction_outcome?.outcome?.gas_burnt || 0
+          const details: TransactionErrorDetails = {
+            tx: error?.transaction_outcome?.id,
+            gasBurned: error?.transaction_outcome?.outcome?.gas_burnt || 0,
+          };
           const errorKind = error?.kind?.ExecutionError;
           if (errorKind) {
             const errorCode = errorKind.replace(
               'Smart contract panicked: ',
               ''
             );
-            return Err(this.errorWithBurnedGas(errorCode, gasBurned));
+            return Err(this.errorWithDetails(errorCode, details));
           }
-          return Err(this.errorWithBurnedGas(error.message, gasBurned));
+          return Err(this.errorWithDetails(error.message, details));
         }
         case 'MethodNotFound':
           return Err(error.message);
@@ -577,8 +585,10 @@ export class Engine {
     return Buffer.from(args);
   }
 
-  private errorWithBurnedGas(message: string, gasBurned: number): string {
-    return `${message}|${gasBurned.toString()}`
+  private errorWithDetails(
+    message: string,
+    details: TransactionErrorDetails
+  ): string {
+    return `${message}|${JSON.stringify(details)}`;
   }
-
 }
