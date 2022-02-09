@@ -5,6 +5,8 @@ import BN from 'bn.js';
 import { utils } from 'near-api-js';
 import { bytesToHex } from './utils.js';
 
+export type GasBurned = number | bigint | undefined;
+
 abstract class Assignable {
   encode(): Uint8Array {
     return utils.serialize.serialize(SCHEMA, this);
@@ -103,6 +105,16 @@ export class SubmitResult {
       const legacy = LegacyExecutionResult.decode(input);
       return new SubmitResult(legacy);
     }
+  }
+}
+
+export class WrappedSubmitResult extends Assignable {
+  constructor(
+    public submitResult: SubmitResult,
+    public gasBurned: GasBurned,
+    public tx: string | undefined
+  ) {
+    super();
   }
 }
 
