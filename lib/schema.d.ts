@@ -2,6 +2,7 @@
 import { Result } from '@hqoss/monads';
 import BN from 'bn.js';
 import { utils } from 'near-api-js';
+export declare type GasBurned = number | bigint | undefined;
 declare abstract class Assignable {
     encode(): Uint8Array;
 }
@@ -17,6 +18,12 @@ export declare class BeginBlockArgs extends Assignable {
 export declare class BeginChainArgs extends Assignable {
     chainID: Uint8Array;
     constructor(chainID: Uint8Array);
+}
+export declare class WrappedSubmitResult extends Assignable {
+    submitResult: SubmitResult;
+    gasBurned: GasBurned;
+    tx: string | undefined;
+    constructor(submitResult: SubmitResult, gasBurned: GasBurned, tx: string | undefined);
 }
 export declare class SubmitResult {
     readonly result: SubmitResultV2 | SubmitResultV1 | LegacyExecutionResult;

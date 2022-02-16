@@ -22,6 +22,8 @@ import {
   FungibleTokenMetadata,
   TransactionStatus,
   OutOfGas,
+  GasBurned,
+  WrappedSubmitResult,
 } from './schema.js';
 import { TransactionID } from './transaction.js';
 
@@ -45,6 +47,8 @@ export type Error = string;
 export interface TransactionOutcome {
   id: TransactionID;
   output: Uint8Array;
+  gasBurned?: GasBurned;
+  tx?: string;
 }
 
 export interface BlockInfo {
@@ -330,7 +334,7 @@ export class Engine {
 
   async submit(
     input: Uint8Array | string
-  ): Promise<Result<SubmitResult, Error>> {
+  ): Promise<Result<WrappedSubmitResult, Error>> {
     try {
       const inputBytes = this.prepareInput(input);
       try {
@@ -343,9 +347,15 @@ export class Engine {
         //console.error(error); // DEBUG
         return Err('ERR_INVALID_TX');
       }
-      return (
-        await this.callMutativeFunction('submit', inputBytes)
-      ).map(({ output }) => SubmitResult.decode(Buffer.from(output)));
+      return (await this.callMutativeFunction('submit', inputBytes)).map(
+        ({ output, gasBurned, tx }) => {
+          return new WrappedSubmitResult(
+            SubmitResult.decode(Buffer.from(output)),
+            gasBurned,
+            tx
+          );
+        }
+      );
     } catch (error) {
       //console.error(error); // DEBUG
       return Err(error.message);
@@ -551,6 +561,8 @@ export class Engine {
         return Ok({
           id: TransactionID.fromHex(result.transaction.hash),
           output: Buffer.from(result.status.SuccessValue, 'base64'),
+          tx: result?.transaction_outcome?.id,
+          gasBurned: result?.transaction_outcome?.outcome?.gas_burnt || 0,
         });
       }
       return Err(result.toString()); // FIXME: unreachable?
