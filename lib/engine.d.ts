@@ -66,7 +66,7 @@ export declare class EngineState {
 }
 export interface TransactionErrorDetails {
     tx?: string;
-    gasBurned?: string;
+    gasBurned?: GasBurned;
 }
 export declare class Engine {
     readonly near: NEAR.Near;
@@ -107,4 +107,5 @@ export declare class Engine {
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
     private prepareInput;
     private errorWithDetails;
+    private transactionGasBurned;
 }

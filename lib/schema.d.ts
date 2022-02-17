@@ -19,17 +19,17 @@ export declare class BeginChainArgs extends Assignable {
     chainID: Uint8Array;
     constructor(chainID: Uint8Array);
 }
-export declare class WrappedSubmitResult extends Assignable {
-    submitResult: SubmitResult;
-    gasBurned: GasBurned;
-    tx: string | undefined;
-    constructor(submitResult: SubmitResult, gasBurned: GasBurned, tx: string | undefined);
-}
 export declare class SubmitResult {
     readonly result: SubmitResultV2 | SubmitResultV1 | LegacyExecutionResult;
     constructor(result: SubmitResultV2 | SubmitResultV1 | LegacyExecutionResult);
     output(): Result<Uint8Array, ExecutionError>;
     static decode(input: Buffer): SubmitResult;
+}
+export declare class WrappedSubmitResult extends Assignable {
+    submitResult: SubmitResult;
+    gasBurned: GasBurned;
+    tx: string | undefined;
+    constructor(submitResult: SubmitResult, gasBurned: GasBurned, tx: string | undefined);
 }
 export declare type LegacyStatusFalse = 'LegacyStatusFalse';
 export declare type ExecutionError = RevertStatus | OutOfGas | OutOfFund | OutOfOffset | CallTooDeep | LegacyStatusFalse;

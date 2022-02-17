@@ -30,8 +30,8 @@ declare const _default: {
     Transaction: typeof transaction.Transaction;
     BeginBlockArgs: typeof schema.BeginBlockArgs;
     BeginChainArgs: typeof schema.BeginChainArgs;
-    WrappedSubmitResult: typeof schema.WrappedSubmitResult;
     SubmitResult: typeof schema.SubmitResult;
+    WrappedSubmitResult: typeof schema.WrappedSubmitResult;
     SuccessStatus: typeof schema.SuccessStatus;
     RevertStatus: typeof schema.RevertStatus;
     OutOfGas: typeof schema.OutOfGas;
