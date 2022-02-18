@@ -27,6 +27,7 @@ import {
 } from './schema.js';
 import { TransactionID } from './transaction.js';
 
+import { base58ToBytes } from './utils.js';
 import { defaultAbiCoder } from '@ethersproject/abi';
 import { arrayify as parseHexString } from '@ethersproject/bytes';
 import { parse as parseRawTransaction } from '@ethersproject/transactions';
@@ -107,7 +108,7 @@ export class EngineState {
 
 export interface TransactionErrorDetails {
   tx?: string;
-  gasBurned?: string;
+  gasBurned?: GasBurned;
 }
 
 const DEFAULT_NETWORK_ID = 'local';
@@ -558,11 +559,12 @@ export class Engine {
         typeof result.status === 'object' &&
         typeof result.status.SuccessValue === 'string'
       ) {
+        const transactionId = result?.transaction_outcome?.id;
         return Ok({
           id: TransactionID.fromHex(result.transaction.hash),
           output: Buffer.from(result.status.SuccessValue, 'base64'),
-          tx: result?.transaction_outcome?.id,
-          gasBurned: result?.transaction_outcome?.outcome?.gas_burnt || 0,
+          tx: transactionId,
+          gasBurned: await this.transactionGasBurned(transactionId),
         });
       }
       return Err(result.toString()); // FIXME: unreachable?
@@ -570,9 +572,10 @@ export class Engine {
       //assert(error instanceof ServerTransactionError);
       switch (error?.type) {
         case 'FunctionCallError': {
+          const transactionId = error?.transaction_outcome?.id;
           const details: TransactionErrorDetails = {
-            tx: error?.transaction_outcome?.id,
-            gasBurned: error?.transaction_outcome?.outcome?.gas_burnt || 0,
+            tx: transactionId,
+            gasBurned: await this.transactionGasBurned(transactionId),
           };
           const errorKind = error?.kind?.ExecutionError;
           if (errorKind) {
@@ -605,5 +608,23 @@ export class Engine {
     details: TransactionErrorDetails
   ): string {
     return `${message}|${JSON.stringify(details)}`;
+  }
+
+  private async transactionGasBurned(id: string): Promise<GasBurned> {
+    try {
+      const transactionStatus = await this.near.connection.provider.txStatus(
+        base58ToBytes(id),
+        this.contractID.toString()
+      );
+      const receiptsGasBurned = transactionStatus.receipts_outcome.reduce(
+        (sum, value) => sum + value.outcome.gas_burnt,
+        0
+      );
+      const transactionGasBurned =
+        transactionStatus.transaction_outcome.outcome.gas_burnt || 0;
+      return receiptsGasBurned + transactionGasBurned;
+    } catch (error) {
+      return 0;
+    }
   }
 }
