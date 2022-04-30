@@ -241,10 +241,46 @@ export class LegacyExecutionResult extends Assignable {
   }
 }
 
-// Borsh-encoded parameters for the `call` method.
-export class FunctionCallArgs extends Assignable {
-  constructor(public contract: Uint8Array, public input: Uint8Array) {
+export class CallArgs extends utils.enums.Enum {
+  public readonly functionCallArgsV2?: FunctionCallArgsV2;
+  public readonly functionCallArgsV1?: FunctionCallArgsV1;
+
+  static decode(input: Buffer): CallArgs {
+    return utils.serialize.deserialize(SCHEMA, CallArgs, input);
+  }
+
+  encode(): Uint8Array {
+    return utils.serialize.serialize(SCHEMA, this);
+  }
+}
+
+// New variant Borsh-encoded parameters for the `call` method.
+export class FunctionCallArgsV2 extends Assignable {
+  public readonly contract: Uint8Array;
+  public readonly value: Uint8Array;
+  public readonly input: Uint8Array;
+
+  constructor(args: {
+    contract: Uint8Array;
+    value: Uint8Array;
+    input: Uint8Array;
+  }) {
     super();
+    this.contract = Buffer.from(args.contract);
+    this.value = Buffer.from(args.value);
+    this.input = Buffer.from(args.input);
+  }
+}
+
+// Legacy Borsh-encoded parameters for the `call` method.
+export class FunctionCallArgsV1 extends Assignable {
+  public readonly contract: Uint8Array;
+  public readonly input: Uint8Array;
+
+  constructor(args: { contract: Uint8Array; input: Uint8Array }) {
+    super();
+    this.contract = Buffer.from(args.contract);
+    this.input = Buffer.from(args.input);
   }
 }
 
@@ -505,7 +541,29 @@ const SCHEMA = new Map<Function, any>([
     },
   ],
   [
-    FunctionCallArgs,
+    CallArgs,
+    {
+      kind: 'enum',
+      field: 'enum',
+      values: [
+        ['functionCallArgsV2', FunctionCallArgsV2],
+        ['functionCallArgsV1', FunctionCallArgsV1],
+      ],
+    },
+  ],
+  [
+    FunctionCallArgsV2,
+    {
+      kind: 'struct',
+      fields: [
+        ['contract', [20]],
+        ['value', [32]],
+        ['input', ['u8']],
+      ],
+    },
+  ],
+  [
+    FunctionCallArgsV1,
     {
       kind: 'struct',
       fields: [

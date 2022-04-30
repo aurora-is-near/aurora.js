@@ -1,3 +1,4 @@
+import { toBufferBE } from 'bigint-buffer';
 import { hexToBytes, bytesToHex } from '../lib/utils.js';
 import {
   SubmitResultV1,
@@ -16,7 +17,45 @@ import {
   InitCallArgs,
   SubmitResultV2,
   LogEventWithAddress,
+  FunctionCallArgsV1,
+  FunctionCallArgsV2,
+  CallArgs,
 } from '../lib/schema.js';
+
+test('CallArgs v1', () => {
+  const inner_args = new FunctionCallArgsV1({
+    contract: hexToBytes('0x24a0ff6eb0a5779b1c7bfbd520ec7b258c4e2fbd'),
+    input: hexToBytes('0xdeadbeef'),
+  });
+  const args = new CallArgs({ functionCallArgsV1: inner_args });
+  const bytes = args.encode();
+  const bytes_hex = bytesToHex(bytes);
+
+  const expected_hex =
+    '0x0124a0ff6eb0a5779b1c7bfbd520ec7b258c4e2fbd04000000deadbeef';
+  expect(expected_hex).toBe(bytes_hex);
+
+  const decoded = CallArgs.decode(Buffer.from(bytes));
+  expect(decoded).toEqual(args);
+});
+
+test('CallArgs v2', () => {
+  const inner_args = new FunctionCallArgsV2({
+    contract: hexToBytes('0xfd70354c0895a34ba001d9db2843fc59c809dbfa'),
+    input: hexToBytes('0xdeadbeef'),
+    value: toBufferBE(BigInt('123456789'), 32),
+  });
+  const args = new CallArgs({ functionCallArgsV2: inner_args });
+  const bytes = args.encode();
+  const bytes_hex = bytesToHex(bytes);
+
+  const expected_hex =
+    '0x00fd70354c0895a34ba001d9db2843fc59c809dbfa00000000000000000000000000000000000000000000000000000000075bcd1504000000deadbeef';
+  expect(expected_hex).toBe(bytes_hex);
+
+  const decoded = CallArgs.decode(Buffer.from(bytes));
+  expect(decoded).toEqual(args);
+});
 
 test('SubmitResult.decode binary format include address in logs', () => {
   const expected = new SubmitResult(
