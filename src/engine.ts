@@ -14,7 +14,7 @@ import { KeyStore } from './key_store.js';
 import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
 import {
   SubmitResult,
-  FunctionCallArgs,
+  FunctionCallArgsV2,
   GetStorageAtArgs,
   InitCallArgs,
   NewCallArgs,
@@ -24,6 +24,7 @@ import {
   OutOfGas,
   GasBurned,
   WrappedSubmitResult,
+  CallArgs,
 } from './schema.js';
 import { TransactionID } from './transaction.js';
 
@@ -322,12 +323,15 @@ export class Engine {
 
   async call(
     contract: Address,
-    input: Uint8Array | string
+    input: Uint8Array | string,
+    value?: number | bigint | string
   ): Promise<Result<Uint8Array, Error>> {
-    const args = new FunctionCallArgs(
-      contract.toBytes(),
-      this.prepareInput(input)
-    );
+    const inner_args = new FunctionCallArgsV2({
+      contract: contract.toBytes(),
+      value: this.prepareAmount(value),
+      input: this.prepareInput(input),
+    });
+    const args = new CallArgs({ functionCallArgsV2: inner_args });
     return (await this.callMutativeFunction('call', args.encode())).map(
       ({ output }) => output
     );
@@ -613,6 +617,13 @@ export class Engine {
           return Err(error.toString());
       }
     }
+  }
+
+  private prepareAmount(value?: number | bigint | string): Buffer {
+    if (typeof value === 'undefined') return toBufferBE(BigInt(0), 32);
+
+    const number = BigInt(value);
+    return toBufferBE(number, 32);
   }
 
   private prepareInput(args?: Uint8Array | string): Buffer {

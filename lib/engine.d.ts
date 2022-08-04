@@ -93,7 +93,7 @@ export declare class Engine {
     getBridgeProvider(options?: ViewOptions): Promise<Result<AccountID, Error>>;
     getChainID(options?: ViewOptions): Promise<Result<ChainID, Error>>;
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
-    call(contract: Address, input: Uint8Array | string): Promise<Result<Uint8Array, Error>>;
+    call(contract: Address, input: Uint8Array | string, value?: number | bigint | string): Promise<Result<Uint8Array, Error>>;
     submit(input: Uint8Array | string): Promise<Result<WrappedSubmitResult, Error>>;
     view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array | ResErr<unknown, OutOfGas>, Error>>;
     getCode(address: Address, options?: ViewOptions): Promise<Result<Bytecode, Error>>;
@@ -105,6 +105,7 @@ export declare class Engine {
     getStorage(): Promise<Result<EngineStorage, Error>>;
     protected callFunction(methodName: string, args?: Uint8Array, options?: ViewOptions): Promise<Result<Buffer, Error>>;
     protected callMutativeFunction(methodName: string, args?: Uint8Array): Promise<Result<TransactionOutcome, Error>>;
+    private prepareAmount;
     private prepareInput;
     private errorWithDetails;
     private transactionGasBurned;
