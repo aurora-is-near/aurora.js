@@ -45,7 +45,7 @@ export class TransactionID {
   }
 }
 
-const evmMethods = ['raw_call', 'submit']; // TODO: support all EVM methods
+const evmMethods = ['submit']; // TODO: support all EVM methods
 
 export class Transaction {
   constructor(
@@ -74,6 +74,12 @@ export class Transaction {
     }
 
     const actions = outcome.transaction.actions as NEARAction[];
+
+    // Ignore transactions with batched actions.
+    if (actions.length !== 1) {
+      return None;
+    }
+
     const action = actions.find(
       (action) =>
         action.FunctionCall &&
@@ -116,9 +122,9 @@ export class Transaction {
           Address.parse(transaction.to).ok(),
           BigInt(transaction.value.toString()),
           hexToBytes(transaction.data),
-          BigInt(transaction.v),
-          BigInt(transaction.r),
-          BigInt(transaction.s),
+          BigInt(transaction.v!),
+          BigInt(transaction.r!),
+          BigInt(transaction.s!),
           transaction.from
             ? Address.parse(transaction.from).unwrap()
             : undefined,

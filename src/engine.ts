@@ -361,7 +361,7 @@ export class Engine {
           );
         }
       );
-    } catch (error) {
+    } catch (error: any) {
       //console.error(error); // DEBUG
       return Err(error.message);
     }
@@ -591,7 +591,7 @@ export class Engine {
         });
       }
       return Err(result.toString()); // FIXME: unreachable?
-    } catch (error) {
+    } catch (error: any) {
       //assert(error instanceof ServerTransactionError);
       switch (error?.type) {
         case 'FunctionCallError': {

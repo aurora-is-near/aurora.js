@@ -60,7 +60,7 @@ declare const _default: {
     isLeft: typeof prelude.isLeft;
     isRight: typeof prelude.isRight;
     Some: typeof prelude.Some;
-    None: import("@hqoss/monads/dist/lib/option/option").OptNone<any>;
+    None: import("@hqoss/monads/dist/lib/option/option.js").OptNone<any>;
     isSome: typeof prelude.isSome;
     isNone: typeof prelude.isNone;
     Ok: typeof prelude.Ok;

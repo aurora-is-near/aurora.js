@@ -40,7 +40,7 @@ export class Address {
   static parse(id?: string): Result<Address, string> {
     try {
       return Ok(new Address(parseAddress(id!)));
-    } catch (error) {
+  } catch (error: any) {
       return Err(error.message);
     }
   }

@@ -67,7 +67,7 @@ export class BlockProxy {
     try {
       await provider.block(parseBlockID(id));
       return Ok(true);
-    } catch (error) {
+    } catch (error: any) {
       return Err(error.message);
     }
   }
@@ -124,7 +124,7 @@ export class BlockProxy {
           { hash: base58ToBytes(block.header.hash) }
         )
       );
-    } catch (error) {
+    } catch (error: any) {
       return Err(error.message);
     }
   }
