@@ -28,7 +28,7 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
   "typedocOptions": {
     "entryPoints": ["index.ts"],
