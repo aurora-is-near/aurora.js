@@ -302,7 +302,6 @@ export class GetStorageAtArgs extends Assignable {
 export class GetErc20FromNep141CallArgs extends Assignable {
   constructor(public nep141: Buffer) {
     super();
-    this.nep141 = nep141;
   }
 }
 
