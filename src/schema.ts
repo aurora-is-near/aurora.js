@@ -298,6 +298,14 @@ export class GetStorageAtArgs extends Assignable {
   }
 }
 
+// Borsh-encoded parameters for the `get_erc20_from_nep141` method.
+export class GetErc20FromNep141CallArgs extends Assignable {
+  constructor(public nep141: Buffer) {
+    super();
+    this.nep141 = nep141;
+  }
+}
+
 // Borsh-encoded log for use in a latest `SubmitResult`.
 export class LogEventWithAddress extends Assignable {
   public readonly address: Uint8Array;
@@ -581,6 +589,13 @@ const SCHEMA = new Map<Function, any>([
         ['address', [20]],
         ['key', [32]],
       ],
+    },
+  ],
+  [
+    GetErc20FromNep141CallArgs,
+    {
+      kind: 'struct',
+      fields: [['nep141', ['u8']]],
     },
   ],
   [
