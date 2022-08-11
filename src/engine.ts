@@ -16,6 +16,7 @@ import {
   SubmitResult,
   FunctionCallArgsV2,
   GetStorageAtArgs,
+  GetErc20FromNep141CallArgs,
   InitCallArgs,
   NewCallArgs,
   ViewCallArgs,
@@ -447,11 +448,13 @@ export class Engine {
     nep141: AccountID,
     options?: ViewOptions
   ): Promise<Result<Address, Error>> {
-    const args = Buffer.from(nep141.id, 'utf-8');
+    const args = new GetErc20FromNep141CallArgs(
+      Buffer.from(nep141.id, 'utf-8')
+    );
 
     const result = await this.callFunction(
       'get_erc20_from_nep141',
-      args,
+      args.encode(),
       options
     );
 

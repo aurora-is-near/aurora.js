@@ -47,6 +47,7 @@ declare const _default: {
     FunctionCallArgsV1: typeof schema.FunctionCallArgsV1;
     GetChainID: typeof schema.GetChainID;
     GetStorageAtArgs: typeof schema.GetStorageAtArgs;
+    GetErc20FromNep141CallArgs: typeof schema.GetErc20FromNep141CallArgs;
     LogEventWithAddress: typeof schema.LogEventWithAddress;
     LogEvent: typeof schema.LogEvent;
     MetaCallArgs: typeof schema.MetaCallArgs;

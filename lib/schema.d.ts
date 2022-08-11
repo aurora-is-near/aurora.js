@@ -134,6 +134,10 @@ export declare class GetStorageAtArgs extends Assignable {
     key: Uint8Array;
     constructor(address: Uint8Array, key: Uint8Array);
 }
+export declare class GetErc20FromNep141CallArgs extends Assignable {
+    nep141: Buffer;
+    constructor(nep141: Buffer);
+}
 export declare class LogEventWithAddress extends Assignable {
     readonly address: Uint8Array;
     readonly topics: RawU256[];
