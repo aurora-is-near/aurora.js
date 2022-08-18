@@ -1,12 +1,14 @@
 ---
 on:
   push:
+    branches:
+      - master
   pull_request:
 
-name: Lints
+name: Tests
 jobs:
-  lints:
-    name: ESLint & Prettier
+  tests:
+    name: Build & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,12 +21,11 @@ jobs:
         with:
           node-version: 16
           cache: pnpm
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run ESLint
-        run: pnpm eslint . --ext .ts,.tsx
+      - name: Build
+        run: pnpm build
 
-      - name: Run Prettier
-        run: pnpm prettier --check src
+      - name: Jest tests
+        run: pnpm test

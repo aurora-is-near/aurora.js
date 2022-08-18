@@ -31,7 +31,7 @@
     "allowSyntheticDefaultImports": true,
   },
   "typedocOptions": {
-    "entryPoints": ["index.ts"],
+    "entryPoints": ["src/index.ts"],
     "includeVersion": false,
     "hideGenerator": true
   }
