@@ -294,11 +294,11 @@ export class Engine {
     ).andThen((output) => AccountID.parse(output.toString()));
   }
 
-  async getBridgeProvider(
+  async getBridgeProver(
     options?: ViewOptions
   ): Promise<Result<AccountID, Error>> {
     return (
-      await this.callFunction('get_bridge_provider', undefined, options)
+      await this.callFunction('get_bridge_prover', undefined, options)
     ).andThen((output) => AccountID.parse(output.toString()));
   }
 

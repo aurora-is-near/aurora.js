@@ -91,7 +91,7 @@ export declare class Engine {
     getCoinbase(): Promise<Result<Address, Error>>;
     getVersion(options?: ViewOptions): Promise<Result<string, Error>>;
     getOwner(options?: ViewOptions): Promise<Result<AccountID, Error>>;
-    getBridgeProvider(options?: ViewOptions): Promise<Result<AccountID, Error>>;
+    getBridgeProver(options?: ViewOptions): Promise<Result<AccountID, Error>>;
     getChainID(options?: ViewOptions): Promise<Result<ChainID, Error>>;
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string, value?: number | bigint | string): Promise<Result<Uint8Array, Error>>;
