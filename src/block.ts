@@ -9,7 +9,7 @@ import { base58ToBytes, base58ToHex, exportJSON } from './utils.js';
 import { BlockHeader, ChunkResult } from 'near-api-js/lib/providers/provider';
 
 export type BlockHash = string;
-export type BlockHeight = Quantity;
+export type BlockHeight = number;
 export type BlockID = BlockTag | BlockHeight | BlockHash;
 export type BlockTag = 'earliest' | 'latest' | 'pending';
 

@@ -37,6 +37,7 @@ import { toBigIntBE, toBufferBE } from 'bigint-buffer';
 import { Buffer } from 'buffer';
 import BN from 'bn.js';
 import * as NEAR from 'near-api-js';
+import { CodeResult } from 'near-api-js/lib/providers/provider';
 import { ResErr } from '@hqoss/monads/dist/lib/result/result';
 
 export { getAddress as parseAddress } from '@ethersproject/address';
@@ -140,7 +141,8 @@ export class Engine {
 
     const keyStore = KeyStore.load(networkID, env);
     const near = new NEAR.Near({
-      deps: { keyStore },
+      headers: {},
+      keyStore,
       networkId: networkID,
       nodeUrl:
         options.endpoint || (env && env.NEAR_URL) || network.nearEndpoint,
@@ -534,7 +536,7 @@ export class Engine {
     let err;
     for (let i = 0, retries = 3; i < retries; i++) {
       try {
-        const result = await this.signer.connection.provider.query({
+        const result = await this.signer.connection.provider.query<CodeResult>({
           request_type: 'call_function',
           account_id: this.contractID.toString(),
           method_name: methodName,
@@ -542,8 +544,8 @@ export class Engine {
           finality:
             options?.block === undefined || options?.block === null
               ? 'final'
-              : undefined,
-          block_id:
+              : 'optimistic',
+          blockId:
             options?.block !== undefined && options?.block !== null
               ? options.block
               : undefined,
@@ -575,12 +577,12 @@ export class Engine {
     this.keyStore.reKey();
     const gas = new BN('300000000000000'); // TODO?
     try {
-      const result = await this.signer.functionCall(
-        this.contractID.toString(),
+      const result = await this.signer.functionCall({
+        contractId: this.contractID.toString(),
         methodName,
-        this.prepareInput(args),
-        gas
-      );
+        args: this.prepareInput(args),
+        gas,
+      });
       if (
         typeof result.status === 'object' &&
         typeof result.status.SuccessValue === 'string'
