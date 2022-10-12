@@ -68,7 +68,7 @@
     "@tsconfig/node14": "^1.0.0",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",
-    "@types/jest": "^27.0.0",
+    "@types/jest": "^29.1.2",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "bs58": "^4.0.1",
@@ -84,11 +84,6 @@
   },
   "jest": {
     "preset": "ts-jest/presets/default-esm",
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    },
     "testEnvironment": "node",
     "transform": {
       "^.+\\.[tj]sx?$": "ts-jest"

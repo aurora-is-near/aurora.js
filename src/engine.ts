@@ -541,10 +541,7 @@ export class Engine {
           account_id: this.contractID.toString(),
           method_name: methodName,
           args_base64: this.prepareInput(args).toString('base64'),
-          finality:
-            options?.block === undefined || options?.block === null
-              ? 'final'
-              : 'optimistic',
+          finality: 'final',
           blockId:
             options?.block !== undefined && options?.block !== null
               ? options.block
