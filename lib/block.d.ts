@@ -4,7 +4,7 @@ import { Quantity, Result } from './prelude.js';
 import { Transaction, TransactionID } from './transaction.js';
 import { BlockHeader, ChunkResult } from 'near-api-js/lib/providers/provider';
 export declare type BlockHash = string;
-export declare type BlockHeight = Quantity;
+export declare type BlockHeight = number;
 export declare type BlockID = BlockTag | BlockHeight | BlockHash;
 export declare type BlockTag = 'earliest' | 'latest' | 'pending';
 export interface BlockOptions {
