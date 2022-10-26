@@ -2,12 +2,13 @@
 import { AccountID, Address } from './account.js';
 import { BlockHash, BlockHeight, BlockID, BlockOptions, BlockProxy } from './block.js';
 import { KeyStore } from './key_store.js';
-import { Quantity, Result, U256 } from './prelude.js';
-import { OutOfGas, GasBurned, WrappedSubmitResult } from './schema.js';
+import { Quantity, U256 } from './prelude.js';
+import { Result } from '@sniptt/monads';
+import { ExecutionError, GasBurned, WrappedSubmitResult } from './schema.js';
 import { TransactionID } from './transaction.js';
 import { Buffer } from 'buffer';
 import * as NEAR from 'near-api-js';
-import { ResErr } from '@hqoss/monads/dist/lib/result/result';
+import { ResErr } from '@sniptt/monads/build/result/result';
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
 export declare type Bytecode = Uint8Array;
@@ -96,7 +97,7 @@ export declare class Engine {
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string, value?: number | bigint | string): Promise<Result<Uint8Array, Error>>;
     submit(input: Uint8Array | string): Promise<Result<WrappedSubmitResult, Error>>;
-    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array | ResErr<unknown, OutOfGas>, Error>>;
+    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<(Result<unknown, ExecutionError> | ResErr<unknown, ExecutionError>) | Uint8Array, Error>>;
     getCode(address: Address, options?: ViewOptions): Promise<Result<Bytecode, Error>>;
     getBalance(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
     getNonce(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;

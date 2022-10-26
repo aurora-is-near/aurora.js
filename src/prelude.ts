@@ -1,6 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-export * from '@hqoss/monads';
+export * from '@sniptt/monads';
 
 export type Quantity = number | bigint;
 export type U64 = number | bigint;

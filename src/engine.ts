@@ -11,7 +11,8 @@ import {
 } from './block.js';
 import { NETWORKS } from './config.js';
 import { KeyStore } from './key_store.js';
-import { Err, Ok, Quantity, Result, U256 } from './prelude.js';
+import { Quantity, U256 } from './prelude.js';
+import { Err, Ok, Result } from '@sniptt/monads'
 import {
   SubmitResult,
   FunctionCallArgsV2,
@@ -22,7 +23,7 @@ import {
   ViewCallArgs,
   FungibleTokenMetadata,
   TransactionStatus,
-  OutOfGas,
+  ExecutionError,
   GasBurned,
   WrappedSubmitResult,
   CallArgs,
@@ -38,7 +39,7 @@ import { Buffer } from 'buffer';
 import BN from 'bn.js';
 import * as NEAR from 'near-api-js';
 import { CodeResult } from 'near-api-js/lib/providers/provider';
-import { ResErr } from '@hqoss/monads/dist/lib/result/result';
+import { ResErr } from '@sniptt/monads/build/result/result';
 
 export { getAddress as parseAddress } from '@ethersproject/address';
 export { arrayify as parseHexString } from '@ethersproject/bytes';
@@ -378,7 +379,7 @@ export class Engine {
     amount: Quantity,
     input: Uint8Array | string,
     options?: ViewOptions
-  ): Promise<Result<Uint8Array | ResErr<unknown, OutOfGas>, Error>> {
+  ): Promise<Result<(Result<unknown, ExecutionError> | ResErr<unknown, ExecutionError>) | Uint8Array, Error>> {
     const args = new ViewCallArgs(
       sender.toBytes(),
       address.toBytes(),

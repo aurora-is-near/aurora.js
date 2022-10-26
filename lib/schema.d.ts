@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { Result } from '@hqoss/monads';
+import { Result } from '@sniptt/monads';
 import BN from 'bn.js';
 import { utils } from 'near-api-js';
 export declare type GasBurned = number | bigint | undefined;

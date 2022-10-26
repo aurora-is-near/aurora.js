@@ -6,7 +6,7 @@ specifiers:
   '@ethersproject/bytes': ^5.0.11
   '@ethersproject/keccak256': ^5.1.0
   '@ethersproject/transactions': ^5.1.1
-  '@hqoss/monads': ^0.4.0
+  '@sniptt/monads': ^0.5.10
   '@tsconfig/node14': ^1.0.0
   '@types/bn.js': ^5.1.0
   '@types/bs58': ^4.0.1
@@ -28,7 +28,7 @@ dependencies:
   '@ethersproject/abi': 5.7.0
   '@ethersproject/address': 5.7.0
   '@ethersproject/bytes': 5.7.0
-  '@hqoss/monads': 0.4.0
+  '@sniptt/monads': 0.5.10
   bigint-buffer: 1.1.5
   bn.js: 5.2.1
   near-api-js: 1.1.0
@@ -563,13 +563,6 @@ packages:
       '@ethersproject/strings': 5.7.0
     dev: false
 
-  /@hqoss/monads/0.4.0:
-    resolution: {integrity: sha512-TmNqu05uy6Du40fHuiJddlomb3NREx6h0AK/Wy+cu6TiTnyTUbD1sK7KhmAiJ/XEes8fP+QDAVJIoD0J4QTC4g==}
-    engines: {node: '>=12', npm: '>=6'}
-    dependencies:
-      tslib: 2.4.0
-    dev: false
-
   /@humanwhocodes/config-array/0.5.0:
     resolution: {integrity: sha512-FagtKFz74XrTl7y6HCzQpwDfXP0yhxe9lHLD1UZxjvZIcbyRz8zTFF/yYNfSfzU414eDwZ1SrO0Qvtyf+wFMQg==}
     engines: {node: '>=10.10.0'}
@@ -889,6 +882,11 @@ packages:
     dependencies:
       '@sinonjs/commons': 1.8.3
     dev: true
+
+  /@sniptt/monads/0.5.10:
+    resolution: {integrity: sha512-+agDOv9DpDV+9e2zN/Vmdk+XaqGx5Sykl0fqhqgiJ90r18nsBkxe44DmZ2sA1HYK+MSsBeZBiAr6pq4w+5uhfw==}
+    engines: {node: '>=14', npm: '>=7'}
+    dev: false
 
   /@tsconfig/node14/1.0.3:
     resolution: {integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==}
@@ -3254,10 +3252,6 @@ packages:
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
-
-  /tslib/2.4.0:
-    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
-    dev: false
 
   /tsutils/3.21.0_typescript@4.8.4:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}

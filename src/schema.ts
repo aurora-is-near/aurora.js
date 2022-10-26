@@ -1,6 +1,6 @@
 /* This is free and unencumbered software released into the public domain. */
 
-import { Err, Ok, Result } from '@hqoss/monads';
+import { Err, Ok, Result } from '@sniptt/monads';
 import BN from 'bn.js';
 import { utils } from 'near-api-js';
 import { bytesToHex } from './utils.js';
