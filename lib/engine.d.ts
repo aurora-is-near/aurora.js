@@ -3,7 +3,7 @@ import { AccountID, Address } from './account.js';
 import { BlockHash, BlockHeight, BlockID, BlockOptions, BlockProxy } from './block.js';
 import { KeyStore } from './key_store.js';
 import { Quantity, Result, U256 } from './prelude.js';
-import { OutOfGas, GasBurned, WrappedSubmitResult } from './schema.js';
+import { ExecutionError, GasBurned, WrappedSubmitResult } from './schema.js';
 import { TransactionID } from './transaction.js';
 import { Buffer } from 'buffer';
 import * as NEAR from 'near-api-js';
@@ -96,7 +96,7 @@ export declare class Engine {
     deployCode(bytecode: Bytecodeish): Promise<Result<Address, Error>>;
     call(contract: Address, input: Uint8Array | string, value?: number | bigint | string): Promise<Result<Uint8Array, Error>>;
     submit(input: Uint8Array | string): Promise<Result<WrappedSubmitResult, Error>>;
-    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array | ResErr<unknown, OutOfGas>, Error>>;
+    view(sender: Address, address: Address, amount: Quantity, input: Uint8Array | string, options?: ViewOptions): Promise<Result<Uint8Array | ResErr<ExecutionError, any>, Error>>;
     getCode(address: Address, options?: ViewOptions): Promise<Result<Bytecode, Error>>;
     getBalance(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;
     getNonce(address: Address, options?: ViewOptions): Promise<Result<U256, Error>>;

@@ -22,7 +22,7 @@ import {
   ViewCallArgs,
   FungibleTokenMetadata,
   TransactionStatus,
-  OutOfGas,
+  ExecutionError,
   GasBurned,
   WrappedSubmitResult,
   CallArgs,
@@ -378,7 +378,7 @@ export class Engine {
     amount: Quantity,
     input: Uint8Array | string,
     options?: ViewOptions
-  ): Promise<Result<Uint8Array | ResErr<unknown, OutOfGas>, Error>> {
+  ): Promise<Result<Uint8Array | ResErr<ExecutionError, any>, Error>> {
     const args = new ViewCallArgs(
       sender.toBytes(),
       address.toBytes(),
