@@ -15,7 +15,7 @@
   "compilerOptions": {
     "outDir": "./lib",
     "target": "es2020",
-    "module": "es2020",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "declaration": true,
     "isolatedModules": true,

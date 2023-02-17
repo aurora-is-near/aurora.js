@@ -2,7 +2,7 @@
   "name": "@aurora-is-near/engine",
   "version": "0.0.0",
   "description": "Aurora Engine client library for JavaScript.",
-  "type": "module",
+  "type": "commonjs",
   "module": "lib/index.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
